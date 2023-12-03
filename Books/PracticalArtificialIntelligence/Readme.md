@@ -30,7 +30,7 @@ Types of Architecture:
     so forth, and decisions.
  
 3) Touring Machines  and Interrap(integration of Ractional Reactive behaviour and planning)
-=============================================================================================
+===========================================================================================
 
    -Mix of Reactive & deliberative Architecture.
    -compose of three layers(modelling layer,planning layer and reactive layer).
