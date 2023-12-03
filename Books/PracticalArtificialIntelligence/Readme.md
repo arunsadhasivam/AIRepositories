@@ -23,7 +23,8 @@ Types of Architecture:
     - since no learning difficult for creating large systems
       
 2) Deliberative Architectures: BDI Architecture(Beliefs,Desires and Intentions)
-================================================================================
+===============================================================================
+
    -Goal based
    -deliberate architecture symbolic representation of the world via logic,graphs,discreet math and
     so forth, and decisions.
