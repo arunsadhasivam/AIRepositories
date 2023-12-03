@@ -11,7 +11,7 @@ Types of Architecture:
 =====================
 
 
-1) Reactive Architectures: subsumption Architecture
+1)Reactive Architectures: subsumption Architecture
 ====================================================
     - behaviour based
     - cleaning agent purely involves purely reactive and no learning.
@@ -22,14 +22,14 @@ Types of Architecture:
         "moveup"  - moveup
     - since no learning difficult for creating large systems
       
-2) Deliberative Architectures: BDI Architecture(Beliefs,Desires and Intentions)
+2.Deliberative Architectures: BDI Architecture(Beliefs,Desires and Intentions)
 ===============================================================================
 
    -Goal based
    -deliberate architecture symbolic representation of the world via logic,graphs,discreet math and
     so forth, and decisions.
  
-3) Touring Machines  and Interrap(integration of Ractional Reactive behaviour and planning)
+3.Touring Machines  and Interrap(integration of Ractional Reactive behaviour and planning)
 ===========================================================================================
 
    -Mix of Reactive & deliberative Architecture.
