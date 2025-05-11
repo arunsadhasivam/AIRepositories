@@ -4,9 +4,9 @@ main project:
 ===============
 
 
-  C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts>activate
+    C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts>activate
   
-  (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG>streamlit run RAGUI.py
+    (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG>streamlit run RAGUI.py
   
     You can now view your Streamlit app in your browser.
   
@@ -18,7 +18,7 @@ REST Project:
 ==============
 
 
-  (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python app.py
+    (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python app.py
   
    * Serving Flask app 'app'
    * Debug mode: on
