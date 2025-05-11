@@ -7,11 +7,12 @@ This application is designed to handle queries using a language model and a vect
 1. **Python 3**: Ensure you have Python 3.x installed.
 2. **Ollama**: This app requires Ollama to be installed and running locally. Follow the [Ollama installation guide](https://github.com/ollama/ollama/blob/main/README.md#quickstart) to set it up.
 
+
 ## Setup
 
 1. **Clone the repository**:
 ```bash
-$ git clone https://github.com/your-repo/local-rag.git
+$ git clone https://github.com/your-repo/LOCAL_RAG_REST_API.git
 $ cd local-rag
 ```
 
@@ -48,6 +49,15 @@ $ ollama serve
 ```bash
 $ python app.py
 ```
+
+## chroma db
+
+all uploaded embedding will be stored in the .env path
+
+  TEMP_FOLDER = 'C:\Arun\RAG_DATA\TEMP'
+  CHROMA_PATH = "C:\Arun\RAG_DATA\VECTOR_DB\CHROMA"
+
+
 
 
 ## Conclusion
