@@ -64,4 +64,4 @@ all uploaded embedding will be stored in the .env path
 
 
 ![image](https://github.com/user-attachments/assets/75dbd39a-888b-4999-a40c-6445080b7830)
-![image](https://github.com/user-attachments/assets/1e79348f-b1dd-4da1-98c8-c5ad85e52dac)
+ ![image](https://github.com/user-attachments/assets/94ea6ef3-4f9f-46e1-bc2d-cb96779ded15)
