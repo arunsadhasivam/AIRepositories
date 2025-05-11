@@ -13,6 +13,10 @@ main project:
     Local URL: http://localhost:8501
     Network URL: http://10.0.0.218:8501
 
+To get the installed package list for a project:
+================================================
+
+    pip freeze > requirements.txt.
 
 REST Project:
 ==============
