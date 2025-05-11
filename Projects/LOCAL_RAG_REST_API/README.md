@@ -50,16 +50,18 @@ $ ollama serve
 $ python app.py
 ```
 
+## Conclusion
+
+This app leverages a language model and a vector database to provide enhanced query handling capabilities. Ensure Ollama is running locally and follow the setup instructions to get started.
+
+
 ## chroma db
 
 all uploaded embedding will be stored in the .env path
 
-  TEMP_FOLDER = 'C:\Arun\RAG_DATA\TEMP'
-  CHROMA_PATH = "C:\Arun\RAG_DATA\VECTOR_DB\CHROMA"
+    TEMP_FOLDER = 'C:\Arun\RAG_DATA\TEMP'
+    CHROMA_PATH = "C:\Arun\RAG_DATA\VECTOR_DB\CHROMA"
 
 
-
-
-## Conclusion
-
-This app leverages a language model and a vector database to provide enhanced query handling capabilities. Ensure Ollama is running locally and follow the setup instructions to get started.
+![image](https://github.com/user-attachments/assets/75dbd39a-888b-4999-a40c-6445080b7830)
+![image](https://github.com/user-attachments/assets/1e79348f-b1dd-4da1-98c8-c5ad85e52dac)
