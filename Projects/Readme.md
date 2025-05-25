@@ -37,14 +37,14 @@ REST Project:
 
 Flow :
 ======
+![image](https://github.com/user-attachments/assets/39130850-e138-469b-9b97-557ef7ce5172)
 
-![image](https://github.com/user-attachments/assets/68db55ba-af7e-4a93-b1b2-94a28dbb325a)
-
+ 
 
       ------------------------------------------------------------------------------------------|-----------------------------------------
         LOCAL_RAG (project )                                                                    | LOCAL_RAG_REST_API
                                                                                                 |
-        RAGUI.py (streamlit) --> SearchController (controller) -- > SearchController(service)---|-> app.py(route_query)---> query.py(prompt)
+        RAGUI.py (streamlit) --> SearchController (controller) -- > SearchController(service)---|--s-> app.py(route_query)---> query.py(prompt)
                                                                                                 |                             |
       ------------------------------------------------------------------------------------------|-----------------------------|-----------                                                                                                                                                             |
                  Agent                                                                                           MathClassificationAgent.py
