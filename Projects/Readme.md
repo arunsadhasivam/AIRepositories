@@ -34,4 +34,24 @@ REST Project:
        * Restarting with stat
        * Debugger is active!
        * Debugger PIN: 124-060-967
-  
+
+Flow :
+======
+
+  ------------------------------------------------------------------------------------------|-----------------------------------------
+    LOCAL_RAG (project )                                                                    | LOCAL_RAG_REST_API
+                                                                                            |
+    RAGUI.py (streamlit) --> SearchController (controller) -- > SearchController(service)---|-> app.py(route_query)---> query.py(prompt)
+                                                                                            |                             |
+  ------------------------------------------------------------------------------------------|-----------------------------|-----------                                                                                                                                                             |
+             Agent                                                                                                  MathClassificationAgent.py
+                                                                                                                    (Agent)
+                                                                                                                          |
+ -------------------------------------------------------------------------------------------------------------------------|--------------------------                                                                                                                                              |                                                                                                                                                                        |
+                                                                                 --|---------if requires_math=true--------|--- false-----|
+                                                                                   |                                                     |
+                                                                                   |                                                     |
+                                                                            MathClassification(math_exectutor)                     Ollama LLM 
+                                                                                   |                                                     |
+                                                                                return response                                     return response
+                                                                                                                                             
