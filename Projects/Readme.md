@@ -38,6 +38,9 @@ REST Project:
 Flow :
 ======
 
+![image](https://github.com/user-attachments/assets/68db55ba-af7e-4a93-b1b2-94a28dbb325a)
+
+
       ------------------------------------------------------------------------------------------|-----------------------------------------
         LOCAL_RAG (project )                                                                    | LOCAL_RAG_REST_API
                                                                                                 |
