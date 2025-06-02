@@ -41,3 +41,6 @@ I'll help you create an HTTP server-client setup where the MCP server runs as a 
 - RESTful API design
 
 The server includes built-in tools (weather, calculator, time) and resources (system info, config) as examples. You can easily extend it with your own tools and resources.
+
+
+![image](https://github.com/user-attachments/assets/6ba8a2d5-58eb-4a8f-ba8f-0b74bcaed849)
