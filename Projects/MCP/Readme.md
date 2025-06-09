@@ -42,9 +42,11 @@ mcp endpoint -> /mcp/query?query=35353*352
           DEBUG:root:create math Agent called:::
           DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): us-api.i.posthog.com:443
           DEBUG:urllib3.connectionpool:https://us-api.i.posthog.com:443 "POST /batch/ HTTP/11" 200 15
-          C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Lib\site-packages\langchain_core\_api\deprecation.py:139: LangChainDeprecationWarning: The class `LLMChain` was       deprecated in LangChain 0.1.17 and will be removed in 1.0. Use RunnableSequence, e.g., `prompt | llm` instead.
+          C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Lib\site-packages\langchain_core\_api\deprecation.py:139: LangChainDeprecationWarning: 
+          The class `LLMChain` was       deprecated in LangChain 0.1.17 and will be removed in 1.0. Use RunnableSequence, e.g., `prompt | llm` instead.
             warn_deprecated(
-          C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Lib\site-packages\langchain_core\_api\deprecation.py:139: LangChainDeprecationWarning: The class `ZeroShotAgent` was deprecated in LangChain 0.1.0 and will be removed in 0.3.0. Use create_react_agent instead.
+          C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Lib\site-packages\langchain_core\_api\deprecation.py:139: LangChainDeprecationWarning:
+          The class `ZeroShotAgent` was deprecated in LangChain 0.1.0 and will be removed in 0.3.0. Use create_react_agent instead.
             warn_deprecated(
           DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:11434
           DEBUG:urllib3.connectionpool:http://localhost:11434 "POST /api/chat HTTP/11" 200 None
