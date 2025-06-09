@@ -35,7 +35,8 @@ mcp endpoint -> /mcp/query?query=35353*352
            * Running on http://127.0.0.1:8080
           INFO:werkzeug:Press CTRL+C to quit
           MCP Query APP:data::: {'query': '35353*352'}
-          INFO:chromadb.telemetry.product.posthog:Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+          INFO:chromadb.telemetry.product.posthog:Anonymized telemetry enabled. See                  
+          https://docs.trychroma.com/telemetry for more information.
           DEBUG:chromadb.config:Starting component System
           DEBUG:chromadb.api.segment:Collection LOCAL-RAG already exists, returning existing collection.
           DEBUG:root:Math tool initialization :INIT()
