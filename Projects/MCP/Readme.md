@@ -31,7 +31,6 @@ mcp endpoint -> /mcp/query?query=35353*352
           (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python rest.py
            * Serving Flask app 'rest'
            * Debug mode: off
-          INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
            * Running on http://127.0.0.1:8080
           INFO:werkzeug:Press CTRL+C to quit
           MCP Query APP:data::: {'query': '35353*352'}
