@@ -64,11 +64,33 @@ a43835d3817a   pgvector/pgvector:pg16          "docker-entrypoint.s…"   9 minu
 ```
 
 
-connect to db
+connect to db:
+================
+
+connect to postgres
 
 ```
 C:\Users\aruns>docker exec -it  VECTOR_NEW_RAG_DB psql -U admin -d admin
 psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "admin" does not exist
 ```
 
- 
+
+exec commands:
+===============
+
+
+ exec commands and list tables
+
+
+ ```
+postgres=# C:\Users\aruns>docker exec -it  VECTOR_NEW_RAG_DB psql -U postgres -d postgres
+psql (18.1 (Debian 18.1-1.pgdg13+2))
+Type "help" for help.
+postgres-# \dx
+                          List of installed extensions
+  Name   | Version | Default version |   Schema   |         Description
+---------+---------+-----------------+------------+------------------------------
+ plpgsql | 1.0     | 1.0             | pg_catalog | PL/pgSQL procedural language
+(1 row)
+
+postgres-#
