@@ -94,3 +94,14 @@ postgres-# \dx
 (1 row)
 
 postgres-#
+```
+
+
+install vc++ and x64 Native Tools Command Prompt for VS
+==========================================================
+
+
+- https://github.com/pgvector/pgvector
+
+
+<img width="3577" height="1835" alt="image" src="https://github.com/user-attachments/assets/df396671-cdc6-4e7c-919e-64f4a4c45af6" />
