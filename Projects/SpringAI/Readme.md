@@ -139,3 +139,11 @@ Step 2 : create extension:
 
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/687d0095-643f-4190-94a7-4397f3a6fbdb" />
+
+
+Step3 : verify vector works:
+=============================
+
+
+- see below it works (https://github.com/pgvector/pgvector)
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/3adee758-4044-41ad-acdc-20f41d18e699" />
