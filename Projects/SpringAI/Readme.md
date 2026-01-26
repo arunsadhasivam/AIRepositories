@@ -3,6 +3,20 @@ https://github.com/ThomasVitale/modular-rag
 https://github.com/ThomasVitale/llm-apps-java-spring-ai
 
 
+
+install vc++ tools for nmake:
+===============================
+
+- to compile the pgvector code
+
+
+
+<img width="3577" height="1835" alt="image" src="https://github.com/user-attachments/assets/df396671-cdc6-4e7c-919e-64f4a4c45af6" />
+
+
+
+
+
 Step 1:
 ========
 
@@ -117,3 +131,11 @@ C:\Arun\PGVECTOR\pgvector-master>
 
 
 ```
+
+
+
+Step 2 : create extension:
+=============================
+
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/687d0095-643f-4190-94a7-4397f3a6fbdb" />
