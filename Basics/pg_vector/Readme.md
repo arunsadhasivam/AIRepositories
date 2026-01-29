@@ -813,6 +813,4 @@ LIMIT 10;
 
 **Key Takeaway**: pgvector extends PostgreSQL with vector operations, but follows familiar SQL patterns!
 
----
 
-*Guide created for developers familiar with SQL who want to leverage pgvector for semantic search and similarity operations.*
