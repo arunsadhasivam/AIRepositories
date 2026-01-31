@@ -20,6 +20,7 @@ you can see embedding stored in db:
 ===================================
 
 - see in the screenshot vector extension added
+<img width="3822" height="2200" alt="image" src="https://github.com/user-attachments/assets/a13bbc7e-4e95-434a-9021-8da34dfcbb03" />
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/6e080fc5-74a1-4e30-b653-330caa50cd90" />
 
