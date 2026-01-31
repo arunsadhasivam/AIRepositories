@@ -19,8 +19,21 @@ Start ollama:
 
 - use **ollama serve** to start ollama
 
+
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/0c32d7df-71e7-49da-a265-e3412965a64c" />
 
+
+- make sure ollama has embedding model installed
+
+```
+C:\Users\aruns>ollama list
+NAME                       ID              SIZE      MODIFIED
+mistral:latest             6577803aa9a0    4.4 GB    6 months ago
+llama2:latest              78e26419b446    3.8 GB    7 months ago
+nomic-embed-text:latest    0a109f422b47    274 MB    10 months ago
+```
+
+C:\Users\aruns>
 
 To get the installed package list for a project:
 ================================================
