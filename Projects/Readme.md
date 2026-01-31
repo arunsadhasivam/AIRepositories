@@ -1,4 +1,4 @@
-
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/4b90f708-93a9-452b-9e53-02fc441cf45a" />
 
 main project:
 ===============
@@ -75,7 +75,12 @@ ollama
 local rag:
 ============
 
-![Uploading image.png…]()
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/af078138-3325-4b00-8b8b-3a55e093f9be" />
+
+
+Note:
+======
+- make sure requirements.txt is followed and versions are same.
 
 
 Flow :
