@@ -65,7 +65,6 @@ rest api
 =========
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7e50e647-73cf-4d38-88d9-e9350f7d311f" />
-<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/4b90f708-93a9-452b-9e53-02fc441cf45a" />
 
 ollama
 ======
