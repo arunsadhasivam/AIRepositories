@@ -11,6 +11,7 @@ main project:
   
     Local URL: http://localhost:8501
     Network URL: http://10.0.0.218:8501
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/4b90f708-93a9-452b-9e53-02fc441cf45a" />
 
 
 Start ollama:
