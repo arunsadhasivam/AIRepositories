@@ -13,6 +13,15 @@ main project:
     Local URL: http://localhost:8501
     Network URL: http://10.0.0.218:8501
 
+
+Start ollama:
+==============
+
+- use **ollama serve** to start ollama
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/0c32d7df-71e7-49da-a265-e3412965a64c" />
+
+
 To get the installed package list for a project:
 ================================================
 
@@ -38,7 +47,8 @@ REST Project:
 Flow :
 ======
 
- 
+
+ - ollama server to persist embedding.
 
       ------------------------------------------------------------------------------------------|-----------------------------------------
         LOCAL_RAG (project )                                                                    | LOCAL_RAG_REST_API
