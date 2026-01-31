@@ -1,7 +1,16 @@
-CREATE USER admin WITH PASSWORD 'admin';
--- Grant login permission
-ALTER ROLE admin WITH LOGIN;
--- Grant all privileges on database
-GRANT ALL PRIVILEGES ON DATABASE rag TO admin;
+create user and grant permission:
+==================================
 
-SELECT usename FROM pg_user;
+
+```
+
+-- Grant schema public permissions
+GRANT ALL ON SCHEMA public TO admin;
+
+-- Grant all table permissions
+GRANT ALL ON ALL TABLES IN SCHEMA public TO admin;
+
+-- Grant permissions on future tables as well
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO admin;
+```
