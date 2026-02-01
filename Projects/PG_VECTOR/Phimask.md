@@ -19,6 +19,9 @@ after mask:
 predio analyzer replace PII:
 ==============================
 
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/75cbeb40-5d05-432a-98a5-970a365ff684" />
+
+
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/e7eaf11f-b537-480f-abef-e26d939b3fd0" />
 
 
