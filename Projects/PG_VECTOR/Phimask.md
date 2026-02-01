@@ -11,3 +11,6 @@ after mask:
 
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/d1c6de3e-28b7-47bc-a802-151c807577a7" />
+
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/56321e71-af66-487b-b7ad-34178c3639a1" />
