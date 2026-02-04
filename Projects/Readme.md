@@ -34,6 +34,15 @@ nomic-embed-text:latest    0a109f422b47    274 MB    10 months ago
 
 C:\Users\aruns>
 
+Start Redis:
+=============
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/10148735-7c2f-4c94-8aec-f6677b0762e5" />
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/9c093a5b-e98a-41ce-885c-7c34da6ac24d" />
+![Uploading image.png…]()
+
+
+
 To get the installed package list for a project:
 ================================================
 
