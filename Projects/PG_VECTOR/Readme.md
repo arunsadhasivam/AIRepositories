@@ -5,6 +5,8 @@ Architecture Diagram:
 <img width="2160" height="917" alt="image" src="https://github.com/user-attachments/assets/595b090d-1e96-4a36-8e10-07a9662de22d" />
 
 
+#### PROJECT SETUP #####
+
 LOCAL_REST_API:
 ===============
 
