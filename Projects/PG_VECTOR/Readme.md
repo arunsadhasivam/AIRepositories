@@ -5,7 +5,13 @@ Architecture Diagram:
 <img width="2160" height="917" alt="image" src="https://github.com/user-attachments/assets/595b090d-1e96-4a36-8e10-07a9662de22d" />
 
 
-                                                        ## PROJECT SETUP ##
+                                                        
+
+<div align="center">
+  <h1>PROJECT SETUP</h1>
+
+
+
 
 LOCAL_REST_API:
 ===============
@@ -32,3 +38,6 @@ LOCAL_RAG:
 ==========
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/4f6b5ddb-6a2a-4a86-b48e-154ec92b6a32" />
+
+
+</div>
