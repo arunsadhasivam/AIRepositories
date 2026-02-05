@@ -2,7 +2,7 @@
 Architecture Diagram:
 =====================
 
-<img width="2205" height="877" alt="image" src="https://github.com/user-attachments/assets/45b25ab0-e806-4bec-96a4-fdd460dc47d1" />
+<img width="2170" height="982" alt="image" src="https://github.com/user-attachments/assets/ece53bdc-5d7a-4b5b-b557-b4fb87b45bd0" />
 
 
 LOCAL_REST_API:
