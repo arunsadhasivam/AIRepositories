@@ -1,4 +1,8 @@
 
+Architecture Diagram:
+=====================
+
+<img width="2205" height="877" alt="image" src="https://github.com/user-attachments/assets/45b25ab0-e806-4bec-96a4-fdd460dc47d1" />
 
 
 LOCAL_REST_API:
