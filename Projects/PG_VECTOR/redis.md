@@ -1,6 +1,4 @@
-use this tool for windows it is better
-
-https://www.memurai.com/
+for windows : https://www.memurai.com/
 
 
 Make sure run the merumai server first:
