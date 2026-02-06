@@ -137,7 +137,7 @@ Step 2 : create extension:
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/687d0095-643f-4190-94a7-4397f3a6fbdb" />
 
 
-Step3 : verify vector works:
+Step 3 : verify vector works:
 =============================
 
 
@@ -145,8 +145,8 @@ Step3 : verify vector works:
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/3adee758-4044-41ad-acdc-20f41d18e699" />
 
 
-create user and grant permission:
-==================================
+step 4:create user and grant permission:
+========================================
 
 
 ```
@@ -163,8 +163,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO admin;
 ```
 
 
-you can see embedding stored in db:
-===================================
+Step 5:you can see embedding stored in db:
+==============================================
 
 - see in the screenshot vector extension added
 <img width="3822" height="2200" alt="image" src="https://github.com/user-attachments/assets/a13bbc7e-4e95-434a-9021-8da34dfcbb03" />
