@@ -2,8 +2,28 @@
 Scripts to enable RLS:
 =======================
 
+```
+- GRANT = Can this role has permission to this the table
 
-               
+- RLS =  this role can they change this row
+
+
+app_admin → granted full table-level privileges, RLS policy allows all rows → full CRUD
+
+app_user → granted SELECT only, RLS policy allows all rows → read-only access
+
+
+
+```
+
+Scenario where RLS comes in:
+============================
+
+  - Scenario : where RLS plays major role - Suppose you give app_user GRANT INSERT by mistake:
+  - Without RLS =  app_user can now insert anywhere → security breach!
+  - With RLS → your policy still applies:
+
+
           -- =========================
           -- 1️⃣ Create roles
           -- =========================
@@ -20,9 +40,9 @@ Scripts to enable RLS:
           ALTER TABLE langchain_pg_embedding ENABLE ROW LEVEL SECURITY;
           ALTER TABLE langchain_pg_embedding FORCE ROW LEVEL SECURITY;
           
-          -- =========================
-          -- 4️⃣ Create policies
-          -- =========================
+          -- ========================================
+          -- 4️⃣ Create policies - ROW LEVEL SECURITY
+          -- ================================================
           
           -- Admin: full CRUD (SELECT, INSERT, UPDATE, DELETE)
           CREATE POLICY admin_full_access
@@ -44,11 +64,11 @@ Scripts to enable RLS:
           -- =========================
           REVOKE ALL ON langchain_pg_embedding FROM PUBLIC;
           
-          -- =========================
-          -- 6️⃣ Grant usage
-          -- =========================
+          -- ==============================================
+          -- 6️⃣ Grant usage - TABLE LEVEL SECURITY
+          -- =================================================
           -- Admin gets all rights (optional but recommended)
-          GRANT SELECT, INSERT, UPDATE, DELETE ON langchain_pg_embedding TO app_admin;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON langchain_pg_embedding TO app_admin; 
           
           -- Users get only read access
           GRANT SELECT ON langchain_pg_embedding TO app_user;
