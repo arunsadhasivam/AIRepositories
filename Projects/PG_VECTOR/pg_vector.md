@@ -162,6 +162,14 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO admin;
 ```
 
+Step5: row level security:
+==========================
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/eca8a0a6-6898-46ca-b716-4357b25440c1" />
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/eb4cbd7c-19c2-47e7-bd8e-192557247fa9" />
+
+
 
 Step 5:you can see embedding stored in db:
 ==============================================
