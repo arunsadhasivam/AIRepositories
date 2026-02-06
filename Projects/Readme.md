@@ -46,11 +46,6 @@ Start Redis:
 
 
 
-To get the installed package list for a project:
-================================================
-
-    pip freeze > requirements.txt.
-
 REST Project:
 ==============
 
