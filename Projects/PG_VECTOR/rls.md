@@ -24,6 +24,9 @@ Scenario where RLS comes in:
   - With RLS → your policy still applies:
 
 
+Scripts:
+=========
+
           -- =========================
           -- 1️⃣ Create roles
           -- =========================
