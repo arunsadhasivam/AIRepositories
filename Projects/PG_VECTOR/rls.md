@@ -19,7 +19,7 @@ app_user → granted SELECT only, RLS policy allows all rows → read-only acces
 Scenario where RLS comes in:
 ============================
 
-  - Scenario : where RLS plays major role - Suppose you give app_user GRANT INSERT by mistake:
+  - **Scenario** : where RLS plays major role - Suppose you give app_user **GRANT INSERT by mistake**
   - Without RLS =  app_user can now insert anywhere → security breach!
   - With RLS → your policy still applies:
 
