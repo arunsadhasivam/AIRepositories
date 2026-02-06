@@ -11,7 +11,7 @@ This application is designed to handle queries using a language model and a vect
 
 1. **Clone the repository**:
 ```bash
-$ git clone https://github.com/your-repo/local-rag.git
+$ git clone https://github.com/arunsadhasivam/AIRepositories/blob/master/Projects/LOCAL_RAG.git
 $ cd local-rag
 ```
 
