@@ -151,13 +151,13 @@ step 4:create user and grant permission:
 
 ```
 
--- Grant schema public permissions
+-- Grant schema public with all permissions
 GRANT ALL ON SCHEMA public TO admin;
 
--- Grant all table permissions
+-- Grant admin permission to all tables in public schema
 GRANT ALL ON ALL TABLES IN SCHEMA public TO admin;
 
--- Grant permissions on future tables as well
+-- Grant admin permissions as default for all tables on public schema
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO admin;
 ```
