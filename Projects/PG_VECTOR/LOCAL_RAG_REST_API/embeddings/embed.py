@@ -46,8 +46,8 @@ def embed(file):
     if file.filename != '' and file and allowed_file(file.filename):
         file_path = save_file(file)
         chunks = load_and_split_data(file_path)
-        #phi mask
-        chunks= phiMask(chunks)
+        #pii mask
+        chunks= createmask(chunks)
         db = get_vector_db()
         db.add_documents(chunks)
         #pgVector auto save
@@ -58,7 +58,7 @@ def embed(file):
 
     return False
 
-def phiMask(chunks):
+def createmask(chunks):
        # Mask PII in each chunk before inserting
     masked_chunks = []
     for chunk in chunks:
@@ -88,4 +88,5 @@ def mask_pii(text: str) -> str:
         analyzer_results=results
     ).text
     
+
     return masked_text
