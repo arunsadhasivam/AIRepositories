@@ -141,7 +141,7 @@ Step 3 : verify vector works:
 =============================
 
 
-- see below it works (https://github.com/pgvector/pgvector)
+- see below to confirm whether it works (https://github.com/pgvector/pgvector)
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/3adee758-4044-41ad-acdc-20f41d18e699" />
 
 
