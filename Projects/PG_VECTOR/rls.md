@@ -5,6 +5,7 @@ Scripts to enable RLS:
 
     ALTER TABLE langchain_pg_embedding ENABLE ROW LEVEL SECURITY;
     ALTER TABLE langchain_pg_embedding FORCE ROW LEVEL SECURITY;
+    
     CREATE POLICY read_all
     ON langchain_pg_embedding
     FOR SELECT
