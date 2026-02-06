@@ -171,7 +171,7 @@ Step5: row level security:
 
 
 
-Step 5:you can see embedding stored in db:
+Step 6:you can see embedding stored in db:
 ==============================================
 
 - see in the screenshot vector extension added
