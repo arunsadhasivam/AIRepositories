@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from langchain_community.document_loaders.pdf import UnstructuredPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from embeddings.get_vector_db import get_vector_db
-#phi masking
+#pii masking
 from langchain_core.documents import Document
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
@@ -90,3 +90,4 @@ def mask_pii(text: str) -> str:
     
 
     return masked_text
+
