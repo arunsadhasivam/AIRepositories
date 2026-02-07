@@ -33,6 +33,21 @@ Scripts:
           -- Superuser creates roles
           CREATE ROLE app_admin LOGIN PASSWORD 'admin';
           CREATE ROLE app_user  LOGIN PASSWORD 'user123';
+          GRANT CONNECT ON DATABASE rag TO app_admin;
+
+          -- grant permission to app_admin only to select,update,delete
+          GRANT SELECT, INSERT, UPDATE, DELETE ON langchain_pg_embedding TO app_admin;
+          GRANT SELECT ON langchain_pg_embedding TO app_user;
+
+          
+          GRANT SELECT, INSERT, UPDATE, DELETE ON public.langchain_pg_collection TO app_admin;
+          GRANT SELECT ON public.langchain_pg_collection TO app_user;
+
+           
+          GRANT SELECT ON langchain_pg_collection TO app_user;
+          -- Revoke default public access
+          REVOKE ALL ON langchain_pg_collection FROM PUBLIC;
+
           
           -- Optional: prevent superusers from default access
           REVOKE ALL ON DATABASE rag FROM PUBLIC;
@@ -75,3 +90,23 @@ Scripts:
           
           -- Users get only read access
           GRANT SELECT ON langchain_pg_embedding TO app_user;
+
+
+
+Login in as Admin:
+====================
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/036896fd-0bff-45f8-bf27-117fd2c4efef" />
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/bfcb6214-ab5c-404d-ab60-5b2f221f914c" />
+
+
+Failure:
+=========
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/3cad7a9a-205b-4c4a-9763-5d300d3bd704" />
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/669cdb96-d097-4c65-9316-3c27cff71fc1" />
+
+
+
