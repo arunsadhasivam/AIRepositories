@@ -11,10 +11,6 @@
 </div>
 
 
-<div align="center">
-  <h1>Architecture Diagram </h1>
-
-</div>
 Architecture Diagram:
 =====================
 
