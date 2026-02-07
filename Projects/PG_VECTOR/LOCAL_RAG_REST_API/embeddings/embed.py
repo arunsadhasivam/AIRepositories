@@ -11,6 +11,9 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 analyzer = AnalyzerEngine()
 anonymizer = AnonymizerEngine()
+from sqlalchemy.exc import ProgrammingError, OperationalError
+import psycopg2
+import logging
 
 
 TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
@@ -41,16 +44,28 @@ def load_and_split_data(file_path):
     return chunks
 
 # Main function to handle the embedding process
-def embed(file):
+def embed(file,user_role,pwd):
+    logging.info(f'::::: EMBEDDING TO VECTOR DB:BEGIN:::{user_role}')
     # Check if the file is valid, save it, load and split the data, add to the database, and remove the temporary file
     if file.filename != '' and file and allowed_file(file.filename):
         file_path = save_file(file)
         chunks = load_and_split_data(file_path)
         #pii mask
-        chunks= createmask(chunks)
-        db = get_vector_db()
-        db.add_documents(chunks)
-        #pgVector auto save
+        #chunks= createmask(chunks)
+        db = get_vector_db(user_role,pwd)
+        try:
+            logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role}:::')
+            db.add_documents(chunks)
+            logging.info('::::: INSERT TO VECTOR DB:END:::')
+        except ProgrammingError as e:
+            logging.info('::::: INSERT TO VECTOR DB:BEGIN:::PERMISSION ERROR')
+            if "row-level security" in str(e).lower() or "permission denied" in str(e).lower():
+                return False
+            else:
+                raise
+        except psycopg2.errors.InsufficientPrivilege:
+            return False
+        #pgVector auto save 
         #db.persist()
         os.remove(file_path)
 

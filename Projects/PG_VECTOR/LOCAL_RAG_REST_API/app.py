@@ -7,6 +7,22 @@ from flask import Flask, request, jsonify
 from embeddings.embed import embed
 from embeddings.get_vector_db import get_vector_db
 from prompt.query import query
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("langchain").setLevel(logging.WARNING)
+logging.getLogger("pgvector").setLevel(logging.WARNING)
+logging.getLogger("presidio-analyzer").setLevel(logging.WARNING)
+logging.getLogger("presidio-anonymizer").setLevel(logging.WARNING)
+logging.getLogger("pdfminer").setLevel(logging.WARNING)
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
+logging.getLogger("layoutparser").setLevel(logging.WARNING)
+logging.getLogger("numexpr").setLevel(logging.WARNING)
+logging.getLogger("unstructured").setLevel(logging.WARNING)
+logging.getLogger("filelock").setLevel(logging.WARNING)
+logging.getLogger(":pikepdf._core").setLevel(logging.WARNING)
 
 TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
 os.makedirs(TEMP_FOLDER, exist_ok=True)
@@ -18,11 +34,18 @@ def route_embed():
         return jsonify({"error": "No file part"}), 400
 
     file = request.files['file']
+    data = request.form
+    user_role = data.get("user_role")
+    pwd = data.get("password")
+
+    logging.info(f'::::: REST EMBED CONTROLLER: file={file}, user_role={user_role}, pwd={pwd}')
 
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
+    if(user_role=='' or pwd ==''):
+         return jsonify({"error": "enter valid user/pwd"}), 400
     
-    embedded = embed(file)
+    embedded = embed(file,user_role,pwd)
 
     if embedded:
         return jsonify({"message": "File embedded successfully"}), 200
@@ -32,9 +55,9 @@ def route_embed():
 @app.route('/query', methods=['POST'])
 def route_query():
     data = request.get_json()
-    print('Query APP:data:::',data )
+    logging.info('::::: REST CONTROLLER ::::::::::::Query APP:data:::',data )
     response = query(data.get('query'))
-    print('APP:response:::'+response )
+    logging.info('APP:response:::'+response )
      
 
     if response:
@@ -86,9 +109,9 @@ def route_embed():
 @app.route('/query', methods=['POST'])
 def route_query():
     data = request.get_json()
-    print('Query APP:data:::',data )
+    logging.debug('::::: Query APP:data:::',data )
     response = query(data.get('query'))
-    print('APP:response:::'+response )
+    logging.debug('::::: APP:response:::'+response )
      
 
     if response:

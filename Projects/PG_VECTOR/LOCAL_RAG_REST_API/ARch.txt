@@ -1,0 +1,25 @@
+RAG Semantic Search 
+A Simple Retrieval-Augmented Generation (RAG) system with an intelligent caching layer that dramatically reduces API costs and improves response times. The system uses Redis and cosine similarity to automatically detect and serve cached responses for semantically similar queries.
+Architecture:
+Problem:
+ term search has issue earch which search based on column in db or any field value which . it expects the user to enter exact or part of value in db using wild search. if user try to search enter slightly different term if user is not align to business term ends in no result.
+ Solution:
+ Solution is to implement semantic search to make sure it searches the values and return.
+
+Flow:
+we have streamlit preprocessor which can process the input pdf documents and create chunks and create a embedded vector and publish to vector db(pg_vector)
+when user enter the prompt or query it first checks in redis cache if present return the response cached from redis
+if not present in redis it queries the pgvector and inference engine process the embedded vector and return the streaming text response
+it is then cached in the redis cache and return back to the user.
+use phimask for masking the PII (personally identifiable information) 
+so that any sensitive information not returned.
+Inference engine used is Ollama for production grade can use VLLM
+which has GPU hardware.
+
+Code:
+code is in https://github.com/arunsadhasivam/AIRepositories/blob/master/Projects/PG_VECTOR/Readme.md
+
+🚀 Key Features
+Smart Semantic Caching: support semantic search which matches input query based on meaning .
+Cost Reduction: Detects similar queries and retrieves from redis in-memory cache instead of query vector db.
+RESTful API: Clean endpoints for creating embedding and search.
