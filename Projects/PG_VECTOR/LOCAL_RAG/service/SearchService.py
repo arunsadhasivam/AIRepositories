@@ -20,8 +20,8 @@ class SearchService:
                 logging.debug('Controller:route_embed:::response:'+response)
         return response
 
-    def searchQuery(self,query,type):
-        logging.info('::::: SEARCHSERVICE:searchQuery:::'+query )
+    def searchQuery(self,query,search_type,user_role,pwd):
+        logging.info(f'::::: SEARCHSERVICE:searchQuery::::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
         if query:
             cached = self.cache.get(query);   
             if cached:
@@ -30,8 +30,11 @@ class SearchService:
                 return result
         
             endPointQUery  = 'http://localhost:8080/query?query='+query
-            result = requests.post(endPointQUery,headers={"Content-Type": "application/json"},json={'query':query})
-            response = result.json().get('message')
+            result = requests.post(endPointQUery,headers={"Content-Type": "application/json"},json={'query':query,'search_type':search_type,'user_role':user_role,'pwd':pwd})
+            try:
+                response = result.json().get('message')
+            except Exception as e:
+                return "No Result Found"
             logging.info('::::: Controller:response:::'+response)
             self.cache.set(query, None, response)  # or store embedding+result later
         return  response

@@ -137,12 +137,15 @@ class RAGUI:
                 "Search Strategy",
                 options=[s.value for s in SearchType]
             )
+            logging.info(f"::::: RAGUI CONTROLLER:{search_type}")
             # Query input
             query = st.text_input("Enter your query")
             #st.button("Search") 
             try :
                 if query and st.button("Search"):
-                  response =   self.controller.searchQuery(query,search_type)
+                  user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
+                  response =   self.controller.searchQuery(query,search_type,user_role,st.session_state.password)
+                  logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS:{response}")
                   st.write(response)
             except Exception as e:
                 st.text("Error in processing Query From Vector DB",help=e)      

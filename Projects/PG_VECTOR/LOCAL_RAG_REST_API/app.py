@@ -8,7 +8,7 @@ from embeddings.embed import embed
 from embeddings.get_vector_db import get_vector_db
 from prompt.query import query
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -56,8 +56,15 @@ def route_embed():
 def route_query():
     data = request.get_json()
     logging.info('::::: REST CONTROLLER ::::::::::::Query APP:data:::',data )
-    response = query(data.get('query'))
-    logging.info('APP:response:::'+response )
+    #search_type,user_role,st.session_state.password
+    search_query=data.get('query')
+    search_type=data.get('search_type')
+    user_role=data.get('user_role')
+    pwd = data.get('pwd')
+    logging.info(f'::::: REST API : route_query::::{search_query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
+
+    response = query(search_query,search_type,user_role,pwd)
+    logging.info('::::: APP:response:::'+response )
      
 
     if response:

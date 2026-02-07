@@ -15,17 +15,8 @@ class SearchController:
         logging.info('::::: SEARCH CONTROLLER:route_embed:::'+file_path  )
         return  self.service.route_embed(file_path,user_role,pwd)
 
-    def searchQuery(self,query,type):
-        logging.info('::::: SEARCH CONTROLLER:searchQuery:::'+query )
-        return  self.service.searchQuery(query,type)
+    def searchQuery(self,query,search_type,user_role,pwd):
+        logging.info(f'::::: SEARCH CONTROLLER:searchQuery:::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
+    
+        return  self.service.searchQuery(query,search_type,user_role,pwd)
        
- 
-    # def route_delete():
-    #     db = get_vector_db()
-    #     db.delete_collection()
-
-    #     return jsonify({"message": "Collection deleted successfully"}), 200
-
-# if __name__ == '__main__':
-#     app.run(host="0.0.0.0", port=8080, debug=True)
-
