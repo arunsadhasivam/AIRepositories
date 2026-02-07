@@ -40,7 +40,7 @@ Stop.
 ```
 
 
-- use x86 vc++ command prompt , run as admin
+- use **x86 vc++ command prompt not normal command prompt** , run as admin 
 
 
 ```
