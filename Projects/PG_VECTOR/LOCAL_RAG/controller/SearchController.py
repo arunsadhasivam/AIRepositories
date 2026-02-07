@@ -2,9 +2,7 @@ import os
 import logging
 import requests
 from cache.RedisRagCache import RedisRagCache
-logging.basicConfig(level=logging.DEBUG)
 import logging
-logging.basicConfig(level=logging.DEBUG)
 from service.SearchService import SearchService
 
 class SearchController:    
@@ -13,12 +11,12 @@ class SearchController:
         self.end_point_url='http://localhost:8080'
         self.service=service
         
-    def route_embed(self,file_path):
-        logging.debug('Controller:route_embed:::'+file_path )
-        return  self.service.route_embed(file_path)
+    def route_embed(self,file_path,user_role,pwd):
+        logging.info('::::: SEARCH CONTROLLER:route_embed:::'+file_path  )
+        return  self.service.route_embed(file_path,user_role,pwd)
 
     def searchQuery(self,query,type):
-        logging.debug('Controller:searchQuery:::'+query )
+        logging.info('::::: SEARCH CONTROLLER:searchQuery:::'+query )
         return  self.service.searchQuery(query,type)
        
  

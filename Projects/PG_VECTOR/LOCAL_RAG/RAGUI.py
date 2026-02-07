@@ -11,57 +11,84 @@ from model.EmbeddingType import EmbeddingType
 from model.SearchType import SearchType
 from model.SearchType import SearchType
 import logging
-logging.basicConfig(level=logging.DEBUG)
+import time   
+import json 
+logging.basicConfig(level=logging.INFO)
+
+
 
 class RAGUI:
     """Streamlit interface for RAG system"""
     def __init__(self,controller:SearchController):
         self.controller = controller
-       
-        
-    def processQuery(self,query,search_type):
-        logging.debug('RAGInterface:::' , query, search_type)
-        if not self.rag_pipeline or not self.rag_pipeline.vector_store:
-            st.error("Please upload documents first!")
-            return
-        with st.spinner("Searching..."):
-            # Perform search
-            results = self.rag_pipeline.search(
-                query,
-                SearchType(search_type)
-            )
-            
-            # Generate response
-            response = self.rag_pipeline.generate_response(
-                query,
-                results
-            )
-            
-            # Display results
-            st.subheader("Response")
-            st.write(response)
-            st.subheader("Source Documents")
-            for doc, score in results:
-                with st.expander(
-                    f"Source: {doc.source} (Page {doc.page_number})"
-                ):
-                    st.write(f"Relevance Score: {score:.3f}")
-                    st.write(doc.text)    
+
+    def isAdmin(self,username):
+        user_file = "users.json"
+        if not os.path.exists(user_file):
+            return False
+        try:
+            with open(user_file) as f:
+                user_data = json.load(f)
+            users = user_data.get("users", {})
+            logging.debug(f'json={users}')
+            return users.get(username).get("role") == 'app_admin'
+        except Exception:
+            return False
+    
+    # -------------------------
+    # Auth helper
+    # -------------------------
+    def authenticate(self,username, password):
+        logging.debug(f':::::user={username}, pwd={password}')
+        user_file = "users.json"
+        if not os.path.exists(user_file):
+            return False
+        try:
+            with open(user_file) as f:
+                user_data = json.load(f)
+            users = user_data.get("users", {})
+            logging.debug(f'::::: json={users}')
+            return users.get(username).get("password") == password
+        except Exception:
+            return False
+    
+    # -------------------------
+    # Login page
+    # -------------------------
+    def login(self):
+        st.title("🔐 Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            if self.authenticate(username, password):
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.session_state.password = password
+                st.success("Login successful!")
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
         
     def run(self):
-        """Run the Streamlit interface"""
+        """Run the Streamlit interface - authenticated users only"""
         st.title("📚 RAG System")
         
         # Sidebar configuration
         with st.sidebar:
-            st.header("Configuration")
-            
+            st.html("<h1>USER DASHBOARD</h1>")
             # Embedding model selection
-            embedding_model = st.selectbox(
-                "Embedding Model",
-                options=[e.value for e in EmbeddingType],
-                format_func=lambda x: x.split('/')[-1]
-            )
+
+            #embedding_model = st.selectbox(
+            #    "Embedding Model",
+            #    options=[e.value for e in EmbeddingType],
+            #    format_func=lambda x: x.split('/')[-1]
+            #)
+            roleName = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
+            st.html('<hr>')
+            st.html('<b>USER<b>: <span style="color:green">'+st.session_state.username +'</span' )
+            st.html('<b>Role: <span style="color:green">'+roleName +'</span' )
+            st.html('<hr>')
             
         # Main interface
         tab1, tab2 = st.tabs(["📄 Document Upload", "🔍 Search"])
@@ -69,7 +96,6 @@ class RAGUI:
         # Document Upload Tab
         with tab1:
             st.header("Upload Documents")
-            
             # File upload
             uploaded_files = st.file_uploader(
                 "Upload PDF files",
@@ -88,8 +114,16 @@ class RAGUI:
 
                         with open(file_path, "wb") as f:
                             f.write(file.getbuffer())
-                        response =   self.controller.route_embed(self,file_path)
-                        st.write(f"File saved at: {response}")
+                        try:    
+                            user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
+                            logging.info(f'::::: RAG UPDATE KNOWLEDGE BASE WITH USER ROLE={user_role}')
+                            response =   self.controller.route_embed(file_path,user_role,st.session_state.password)
+                            if response is not None: 
+                              st.html(f"<span style='color:green'>File saved at: {response}</span>")
+                            else :
+                              st.html(f"<span style='color:red'>* No privilege to update Knowledge Base</span>")
+                        except Exception as e:
+                             st.html(f"<span style='color:red'>* No privilege to update Knowledge Base</span>")
                     if url:
                        
                         st.success(f"Processed {file_path}")
@@ -118,9 +152,19 @@ class RAGUI:
 #     binder.bind(SearchController, to=SearchController)
 
 if __name__ == "__main__":
+    # set default state.
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if "username" not in st.session_state:
+        st.session_state.username = None
+
+    # load redis and inject service to controller.
     cache = RedisRagCache(url="redis://localhost:6379")
     service = SearchService(cache)
     controller = SearchController(service)
     interface = RAGUI(controller)
-    interface.run()
+    if not st.session_state.authenticated:
+        interface.login()
+    else:
+        interface.run()
   

@@ -1,0 +1,24 @@
+{
+  "users": {
+    "admin": {
+      "password": "admin",
+      "role": "app_admin"
+    },
+    "user": {
+      "password": "user123",
+      "role": "app_user"
+    },
+    "user1": {
+      "password": "user123",
+      "role": "app_user"
+    },
+    "demo": {
+      "password": "user123",
+      "role": "app_user"
+    },
+    "test": {
+      "password": "user123",
+      "role": "app_user"
+    }
+  }
+}

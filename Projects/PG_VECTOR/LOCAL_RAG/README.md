@@ -49,3 +49,7 @@ $ ollama serve
 $ python app.py
 ```
 
+
+## Conclusion
+
+This app leverages a language model and a vector database to provide enhanced query handling capabilities. Ensure Ollama is running locally and follow the setup instructions to get started.
