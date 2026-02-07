@@ -1,8 +1,27 @@
 
+
+<p>
+<details><summary>Architecture Diagram</summary>
+
+                                                        
+
+<div align="center">
+  <h1>Architecture Diagram </h1>
+
+</div>
+
+
+<div align="center">
+  <h1>Architecture Diagram </h1>
+
+</div>
 Architecture Diagram:
 =====================
 
 <img width="2160" height="917" alt="image" src="https://github.com/user-attachments/assets/595b090d-1e96-4a36-8e10-07a9662de22d" />
+
+</p>
+</details>
 
 
 <p>
