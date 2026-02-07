@@ -2,9 +2,9 @@
 before mask:
 ==============
 
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/b763d678-b210-426d-af87-a0d5576065f5" />
 
-<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/ae730012-b91b-44d4-a225-7cec76cc689e" />
-
+ 
 
 after mask:
 ===========
@@ -49,21 +49,3 @@ This document compares three commonly used approaches for PII (Personally Identi
 | **Maintenance** | No code change needed for new PII types | No code change for NER entities | Code change needed for every new pattern |
 
 ---
-
-## PII Detection Capability
-
-| PII Type | Presidio | spaCy | re (Regex) |
-|---|---|---|---|
-| Person Name | ✅ Auto | ✅ Auto | ❌ Not possible |
-| Phone Number | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-| Email Address | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-| Aadhaar Number | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-| PAN Card | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-| Date of Birth | ✅ Auto | ✅ Auto | ✅ Manual pattern |
-| Location | ✅ Auto | ✅ Auto | ❌ Not possible |
-| Organization | ✅ Auto | ✅ Auto | ❌ Not possible |
-| SSN | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-| Credit Card | ✅ Auto | ❌ Misses | ✅ Manual pattern |
-
----
-
