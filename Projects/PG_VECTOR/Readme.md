@@ -67,6 +67,8 @@ Step 3:PG VECTOR DB:
 
 
 
+<p>
+<details><summary>Project Setup</summary>
 
 
 <div align="center">
