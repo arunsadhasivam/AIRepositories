@@ -100,9 +100,8 @@ Login in as Admin:
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/bfcb6214-ab5c-404d-ab60-5b2f221f914c" />
 
-
-Failure:
-=========
+Login in as Normal User:
+============================
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/3cad7a9a-205b-4c4a-9763-5d300d3bd704" />
 
