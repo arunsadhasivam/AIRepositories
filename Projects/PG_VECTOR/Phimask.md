@@ -67,27 +67,3 @@ This document compares three commonly used approaches for PII (Personally Identi
 
 ---
 
-## Output Comparison
-
-### Input Text
-```
-Patient John Doe, Phone: 9876543210, Email: john@gmail.com, Aadhaar: 1234 5678 9012, Located in Mumbai
-```
-
-### Presidio Output
-```
-Patient <PERSON>, Phone: <PHONE_NUMBER>, Email: <EMAIL_ADDRESS>, Aadhaar: <IN_AADHAAR>, Located in <LOCATION>
-```
-
-### spaCy + Regex Output
-```
-Patient <PERSON>, Phone: <PHONE_NUMBER>, Email: <EMAIL>, Aadhaar: <AADHAAR>, Located in <GPE>
-```
-
-### Regex Only Output
-```
-Patient John Doe, Phone: <PHONE_NUMBER>, Email: <EMAIL>, Aadhaar: <AADHAAR>, Located in Mumbai
-```
-> ❌ Regex misses Person Name and Location — cannot detect context-based PII.
-
----
