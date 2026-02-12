@@ -18,8 +18,7 @@ Architecture Diagram:
 </details>
 
 
-<p>
-<details><summary>Integrations</summary>
+
 
                                                         
 
@@ -28,7 +27,8 @@ Architecture Diagram:
 
 </div>
 
-
+<p>
+<details><summary>Integrations</summary>
 
 Step 1:Start ollama:
 =====================
@@ -72,7 +72,7 @@ Step 3:PG VECTOR DB:
 
 
 
-
+</div>
 </p>
 </details>
 
