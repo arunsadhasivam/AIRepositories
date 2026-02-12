@@ -79,9 +79,7 @@ Step 3:PG VECTOR DB:
 
 
 
-
-<p>
-<details><summary>Project Setup</summary>
+ 
 
 
 <div align="center">
@@ -141,5 +139,4 @@ rest api
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7e50e647-73cf-4d38-88d9-e9350f7d311f" />
 <img width="3815" height="2122" alt="image" src="https://github.com/user-attachments/assets/d2c586d9-85c6-4df8-ac19-b4f2ea5c6222" />
-</p>
-</details>
+ 
