@@ -154,3 +154,8 @@ Admin User - update RAG knowledge store:
 Normal User - update RAG knowledge store:
 =========================================
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/dd2129d6-3aa1-449b-8251-de91e328fdc9" />
+
+Retrieve result from cache:
+============================
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/18a981f0-391b-474f-821d-fb3c5049abb8" />
