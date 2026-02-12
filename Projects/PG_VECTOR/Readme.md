@@ -1,8 +1,6 @@
 
 
-<p>
-<details><summary>Architecture Diagram</summary>
-
+ 
                                                         
 
 <div align="center">
@@ -14,7 +12,7 @@
 Architecture Diagram:
 =====================
 
-<img width="2160" height="917" alt="image" src="https://github.com/user-attachments/assets/595b090d-1e96-4a36-8e10-07a9662de22d" />
+<img width="1488" height="888" alt="image" src="https://github.com/user-attachments/assets/b6878cdb-3c15-4fbd-807d-cad3e6fdc969" />
 
 </p>
 </details>
