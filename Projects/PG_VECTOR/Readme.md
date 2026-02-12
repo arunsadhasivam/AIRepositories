@@ -24,7 +24,7 @@ Architecture Diagram:
                                                         
 
 <div align="center">
-  <h1>Integration Setup </h1>
+  <h1>Integration Setup (OLLAMA,REDIS,VECTORDB) </h1>
 
 </div>
 
