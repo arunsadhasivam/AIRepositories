@@ -140,3 +140,17 @@ rest api
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7e50e647-73cf-4d38-88d9-e9350f7d311f" />
 <img width="3815" height="2122" alt="image" src="https://github.com/user-attachments/assets/d2c586d9-85c6-4df8-ac19-b4f2ea5c6222" />
  
+RLS:
+=====
+
+- configured in RLS to allow updation of knowledge store.
+
+Admin User - update RAG knowledge store:
+=========================================
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/c19b6c81-d716-4949-b19c-b1f75bfba106" />
+
+
+
+Normal User - update RAG knowledge store:
+=========================================
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/dd2129d6-3aa1-449b-8251-de91e328fdc9" />
