@@ -11,6 +11,7 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 analyzer = AnalyzerEngine()
 anonymizer = AnonymizerEngine()
+
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import psycopg2
 import logging

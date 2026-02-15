@@ -99,7 +99,7 @@ class RAGUI:
             # File upload
             uploaded_files = st.file_uploader(
                 "Upload PDF files",
-                type="pdf",
+                type=['pdf', 'docx', 'doc', 'md', 'html', 'htm'],
                 accept_multiple_files=True
             )
             temp_dir = "temp_uploads"
@@ -118,15 +118,16 @@ class RAGUI:
                             user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
                             logging.info(f'::::: RAG UPDATE KNOWLEDGE BASE WITH USER ROLE={user_role}')
                             response =   self.controller.route_embed(file_path,user_role,st.session_state.password)
+                            
                             if response is not None: 
                               st.html(f"<span style='color:green'>File saved at: {response}</span>")
                             else :
-                              st.html(f"<span style='color:red'>* No privilege to update Knowledge Base</span>")
+                              st.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
+
                         except Exception as e:
-                             st.html(f"<span style='color:red'>* No privilege to update Knowledge Base</span>")
+                             st.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
                     if url:
-                       
-                        st.success(f"Processed {file_path}")
+                        st.success(f"Processed {url}")
         
         # Search Tab
         with tab2:
@@ -148,7 +149,7 @@ class RAGUI:
                   logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS:{response}")
                   st.write(response)
             except Exception as e:
-                st.text("Error in processing Query From Vector DB",help=e)      
+                st.text(f"Error in processing Query From Vector DB",help={e})      
 
 
 # def configure(binder):

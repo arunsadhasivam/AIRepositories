@@ -35,8 +35,10 @@ class SearchService:
                 response = result.json().get('message')
             except Exception as e:
                 return "No Result Found"
-            logging.info('::::: Controller:response:::'+response)
-            self.cache.set(query, None, response)  # or store embedding+result later
+            
+            if response:
+                logging.info(f'::::: Controller:response:::'+response)
+                self.cache.set(query, None, response)  # or store embedding+result later
         return  response
     
     

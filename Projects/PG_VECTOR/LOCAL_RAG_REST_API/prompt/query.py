@@ -106,7 +106,7 @@ def query(query,search_type,user_role,pwd):
                     | StrOutputParser()
                 )
                 response = rag_chain.invoke(query)
-                return response
+            return response
     except Exception as e:
         logging.error(f"'::::: Error processing query: {str(e)}")
         raise
