@@ -4,14 +4,25 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers import MultiQueryRetriever
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_community.embeddings import OllamaEmbeddings
+
+
+from rag.retriever.config.RetrieverConfig import RetrieverConfig
+from rag.retriever import BaseRetriever,VectorStoreRetriever,HybridRetriever,SparseRetriever
 
 from embeddings.get_vector_db import get_vector_db
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
 import logging
 logging.basicConfig(level=logging.DEBUG)
-
+import os
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+
+COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'default-local-rag')
+TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'default-nomic-embed-text')
+DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PORT = os.getenv('DB_PORT', '5432')
+DB_NAME = os.getenv('DB_NAME', 'rag')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
@@ -51,14 +62,56 @@ def query(query,search_type,user_role,pwd):
             logging.info(f'::::: Query EXECUTION :{query} , search_type:{search_type},user_role={user_role},pwd={pwd}')
 
             if search_type!='cosine':
+                # vectorRetriever = VectorStoreRetriever();   #Dense semantic search
+                # # Step 2: Create config (optional - uses defaults if not provided)
+                # config = RetrieverConfig()
+                # config.setVectorWeight(0.7);   # 70% weight to semantic search
+                # config.setSparseWeight(0.3);   # 30% weight to keyword search
+
+                # #Step 3: Instantiate HybridRetriever
+                # hybridRetriever =  HybridRetriever(vectorRetriever, config)
+                # hybridRetriever.retrieve(query)
+                embedding_model = OllamaEmbeddings(model=LLM_MODEL)
+                vectorRetriever = VectorStoreRetriever(
+                    vector_store=db,              # your existing Chroma/pgvector db
+                    embedding_model=embedding_model,  # embedding model instance
+                    search_type="similarity"
+                )
+                 # Step 2: Create sparse (BM25/keyword) retriever
+                sparseRetriever = SparseRetriever(
+                    host=DB_HOST,
+                    port=DB_PORT,
+                    dbname=DB_NAME,
+                    user=user_role,
+                    password=pwd,
+                    table_name="langchain_pg_embedding",  # the table where your docs are stored in pgvector
+                    content_column="document",    # LangChain default
+                    id_column="uuid",             # LangChain default (not "id")
+                    metadata_column="cmetadata"   # LangChain default
+                )
+                # Step 3: Create config with weights
+                config = RetrieverConfig()
+                config.vector_weight = 0.7   # 70% semantic search
+                config.sparse_weight = 0.3   # 30% keyword search
+                # Step 4: Create HybridRetriever with both retrievers
+                hybridRetriever = HybridRetriever(vectorRetriever, sparseRetriever, config)
+
+
+                # retriever = MultiQueryRetriever.from_llm(
+                #     db.as_retriever(
+                #         search_type="similarity_score_threshold",
+                #         search_kwargs={
+                #             "k": 15,#maximum documents to return
+                #             "score_threshold": 0.75  # cosine similarity threshold
+                #         }     
+                #     ), 
+                #     llm,
+                #     prompt=QUERY_PROMPT
+                # )
+
+                 # Step 5: Use hybridRetriever as the LangChain retriever
                 retriever = MultiQueryRetriever.from_llm(
-                    db.as_retriever(
-                        search_type="similarity_score_threshold",
-                        search_kwargs={
-                            "k": 15,#maximum documents to return
-                            "score_threshold": 0.75  # cosine similarity threshold
-                        }     
-                    ), 
+                    hybridRetriever.as_langchain_retriever(),  # wrap to LangChain compatible
                     llm,
                     prompt=QUERY_PROMPT
                 )
