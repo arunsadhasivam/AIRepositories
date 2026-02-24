@@ -74,7 +74,7 @@ Step 3:PG VECTOR DB:
 Step 4:SOLR:
 ============= 
 
-<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7a23509f-0ad2-48d1-8214-b52684d43b00" />
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/012ecbf8-eb4a-4657-bb30-d482c0332b0e" />
 
 
 </div>
