@@ -71,6 +71,11 @@ Step 3:PG VECTOR DB:
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/99f686c9-dac3-4998-afce-498ad9068e01" />
 
 
+Step 4:SOLR:
+============= 
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7a23509f-0ad2-48d1-8214-b52684d43b00" />
+
 
 </div>
 </p>
