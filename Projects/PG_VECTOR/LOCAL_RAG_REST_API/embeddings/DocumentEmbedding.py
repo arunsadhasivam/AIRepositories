@@ -16,6 +16,9 @@ from presidio_anonymizer import AnonymizerEngine
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import psycopg2
 import logging
+from indexer.SolrIndexer import SolrIndexer
+
+import uuid  # for generating unique document IDs
 
 
 class DocumentEmbedder:
@@ -49,6 +52,7 @@ class DocumentEmbedder:
         self.analyzer = AnalyzerEngine()
         # Initialize PII anonymizer engine for masking sensitive information
         self.anonymizer = AnonymizerEngine()
+        self.solrIndexer = SolrIndexer()
         from docling.document_converter import DocumentConverter
         # Initialize Docling document converter for multi-format processing
         self.converter = DocumentConverter()
@@ -377,6 +381,8 @@ class DocumentEmbedder:
                 logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role} :::::')
                 # Add documents to vector database
                 db.add_documents(chunks)
+                # Index same chunks into Solr for BM25 keyword search
+                self.solrIndexer.index_to_solr(chunks)   # <-- add this line
                 # Log successful insertion
                 logging.info('::::: INSERT TO VECTOR DB SUCESSFULLY:END :::::')
                 
@@ -427,7 +433,8 @@ class DocumentEmbedder:
                 except Exception as e:
                     # Log error during cleanup
                     logging.error(f'Error removing temporary file {file_path}: {str(e)}')
-
+    
+    
 
 # Usage example:
 # embedder = DocumentEmbedder()

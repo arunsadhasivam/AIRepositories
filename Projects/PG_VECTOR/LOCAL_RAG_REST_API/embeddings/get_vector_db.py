@@ -1,6 +1,7 @@
 import os
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores.pgvector import PGVector
+from rag.vectorstore.PgVectorStore import PgVectorStore
 from sqlalchemy.exc import ProgrammingError, OperationalError
 from sqlalchemy import text, create_engine
 from sqlalchemy.pool import QueuePool
@@ -88,6 +89,9 @@ def ensure_rls_enabled(engine, COLLECTION_NAME):
         # Return False to indicate failure
         return False
 
+def get_pg_vector_connection(user_role,pwd):
+    PG_CONNECTION_STRING = f'postgresql+psycopg2://{user_role}:{pwd}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    return PG_CONNECTION_STRING
 
 def get_vector_db(user_role, pwd, max_retries=3, retry_delay=1):
     """
@@ -138,34 +142,35 @@ def get_vector_db(user_role, pwd, max_retries=3, retry_delay=1):
         try:
             # Build connection string from user credentials and environment variables
             PG_CONNECTION_STRING = f'postgresql+psycopg2://{user_role}:{pwd}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-            
+            pg_vector_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={user_role} password={pwd}"
+
             # Log connection attempt
             logging.info(f'::::: DBCONNECTION: GETTING CONNECTION Attempt {attempt + 1}/{max_retries} ::::={PG_CONNECTION_STRING}')
             
-            # Create SQLAlchemy engine with connection pooling
-            engine = create_engine(
-                PG_CONNECTION_STRING,
-                poolclass=QueuePool,  # Use queue-based connection pooling
-                pool_size=5,  # Number of connections to maintain in pool
-                max_overflow=10,  # Additional connections if pool is full
-                pool_timeout=30,  # Timeout in seconds waiting for connection from pool
-                pool_pre_ping=True,  # Verify connections before using them
-                pool_recycle=3600  # Recycle connections after 1 hour
-            )
+            # # Create SQLAlchemy engine with connection pooling
+            # engine = create_engine(
+            #     PG_CONNECTION_STRING,
+            #     poolclass=QueuePool,  # Use queue-based connection pooling
+            #     pool_size=5,  # Number of connections to maintain in pool
+            #     max_overflow=10,  # Additional connections if pool is full
+            #     pool_timeout=30,  # Timeout in seconds waiting for connection from pool
+            #     pool_pre_ping=True,  # Verify connections before using them
+            #     pool_recycle=3600  # Recycle connections after 1 hour
+            # )
             
             # Initialize the embedding model (same as before)
             embedding = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL, show_progress=True)
             
             # PGVector automatically creates the table and pgvector extension if not exists
-            db = PGVector(
+            db = PgVectorStore(
                 collection_name=COLLECTION_NAME,
-                connection_string=PG_CONNECTION_STRING,
+                connection_string=pg_vector_dsn,
                 embedding_function=embedding,
                 use_jsonb=True
             )
             
             # Ensure RLS is enabled (runs only once per collection)
-            ensure_rls_enabled(engine, COLLECTION_NAME)
+           # ensure_rls_enabled(engine, COLLECTION_NAME)
             
             # Test connection with simple query to validate it works
             try:

@@ -309,9 +309,9 @@ class HybridRetriever(BaseRetriever):
                 # Convert your Document objects to LangChain Document objects
                 return [
                     LangChainDocument(
-                        page_content=doc.content,   # map content -> page_content
-                        metadata=doc.metadata        # metadata stays same
-                    )
+                        page_content=str(doc.content) if doc.content is not None else "",   # map content -> page_content
+                        metadata=doc.metadata if isinstance(doc.metadata, dict) else {}    # ensure dict     
+                       )
                     for doc in docs
                 ]
 
