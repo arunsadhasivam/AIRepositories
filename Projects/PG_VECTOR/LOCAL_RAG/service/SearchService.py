@@ -22,8 +22,10 @@ class SearchService:
 
     def searchQuery(self,query,search_type,user_role,pwd):
         logging.info(f'::::: SEARCHSERVICE:searchQuery::::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
+       
         if query:
-            cached = self.cache.get(query);   
+            querykey = query+'_'+search_type
+            cached = self.cache.get(querykey);   
             if cached:
                 result = cached["result"]
                 logging.info("::::: RETURNED FROM REDIScache:::::::::::::::::::",result)
@@ -38,7 +40,7 @@ class SearchService:
             
             if response:
                 logging.info(f'::::: Controller:response:::'+response)
-                self.cache.set(query, None, response)  # or store embedding+result later
+                self.cache.set(querykey, None, response)  # or store embedding+result later
         return  response
     
     
