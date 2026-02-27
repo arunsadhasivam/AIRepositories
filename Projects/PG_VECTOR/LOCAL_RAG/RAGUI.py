@@ -149,7 +149,8 @@ class RAGUI:
                   logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS:{response}")
                   st.write(response)
             except Exception as e:
-                st.text(f"Error in processing Query From Vector DB",help={e})      
+                logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS: {str(e)}")
+                st.text(f"Error in processing Query From Vector DB:help ")      
 
 
 # def configure(binder):
