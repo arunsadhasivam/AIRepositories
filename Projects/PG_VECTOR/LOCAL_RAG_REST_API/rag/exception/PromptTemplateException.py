@@ -8,8 +8,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class PromptTemplateException(Exception):
-    """Custom exception for retriever-related errors."""
-    try :
-        logger.error(f"::::: PromptTemplateException BEGIN :::::")
-    except Exception as e:
-        logger.error(f"::::: PromptTemplateException :::::",str(e))
+    """CustPromptTemplate exception for retriever-related errors."""
+    def __init__(self, message: str, cause: Exception = None):
+        # Call parent Exception constructor with message
+        super().__init__(message)
+        # Store original cause for chaining
+        self.cause = cause
+        # Log error when exception is created
+        logger.error(f"PromptTemplateException: {message}" + (f" | Cause: {str(cause)}" if cause else ""))

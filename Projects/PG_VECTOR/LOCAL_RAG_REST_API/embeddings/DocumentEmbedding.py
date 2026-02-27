@@ -6,10 +6,10 @@ into a vector database with support for PII masking using Docling for document p
 """
 
 import os
+import numpy as np
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from embeddings.get_vector_db import get_vector_db
 from langchain_core.documents import Document
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
@@ -17,8 +17,16 @@ from sqlalchemy.exc import ProgrammingError, OperationalError
 import psycopg2
 import logging
 from indexer.SolrIndexer import SolrIndexer
+from prompt.query import getPgVectorStore
 
 import uuid  # for generating unique document IDs
+from rag.retriever.Document import Document as RagDocument
+from langchain_community.embeddings import OllamaEmbeddings
+TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')
+COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'localrag')
+DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PORT = os.getenv('DB_PORT', '5432')
+DB_NAME = os.getenv('DB_NAME', 'rag')
 
 
 class DocumentEmbedder:
@@ -26,6 +34,11 @@ class DocumentEmbedder:
     Handles multiple document format embedding into vector database with PII masking support.
     Supports: PDF, Word (DOCX/DOC), Markdown (MD), HTML
     """
+
+    #public
+    def get_pg_vector_connection(user_role,pwd):
+        PG_CONNECTION_STRING = f'postgresql+psycopg2://{user_role}:{pwd}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+        return PG_CONNECTION_STRING
     
     def __init__(self, temp_folder=None, max_file_size=None, chunk_size=7500, chunk_overlap=100):
         """
@@ -361,13 +374,33 @@ class DocumentEmbedder:
             # Apply PII masking if enabled
             if enable_pii_masking:
                 # Mask PII in all chunks
-                logging.info("::::: MASKING IN PROCESS ::::::: BEGIN");
+                logging.info("::::: MASKING IN PROCESS ::::::: BEGIN")
                 chunks = self.create_mask(chunks)
-                logging.info("::::: MASKING IN PROCESS ::::::: END");
+                logging.info("::::: MASKING IN PROCESS ::::::: END")
             
             # Get vector database connection using user credentials
-            db = get_vector_db(user_role, pwd)
+            db = getPgVectorStore(user_role, pwd)
+        
+            logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role}:::')
             
+            # Step 1 - Convert LangChain chunks to RagDocument
+            rag_docs = [
+                RagDocument(
+                    id=str(uuid.uuid4()),
+                    content=chunk.page_content,
+                    metadata=chunk.metadata
+                )
+                for chunk in chunks
+            ]
+            
+            # Step 2 - Generate embeddings using same model as search
+            embedding_model = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL, show_progress=True)
+            vectors = embedding_model.embed_documents([doc.content for doc in rag_docs])
+            numpy_vectors = [np.array(v , dtype=np.float32) for v in vectors]  # convert list → numpy array
+            # Step 3 - Insert into PgVectorStore
+            logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role} :::::')
+            db.add_documents(rag_docs, embeddings=numpy_vectors)
+            logging.info(f'::::: INSERT TO SOLR DB:END {user_role} :::::')
             # Validate database connection was established
             if not db:
                 # Log error for failed database connection
@@ -378,13 +411,11 @@ class DocumentEmbedder:
             # Insert chunks into vector database
             try:
                 # Log start of database insertion
-                logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role} :::::')
-                # Add documents to vector database
-                db.add_documents(chunks)
+                logging.info(f'::::: INSERT TO SOLR DB:BEGIN {user_role} :::::')
                 # Index same chunks into Solr for BM25 keyword search
                 self.solrIndexer.index_to_solr(chunks)   # <-- add this line
                 # Log successful insertion
-                logging.info('::::: INSERT TO VECTOR DB SUCESSFULLY:END :::::')
+                logging.info('::::: INSERT TO SOLR DB SUCESSFULLY:END :::::')
                 
             except ProgrammingError as e:
                 # Log database programming error

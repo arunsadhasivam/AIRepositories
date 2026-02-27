@@ -8,8 +8,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class RetrieverException(Exception):
-    """Custom exception for retriever-related errors."""
-    try :
-        logger.error(f"::::: RetrieverException BEGIN :::::")
-    except Exception as e:
-        logger.error(f"::::: RetrieverException :::::",str(e))
+    """Retriever exception for retriever-related errors."""
+    def __init__(self, message: str, cause: Exception = None):
+        # Call parent Exception constructor with message
+        super().__init__(message)
+        # Store original cause for chaining
+        self.cause = cause
+        # Log error when exception is created
+        logger.error(f"RetrieverException: {message}" + (f" | Cause: {str(cause)}" if cause else ""))

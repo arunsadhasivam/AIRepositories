@@ -6,22 +6,23 @@ from langchain.retrievers import MultiQueryRetriever
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_community.embeddings import OllamaEmbeddings
 
+from rag.vectorstore.DistanceMetric import DistanceMetric
 from rag.retriever.config.RetrieverConfig import RetrieverConfig
 from rag.retriever import BaseRetriever,VectorStoreRetriever,HybridRetriever,SolrSparseRetriever
 from rag.vectorstore.PgVectorStore import PgVectorStore
-from embeddings.get_vector_db import get_pg_vector_connection,get_vector_db
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
 import logging
 logging.basicConfig(level=logging.DEBUG)
 import os
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
-
+TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'default-local-rag')
-TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'default-nomic-embed-text')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_PORT = os.getenv('DB_PORT', '5432')
 DB_NAME = os.getenv('DB_NAME', 'rag')
+DB_SUPERUSER = os.getenv('DB_SUPERUSER', '5432')
+DB_SUPERUSER_PWD = os.getenv('DB_SUPERUSER_PWD', '5432')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
@@ -46,9 +47,13 @@ def get_prompt():
 
 def getPgVectorStore(user_role,pwd):
         pg_vector_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={user_role} password={pwd}"
+        pg_vector_admin_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={DB_SUPERUSER} password={DB_SUPERUSER_PWD}"
+
+        logging.info(f":::::: PG_VECTOR CONNECTION:::::{pg_vector_dsn}")
         #db = get_vector_db(user_role,pwd)
         pgVectorStore = PgVectorStore(
                 connection_string=pg_vector_dsn,
+                connection_string_admin=pg_vector_admin_dsn,
                 collection_name=COLLECTION_NAME,
                 dimension=768,   # match your embedding model dimension,
                 user_role=user_role,
@@ -73,27 +78,15 @@ def query(query,search_type,user_role,pwd):
             # Set up the retriever to generate multiple queries using the language model and the query prompt
             logging.info(f'::::: Query EXECUTION :{query} , search_type:{search_type},user_role={user_role},pwd={pwd}')
 
-            embedding_model = OllamaEmbeddings(model=LLM_MODEL)
+            embedding_model = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
             #Step 1: vector store
-            pg_vector_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={user_role} password={pwd}"
-
-            #db = get_vector_db(user_role,pwd)
-            # pgVectorStore = PgVectorStore(
-            #     connection_string=pg_vector_dsn,
-            #     collection_name=COLLECTION_NAME,
-            #     dimension=768,   # match your embedding model dimension,
-            #     user_role=user_role,
-            #     enable_rls=True
-            # )
             pgVectorStore = getPgVectorStore(user_role,pwd)
             vectorRetriever = VectorStoreRetriever(
                 vector_store=pgVectorStore,              # your existing Chroma/pgvector db
                 embedding_model=embedding_model,  # embedding model instance
                 search_type="similarity"
             )
-            if search_type!='cosine':
-                logging.info(f":::::: PG_VECTOR CONNECTION:::::{pg_vector_dsn}")
-               
+            if search_type==DistanceMetric.HYBRID.value:
                  # Step 2: Create sparse (BM25/keyword) retriever
                 sparseRetriever = SolrSparseRetriever(
                     host="localhost",

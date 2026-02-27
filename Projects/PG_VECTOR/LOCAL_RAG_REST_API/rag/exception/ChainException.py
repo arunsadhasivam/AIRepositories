@@ -7,8 +7,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 class ChainException(Exception):
-    """Custom exception for ChainException errors."""
-    try :
-        logger.error(f"::::: ChainException :BEGIN :::::")
-    except Exception as e:
-        logger.error(f"::::: ChainException :::::",str(e))
+    """Chain exception for memory operations."""
+    def __init__(self, message: str, cause: Exception = None):
+        # Call parent Exception constructor with message
+        super().__init__(message)
+        # Store original cause for chaining
+        self.cause = cause
+        # Log error when exception is created
+        logger.error(f"ChainException: {message}" + (f" | Cause: {str(cause)}" if cause else ""))

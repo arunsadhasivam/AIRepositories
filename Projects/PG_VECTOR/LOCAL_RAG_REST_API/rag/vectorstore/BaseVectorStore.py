@@ -112,6 +112,9 @@ class BaseVectorStore(ABC):
         pass
     
     def validate_embedding(self, embedding: np.ndarray, expected_dim: Optional[int] = None) -> None:
+        logger.info(
+            f"::::: VALIDATE EMBEDDINGS  BEGIN {self.__class__.__name__} with collection "
+        )
         """
         Validate embedding vector.
         
@@ -132,6 +135,9 @@ class BaseVectorStore(ABC):
             raise ValueError("Embedding cannot be empty")
         
         if expected_dim is not None and len(embedding) != expected_dim:
+            logger.info(
+            f"::::: EMBEDDINGS  NOT MATCH {self.__class__.__name__} with collection "
+            )
             raise ValueError(
                 f"Embedding dimension mismatch: expected {expected_dim}, "
                 f"got {len(embedding)}"

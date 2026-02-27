@@ -54,6 +54,7 @@ class PgVectorStore(BaseVectorStore):
 
     def __init__(self,
                  connection_string: str,
+                 connection_string_admin: str,
                  collection_name: str,
                  dimension: int = 1536,
                  distance_metric: DistanceMetric = DistanceMetric.COSINE,
@@ -92,12 +93,19 @@ class PgVectorStore(BaseVectorStore):
         # Store whether RLS should be enabled
         self.enable_rls = enable_rls
 
+        self.connection_string_admin = connection_string_admin
         try:
             # Create a thread-safe connection pool for concurrent requests
             self.connection_pool = pool.ThreadedConnectionPool(
                 minconn=1,                          # Always keep at least 1 connection open
                 maxconn=pool_size + max_overflow,   # Max total connections allowed
                 dsn=connection_string               # psycopg2 DSN string
+            )
+
+            self.connection_admin_pool = pool.ThreadedConnectionPool(
+                minconn=1,                          # Always keep at least 1 connection open
+                maxconn=pool_size + max_overflow,   # Max total connections allowed
+                dsn=connection_string_admin               # psycopg2 DSN string
             )
 
             # Create the table, indexes, and optionally enable RLS
@@ -132,6 +140,26 @@ class PgVectorStore(BaseVectorStore):
             if conn:
                 self.connection_pool.putconn(conn)
 
+    @contextmanager
+    def _get_admin_connection(self):
+        """
+        Context manager that borrows a connection from the pool and returns it after use.
+
+        Yields:
+            psycopg2 connection object
+
+        Ensures the connection is always returned to the pool (even on exception).
+        """
+        conn = None
+        try:
+            # Borrow a connection from the pool
+            conn = self.connection_admin_pool.getconn()
+            yield conn
+        finally:
+            # Always return connection to pool, even if an error occurred
+            if conn:
+                self.connection_admin_pool.putconn(conn)
+
     def _initialize_database(self) -> None:
         """
         Initialize database schema, indexes, and optionally RLS.
@@ -148,7 +176,7 @@ class PgVectorStore(BaseVectorStore):
             VectorStoreException: If schema creation fails
         """
         try:
-            with self._get_connection() as conn:
+            with self._get_admin_connection() as conn:
                 with conn.cursor() as cur:
 
                     # Enable pgvector extension (idempotent - safe to run multiple times)
@@ -203,7 +231,9 @@ class PgVectorStore(BaseVectorStore):
 
             # After schema is ready, enable RLS if requested
             if self.enable_rls:
-                self._ensure_rls_enabled(conn)
+                # Create the table, indexes, and optionally enable RLS
+                with self._get_admin_connection() as admincon:
+                    self._ensure_rls_enabled(admincon)
 
         except Exception as e:
             logger.error(f"Database initialization failed: {str(e)}")
@@ -223,6 +253,7 @@ class PgVectorStore(BaseVectorStore):
         Returns:
             True if RLS is now enabled, False if it failed.
         """
+        logger.info(f"::: ROW LEVEL SECURITY for {self.table_name} with role :{self.user_role}")
         # Check in-memory cache first — skip DB call if already done this session
         if self.table_name in _rls_enabled_cache:
             logger.info(f"RLS already enabled for {self.table_name} (cached)")
@@ -230,7 +261,7 @@ class PgVectorStore(BaseVectorStore):
 
         try:
             # Use provided connection or get one from pool
-            ctx = self._get_connection() if conn is None else _NullContext(conn)
+            ctx = self._get_admin_connection() if conn is None else _NullContext(conn)
 
             with ctx as active_conn:
                 with active_conn.cursor() as cur:
@@ -248,33 +279,51 @@ class PgVectorStore(BaseVectorStore):
                     if rls_status and rls_status[0] and rls_status[1]:
                         # Add to cache so we skip this check next time
                         _rls_enabled_cache.add(self.table_name)
-                        logger.info(f"RLS already enabled in database for {self.table_name}")
+                        logger.info(f"RLS already enabled in database for {self.table_name} , role:{self.user_role}")
                         return True
-
-                    # Grant DML permissions to the specified user role
-                    if self.user_role:
-                        cur.execute(
-                            f"GRANT SELECT, INSERT, UPDATE, DELETE ON {self.table_name} TO {self.user_role}"
-                        )
-
-                    # Enable RLS — only superuser/owner rows visible by default
-                    cur.execute(f"ALTER TABLE {self.table_name} ENABLE ROW LEVEL SECURITY")
-
-                    # Force RLS even for table owner (critical for multi-tenant security)
-                    cur.execute(f"ALTER TABLE {self.table_name} FORCE ROW LEVEL SECURITY")
+                    
+                    self.createPolicy(cur)
 
                     # Commit the security changes
                     active_conn.commit()
 
                     # Cache the result to avoid redundant ALTER TABLE calls
                     _rls_enabled_cache.add(self.table_name)
-                    logger.info(f"RLS enabled successfully for {self.table_name}")
+                    logger.info(f"RLS enabled successfully for {self.table_name} , role:{self.user_role}")
                     return True
 
         except Exception as e:
             # Log error but do NOT raise — RLS failure should not crash the app
-            logger.error(f"Error enabling RLS for {self.table_name}: {str(e)}")
+            logger.error(f"Error enabling RLS for {self.table_name} , role:{self.user_role}: {str(e)}")
             return False
+
+
+    def createPolicy(self,cur):
+        logger.info(f"RLS CREATE POLICY BEGIN for {self.table_name} , role:{self.user_role}")
+        if self.user_role:
+             # DROP first to avoid duplicate policy error (works on all PG versions)
+            cur.execute(f"DROP POLICY IF EXISTS insert_policy ON {self.table_name}")
+            cur.execute(f"DROP POLICY IF EXISTS select_policy ON {self.table_name}")
+            cur.execute(f"DROP POLICY IF EXISTS update_policy ON {self.table_name}")
+            cur.execute(f"DROP POLICY IF EXISTS delete_policy ON {self.table_name}")
+
+            # Recreate policies
+            cur.execute(f"CREATE POLICY insert_policy ON {self.table_name} FOR INSERT TO {self.user_role} WITH CHECK (true)")
+            cur.execute(f"CREATE POLICY select_policy ON {self.table_name} FOR SELECT TO {self.user_role} USING (true)")
+            cur.execute(f"CREATE POLICY update_policy ON {self.table_name} FOR UPDATE TO {self.user_role} USING (true)")
+            cur.execute(f"CREATE POLICY delete_policy ON {self.table_name} FOR DELETE TO {self.user_role} USING (true)")
+
+            # Grant DML permissions
+            cur.execute(f"GRANT SELECT, INSERT, UPDATE, DELETE ON {self.table_name} TO {self.user_role}")
+
+            # Enable and force RLS
+            cur.execute(f"ALTER TABLE {self.table_name} ENABLE ROW LEVEL SECURITY")
+            cur.execute(f"ALTER TABLE {self.table_name} FORCE ROW LEVEL SECURITY")
+            # Grant DML permissions to the specified user role
+            cur.execute(
+                f"GRANT SELECT, INSERT, UPDATE, DELETE ON {self.table_name} TO {self.user_role}"
+            )
+           
 
     def add_documents(self,
                       documents: List[Document],
@@ -306,9 +355,16 @@ class PgVectorStore(BaseVectorStore):
 
         try:
             # Validate all embeddings have the correct dimension before inserting
+            #embeddings = [np.array(emb) if not isinstance(emb, np.ndarray) else emb for emb in embeddings]
+            embeddings = [
+                np.array(emb).flatten()  # flatten handles 0-d, 2-d arrays → always 1D
+                if not isinstance(emb, np.ndarray)
+                else emb.flatten()
+                for emb in embeddings
+            ]
             for i, emb in enumerate(embeddings):
                 self.validate_embedding(emb, self.dimension)
-
+            logger.info(f"Embedding shape check: count={len(embeddings)}, dimension={len(embeddings[0])}")
             total_added = 0
 
             # Process documents in fixed-size batches to avoid memory/query size issues
@@ -319,7 +375,6 @@ class PgVectorStore(BaseVectorStore):
                 # Insert this batch into the database
                 self._add_batch(batch_docs, batch_embs)
                 total_added += len(batch_docs)
-
                 logger.debug(f"Added batch {i // batch_size + 1}: {total_added}/{len(documents)}")
 
             logger.info(f"Successfully added {total_added} documents to {self.table_name}")
@@ -339,39 +394,43 @@ class PgVectorStore(BaseVectorStore):
             documents  : Batch of Document objects
             embeddings : Corresponding embedding vectors
         """
+        logger.info(f"::::: ADD BATCH ::: Begin :::::{self.table_name}")
         with self._get_connection() as conn:
-            with conn.cursor() as cur:
+            try:
+                with conn.cursor() as cur:
+                    # Build list of tuples: (id, content, metadata_json, embedding_list)
+                    batch_data = [
+                        (
+                            doc.id,
+                            doc.content,
+                            json.dumps(doc.metadata),   # Serialize metadata dict to JSON string
+                            emb.tolist()                # Convert numpy array to plain Python list
+                        )
+                        for doc, emb in zip(documents, embeddings)
+                    ]
 
-                # Build list of tuples: (id, content, metadata_json, embedding_list)
-                batch_data = [
-                    (
-                        doc.id,
-                        doc.content,
-                        json.dumps(doc.metadata),   # Serialize metadata dict to JSON string
-                        emb.tolist()                # Convert numpy array to plain Python list
+                    # execute_values inserts all rows in one round-trip (much faster than executemany)
+                    # ON CONFLICT updates existing rows with same id (upsert / idempotent)
+                    extras.execute_values(
+                        cur,
+                        f"""
+                        INSERT INTO {self.table_name} (id, content, metadata, embedding)
+                        VALUES %s
+                        ON CONFLICT (id) DO UPDATE SET
+                            content    = EXCLUDED.content,
+                            metadata   = EXCLUDED.metadata,
+                            embedding  = EXCLUDED.embedding,
+                            updated_at = CURRENT_TIMESTAMP
+                        """,
+                        batch_data,
+                        template="(%s, %s, %s::jsonb, %s::vector)"  # Explicit casts for pgvector
                     )
-                    for doc, emb in zip(documents, embeddings)
-                ]
 
-                # execute_values inserts all rows in one round-trip (much faster than executemany)
-                # ON CONFLICT updates existing rows with same id (upsert / idempotent)
-                extras.execute_values(
-                    cur,
-                    f"""
-                    INSERT INTO {self.table_name} (id, content, metadata, embedding)
-                    VALUES %s
-                    ON CONFLICT (id) DO UPDATE SET
-                        content    = EXCLUDED.content,
-                        metadata   = EXCLUDED.metadata,
-                        embedding  = EXCLUDED.embedding,
-                        updated_at = CURRENT_TIMESTAMP
-                    """,
-                    batch_data,
-                    template="(%s, %s, %s::jsonb, %s::vector)"  # Explicit casts for pgvector
-                )
-
-                # Commit this batch
-                conn.commit()
+                    # Commit this batch
+                    conn.commit()
+            except Exception as e:
+                logger.error(f"single batch of documents failed: {str(e)}")
+           
 
     def similarity_search(self,
                           query_embedding: np.ndarray,
@@ -554,6 +613,8 @@ class PgVectorStore(BaseVectorStore):
         if self.connection_pool:
             self.connection_pool.closeall()
             logger.info("Closed all database connections")
+        if self.connection_admin_pool:
+            self.connection_admin_pool.closeall()
 
 
 class _NullContext:

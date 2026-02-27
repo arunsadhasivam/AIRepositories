@@ -272,13 +272,10 @@ class VectorStoreRetriever(BaseRetriever):
         Wraps HybridRetriever into a LangChain compatible retriever.
         Required for MultiQueryRetriever.from_llm() to accept it.
         """
-        
         # Local reference to self (HybridRetriever) for use inside inner class
         vector  = self
-
         # Inner class that extends LangChain's BaseRetriever
         class LangChainAdapter(LangChainBaseRetriever):
-
             def _get_relevant_documents(
                 self, 
                 query: str, 

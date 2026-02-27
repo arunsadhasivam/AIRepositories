@@ -6,8 +6,6 @@ load_dotenv()
 from flask import Flask, request, jsonify
 
 from embeddings.DocumentEmbedding import DocumentEmbedder
-from embeddings.get_vector_db import clear_connection_cache
-from embeddings.get_vector_db import get_vector_db
 from prompt.query import query
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -77,7 +75,11 @@ def route_query():
 
 @app.route('/delete', methods=['DELETE'])
 def route_delete():
-    db = get_vector_db()
+    data = request.get_json()
+    user_role = data.get("user_role")
+    pwd = data.get("password")
+    docEmbed = DocumentEmbedder()
+    db = docEmbed.get_pg_vector_connection(user_role=user_role,pwd=pwd)
     db.delete_collection()
 
     return jsonify({"message": "Collection deleted successfully"}), 200
@@ -92,7 +94,8 @@ def admin_clear_cache():
     """
     try:
         # Clear the cache
-        clear_connection_cache()
+        docEmbed = DocumentEmbedder()
+        docEmbed.clear_connection_cache()
         # Return success response
         return jsonify({
             'status': 'success',
