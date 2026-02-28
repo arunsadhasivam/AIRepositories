@@ -1,0 +1,4 @@
+mcp                  # MCP Python SDK (FastMCP server + client)
+asyncpg              # PostgreSQL async driver
+pydantic             # Input validation
+ollama               # Ollama Python client for llama3
