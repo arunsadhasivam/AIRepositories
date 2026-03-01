@@ -279,7 +279,4 @@ psql -U postgres -d helpdesk_db -c "SELECT * FROM audit_logs;"
 > Tech: Python · FastMCP · Ollama · PostgreSQL · asyncpg
 
 ---
-
-## 📄 License
-
-MIT License — free to use and showcase.
+ 
