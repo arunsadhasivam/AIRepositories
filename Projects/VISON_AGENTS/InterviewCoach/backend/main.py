@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from vision_agents.core import User, Agent, AgentLauncher, Runner
 from vision_agents.plugins.gemini import Realtime
 from vision_agents.plugins.ultralytics import YOLOPoseProcessor
-from vision_agents.plugins import getstream
+from vision_agents.plugins import gemini,getstream
 load_dotenv()
 
 INSTRUCTIONS = """
@@ -25,7 +25,7 @@ async def create_agent(**kwargs) -> Agent:
     return Agent(
         agent_user=User(name="Interview Coach AI", id="agent"),
         instructions=INSTRUCTIONS,
-        llm=Realtime(model="gemini-2.5-flash", fps=5),
+        llm=gemini.Realtime(model="gemini-2.5-flash-native-audio-preview-12-2025"),
         processors=[YOLOPoseProcessor(model_path="yolo11n-pose.pt")],
         edge=edge
     )
