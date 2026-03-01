@@ -125,6 +125,9 @@ npm install @google/generative-ai
 
 
 # Backend (inside interviewcoach/backend)
+
+```
 pip install vision-agent
-pip install google-generativeai
+pip install google-generativeai #ui
+```
 
