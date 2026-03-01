@@ -131,3 +131,13 @@ pip install vision-agent
 pip install google-generativeai #ui
 ```
 
+
+Run backend:
+============ 
+
+```
+(VISION_AGENTS) C:\WorkSpace\InterviewCoach\backend> uv run --active main.py
+```
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/4d9b1ff4-e02a-45ef-830a-91b12bf21edd" />
+
+
