@@ -108,6 +108,10 @@ Tech Stack:
  ======
 
 
+Node Modules:
+==============
+
+
  ```
 
 npm create vite@latest interview-coach -- --template react
@@ -117,3 +121,10 @@ npm install @google/generative-ai
 
 
 ```
+
+
+
+# Backend (inside interviewcoach/backend)
+pip install vision-agent
+pip install google-generativeai
+
