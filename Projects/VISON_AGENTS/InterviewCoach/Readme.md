@@ -102,4 +102,18 @@ Tech Stack:
 - Communication skill improvement
 
 ---
- 
+
+
+ Setup:
+ ======
+
+
+ ```
+
+npm create vite@latest interview-coach -- --template react
+cd interview-coach
+npm install @stream-io/video-react-sdk
+npm install @google/generative-ai
+
+
+```
