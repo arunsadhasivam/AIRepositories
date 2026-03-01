@@ -1,16 +1,16 @@
 Flow:
 ======
 
-User Webcam (React)
-       ↓
-Vision Agents SDK        ← captures live video frames
-       ↓
-YOLO / Moondream         ← detects: eye contact, posture, expressions
-       ↓
-Gemini Live API          ← analyses: answer quality, confidence, clarity
-       ↓
-React UI                 ← shows real-time feedback to user
-
+       User Webcam (React)
+              ↓
+       Vision Agents SDK        ← captures live video frames
+              ↓
+       YOLO / Moondream         ← detects: eye contact, posture, expressions
+              ↓
+       Gemini Live API          ← analyses: answer quality, confidence, clarity
+              ↓
+       React UI                 ← shows real-time feedback to user
+       
 
 
 Tech Stack:
