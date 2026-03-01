@@ -1,6 +1,0 @@
-fastapi              # web framework for REST API
-uvicorn              # ASGI server to run FastAPI
-mediapipe            # Google MediaPipe for pose + face detection
-opencv-python        # OpenCV for image processing
-numpy                # array manipulation
-python-multipart     # for handling form data
