@@ -45,3 +45,19 @@ az functionapp config set \
 
 - to view the functionapp details.
 
+
+Step 4:
+========
+
+- tail log
+- install azure-cli
+
+
+```
+PS C:\Arun> az webapp log tail --name funemployee --resource-group rg-funemployee
+
+get the function app name and resource group name.
+
+az functionapp list --output table
+
+```
