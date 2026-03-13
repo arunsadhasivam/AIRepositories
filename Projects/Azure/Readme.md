@@ -28,7 +28,7 @@ Step 2:
 ========
 
 
-
+npm install -g azurite # emulate the azure storage in local.
 az functionapp config set \
   --python-version 3.11 \
   --name <YOUR_FUNCTION_APP_NAME> \
