@@ -33,3 +33,15 @@ az functionapp config set \
   --python-version 3.11 \
   --name <YOUR_FUNCTION_APP_NAME> \
   --resource-group <YOUR_RESOURCE_GROUP>
+
+
+  step3:
+  ======
+
+```
+  az functionapp list --output table
+
+ ```
+
+- to view the functionapp details.
+
