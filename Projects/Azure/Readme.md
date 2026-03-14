@@ -65,7 +65,7 @@ az functionapp list --output table
 Step 5:
 ========
 
-- to run azure functions locally
+- to run azure functions locally from https://github.com/Azure/azure-functions-core-tools
 
   ```
   npm install -g azure-functions-core-tools@4
