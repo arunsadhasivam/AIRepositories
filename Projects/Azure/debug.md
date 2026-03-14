@@ -26,3 +26,18 @@ To find path where it is installed:
 python -c "import openai; print(openai.__file__)"
 
 ```
+
+To make deployment to build create .deployment:
+=====================================================
+
+
+- in the  project root .deployment file.
+
+https://github.com/projectkudu/kudu/wiki/Configurable-settings#enabledisable-build-actions-preview
+
+```
+ini[config]
+SCM_DO_BUILD_DURING_DEPLOYMENT=true
+```
+
+ 
