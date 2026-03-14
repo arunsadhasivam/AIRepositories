@@ -61,3 +61,12 @@ get the function app name and resource group name.
 az functionapp list --output table
 
 ```
+
+Step 5:
+========
+
+- to run azure functions locally
+
+  ```
+  npm install -g azure-functions-core-tools@4
+  ```
