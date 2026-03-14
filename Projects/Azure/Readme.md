@@ -80,3 +80,13 @@ Debugging:
 
 func  start --language-worker-timeout 60 -- --debugPort 9091
 ```
+
+Prequisties for build:
+=========================
+
+
+- make sure 2 properties are set
+
+```
+SCM_DO_BUILD_DURING_DEPLOYMENT - Tells Azure trigger a build after deployment
+ENABLE_ORYX_BUILD - Tells Azure use Oryx to do that build — which runs pip install
