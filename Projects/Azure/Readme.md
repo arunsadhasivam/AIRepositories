@@ -66,7 +66,8 @@ Step 5:
 ========
 
 - to run azure functions locally from https://github.com/Azure/azure-functions-core-tools
-
+- make sure full version not min 
+  https://github.com/Azure/azure-functions-core-tools/releases/download/4.8.0/Azure.Functions.Cli.win-x64.4.8.0.zip
   ```
   npm install -g azure-functions-core-tools@4
   ```
