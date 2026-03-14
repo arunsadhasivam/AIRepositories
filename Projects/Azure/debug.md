@@ -40,4 +40,18 @@ ini[config]
 SCM_DO_BUILD_DURING_DEPLOYMENT=true
 ```
 
+
+Build:
+=====
+
+- to avoid changing the SCM_DO_BUILD_DURING_DEPLOYMENT better approach is --build-remote true
+
+```
+az functionapp deployment source config-zip --resource-group <<resourcegroup>> --name <<functionname>>  --src app.zip  --build-remote true
+
+#log
+Setting SCM_DO_BUILD_DURING_DEPLOYMENT to true
+Removing ENABLE_ORYX_BUILD app setting
+```
+
  
