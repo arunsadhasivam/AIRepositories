@@ -71,3 +71,12 @@ Step 5:
   ```
   npm install -g azure-functions-core-tools@4
   ```
+
+
+Debugging:
+==============
+
+```
+
+func  start --language-worker-timeout 60 -- --debugPort 9091
+```
