@@ -13,3 +13,12 @@ pip install openai==2.28.0 --target="c:/python/lib/python3.12/site-packages" --u
 ls /opt/python/3/lib/python3.12/site-packages | grep openai
 
 ```
+
+
+To find path where it is installed:
+====================================
+
+```
+python -c "import openai; print(openai.__file__)"
+
+```
