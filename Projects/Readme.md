@@ -13,6 +13,16 @@ main project:
     Network URL: http://10.0.0.218:8501
 
 
+```
+1)  C:\WorkSpace\RAG\LOCAL_RAG_REST_API>python app.py      
+2) C:\WorkSpace\RAG\LOCAL_RAG>streamlit run RAGUI.py
+3) C:\SOLR\solr-9.10.1\bin>solr.cmd start
+4) run first C:\Memurai\merumai.exe
+5) run C:\Memurai\merumai-cli.exe > 127.0.0.1:6379>
+        
+
+```
+
 Start ollama:
 ==============
 
