@@ -27,13 +27,16 @@ class Document:
     content: str
     metadata: Dict[str, Any] = field(default_factory=dict)
     score: Optional[float] = None
-    
+    page_content: Optional[str] = None   
+
     def __post_init__(self):
         """Validate document after initialization."""
         if not self.id:
             raise ValueError("Document ID cannot be empty")
         if not self.content:
             raise ValueError("Document content cannot be empty")
+        
+        self.page_content = self.content  
         
         # Add creation timestamp if not present in metadata
         if 'created_at' not in self.metadata:

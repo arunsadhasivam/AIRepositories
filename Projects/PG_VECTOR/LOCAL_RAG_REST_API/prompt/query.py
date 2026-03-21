@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers import MultiQueryRetriever
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_community.embeddings import OllamaEmbeddings
-
+from rag.judge.JudgePipeline import run_judge_pipeline
 from rag.vectorstore.DistanceMetric import DistanceMetric
 from rag.retriever.config.RetrieverConfig import RetrieverConfig
 from rag.retriever import BaseRetriever,VectorStoreRetriever,HybridRetriever,SolrSparseRetriever
@@ -15,6 +15,7 @@ import json
 import logging
 logging.basicConfig(level=logging.DEBUG)
 import os
+
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'default-local-rag')
@@ -23,7 +24,7 @@ DB_PORT = os.getenv('DB_PORT', '5432')
 DB_NAME = os.getenv('DB_NAME', 'rag')
 DB_SUPERUSER = os.getenv('DB_SUPERUSER', '5432')
 DB_SUPERUSER_PWD = os.getenv('DB_SUPERUSER_PWD', '5432')
-
+SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
     QUERY_PROMPT = PromptTemplate(
@@ -90,7 +91,7 @@ def query(query,search_type,user_role,pwd):
                  # Step 2: Create sparse (BM25/keyword) retriever
                 sparseRetriever = SolrSparseRetriever(
                     host="localhost",
-                    port=8983,
+                    port=SOLR_PORT,
                     core="rag_core",
                     collection_id=None   # or pass specific collection if needed
                 )
@@ -107,6 +108,8 @@ def query(query,search_type,user_role,pwd):
                     llm,
                     prompt=QUERY_PROMPT
                 )
+
+                
             else:
                 logging.info(':::::: COSINE SIMILARITY SEARCH :::::')
                 # Get the vector database instance
@@ -154,12 +157,40 @@ def query(query,search_type,user_role,pwd):
                     | StrOutputParser()
                 )
                 response = rag_chain.invoke(query)
-            return response
+
+           
+            return getJudgeResponse(retriever,hybridRetriever,query,response,llm)
     except Exception as e:
         logging.error(f"'::::: Error processing query: {str(e)}")
         raise
 
-   
+def getJudgeResponse(retriever,hybridRetriever,query,response,llm):
+    # Step 2 — Retrieve docs separately for judge context
+    try:
+        docs = retriever.invoke(query)
+        # Step 3 — Run judge pipeline
+        judge_result = run_judge_pipeline(
+            query=query,
+            answer=response,
+            context_chunks=[doc.page_content for doc in docs],
+            primary_retriever=hybridRetriever,
+            llm=llm
+        )
+
+        # Step 4 — Act on judge result
+        if judge_result["status"] == "blocked":
+            logging.warning(f"::::: JUDGE BLOCKED RESPONSE: {judge_result['reason']}")
+            response = "I could not generate a reliable answer for this query."
+        elif judge_result["status"] == "low_confidence":
+            logging.warning(f"::::: JUDGE LOW CONFIDENCE: {judge_result['scores']}")
+            response = judge_result["answer"]   # return answer but logged as low confidence
+        else:
+            logging.debug(f"::::: JUDGE PASSED: {judge_result['scores']}")
+            response = judge_result["answer"]   # use judge-approved answer
+        return response
+    except Exception as e:
+        logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
+        raise 
 
   # Function to dynamically route between math agent and RAG chain
 def dynamic_router(query):
