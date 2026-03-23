@@ -28,7 +28,7 @@ class SearchService:
             cached = self.cache.get(querykey);   
             if cached:
                 result = cached["result"]
-                logging.info("::::: RETURNED FROM REDIScache:::::::::::::::::::",result)
+                logging.info(f"::::: RETURNED FROM REDIScache:::::::::::::::::::{result}")
                 return result
         
             endPointQUery  = 'http://localhost:8080/query?query='+query
@@ -39,7 +39,7 @@ class SearchService:
                 return "No Result Found"
             
             if response:
-                logging.info(f'::::: Controller:response:::'+response)
+                logging.info(f'::::: Controller:response:::{response}')
                 self.cache.set(querykey, None, response)  # or store embedding+result later
         return  response
     

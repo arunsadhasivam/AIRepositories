@@ -10,6 +10,10 @@ from rag.vectorstore.DistanceMetric import DistanceMetric
 from rag.retriever.config.RetrieverConfig import RetrieverConfig
 from rag.retriever import BaseRetriever,VectorStoreRetriever,HybridRetriever,SolrSparseRetriever
 from rag.vectorstore.PgVectorStore import PgVectorStore
+from rag.guadrail.GuadRail import input_guardrail
+from rag.guadrail.GuadRail import output_guardrail
+from rag.guadrail.GuadRail import is_input_safe
+from rag.guadrail.GuadRail import is_output_safe
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
 import logging
@@ -17,6 +21,8 @@ logging.basicConfig(level=logging.DEBUG)
 import os
 
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
+GUADRAIL_TOPIC_CONTENT=os.getenv('GUADRAIL_TOPIC_CONTENT')
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'default-local-rag')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
@@ -70,6 +76,11 @@ def query(query,search_type,user_role,pwd):
         if query:
             # Initialize the language model with the specified model name
             llm = ChatOllama(model=LLM_MODEL)
+            hybridRetriever = None
+            # ── INPUT GUADTRAIL ──
+            input_result = input_guardrail(query, GUADRAIL_TOPIC_CONTENT)
+            if not is_input_safe(input_result, query):
+             return 'INPUT PROMPT VERIFIER:'+GUADRAIL_WARNING_MESSAGE  # blocked early, never hits ret
           
             # Get the prompt templates
             QUERY_PROMPT, prompt = get_prompt()
@@ -108,8 +119,6 @@ def query(query,search_type,user_role,pwd):
                     llm,
                     prompt=QUERY_PROMPT
                 )
-
-                
             else:
                 logging.info(':::::: COSINE SIMILARITY SEARCH :::::')
                 # Get the vector database instance
@@ -120,6 +129,7 @@ def query(query,search_type,user_role,pwd):
                     prompt=QUERY_PROMPT
                 )
 
+            # GET RETRIEVER     
             classifier_prompt = PromptTemplate(
                 input_variables=["query"],
                 template="""Analyze this query and determine if it requires mathematical calculation.
@@ -133,7 +143,7 @@ def query(query,search_type,user_role,pwd):
                     | llm 
                     | StrOutputParser()
             )
-        
+    
             # Define the processing chain to retrieve context, generate the answer, and parse the output
             classification_response = classifier_chain.invoke(query)
             # Parse JSON response properly
@@ -156,10 +166,18 @@ def query(query,search_type,user_role,pwd):
                     | llm
                     | StrOutputParser()
                 )
-                response = rag_chain.invoke(query)
+            response = rag_chain.invoke(query)
 
-           
-            return getJudgeResponse(retriever,hybridRetriever,query,response,llm)
+            # ── OUTPUT GUADTRAIL ──
+            retrieved_context = retriever.invoke(query)
+            retrieved_context_text = " ".join([doc.page_content for doc in retrieved_context])
+            output_result = output_guardrail(query, retrieved_context_text, response)
+            if not is_output_safe(output_result, response):
+                return 'OUTPUT :'+GUADTRAIL_WARNING_MESSAGE
+            # ── END ADD ──
+            response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm)
+
+        return response
     except Exception as e:
         logging.error(f"'::::: Error processing query: {str(e)}")
         raise
