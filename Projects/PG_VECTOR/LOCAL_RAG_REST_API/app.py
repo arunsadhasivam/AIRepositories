@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
-
+import phoenix as px
+os.environ["PHOENIX_WORKING_DIR"] = "C:/Arun/phoenix"
+px.launch_app()
 load_dotenv()
 
 from flask import Flask, request, jsonify
