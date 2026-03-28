@@ -2,7 +2,7 @@ import os
 from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from langchain.retrievers import MultiQueryRetriever
+from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_community.embeddings import OllamaEmbeddings
 from rag.judge.JudgePipeline import run_judge_pipeline
@@ -18,6 +18,11 @@ from agents.MathClassificationAgent import MathClassificationAgent
 import json
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+import phoenix as px
+from phoenix.client import Client
+
+client = Client()
 import os
 
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
@@ -31,6 +36,27 @@ DB_NAME = os.getenv('DB_NAME', 'rag')
 DB_SUPERUSER = os.getenv('DB_SUPERUSER', '5432')
 DB_SUPERUSER_PWD = os.getenv('DB_SUPERUSER_PWD', '5432')
 SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
+
+
+def get_phoenix_prompt(name: str) -> dict:
+    prompts = client.prompts.list()
+    matched = next((p for p in prompts if p.name == name), None)
+    
+    if not matched:
+        logging.warning(f"::::: Phoenix prompt '{name}' not found, using default")
+        return None
+    
+    prompt_version = client.prompts.get(prompt_id=matched.id)
+    messages = prompt_version.template["messages"]
+    
+    result = {}
+    for msg in messages:
+        result[msg["role"]] = msg["content"]
+    
+    logging.info(f"::::: Phoenix prompt loaded: {name}")
+    return result
+
+
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
     QUERY_PROMPT = PromptTemplate(
@@ -75,7 +101,8 @@ def query(query,search_type,user_role,pwd):
     try:
         if query:
             # Initialize the language model with the specified model name
-            llm = ChatOllama(model=LLM_MODEL)
+            ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+            llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
             hybridRetriever = None
             # ── INPUT GUADTRAIL ──
             input_result = input_guardrail(query, GUADRAIL_TOPIC_CONTENT)
@@ -129,6 +156,8 @@ def query(query,search_type,user_role,pwd):
                     prompt=QUERY_PROMPT
                 )
 
+
+            #math_prompt_template = get_phoenix_prompt("math_prompt")
             # GET RETRIEVER     
             classifier_prompt = PromptTemplate(
                 input_variables=["query"],

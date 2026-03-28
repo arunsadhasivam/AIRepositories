@@ -1,12 +1,18 @@
 import os
 from dotenv import load_dotenv
-import phoenix as px
-os.environ["PHOENIX_WORKING_DIR"] = "C:/Arun/phoenix"
-px.launch_app()
 load_dotenv()
+# tmp_path = os.getenv('PHOENIX_TMP_DIR')
+# import phoenix as px
+# px.launch_app()
+# Phoenix setup - MUST be before all other imports
+if not os.environ.get("PHOENIX_WORKING_DIR"):
+    os.environ["PHOENIX_WORKING_DIR"] = os.getenv('PHOENIX_TMP_DIR')
+import phoenix as px
+from phoenix.otel import register
+px.launch_app()
+tracer_provider = register(project_name="rag-pipeline")
 
 from flask import Flask, request, jsonify
-
 from embeddings.DocumentEmbedding import DocumentEmbedder
 from prompt.query import query
 import logging
@@ -28,6 +34,8 @@ logging.getLogger(":pikepdf._core").setLevel(logging.WARNING)
 
 TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
 os.makedirs(TEMP_FOLDER, exist_ok=True)
+
+
 
 app = Flask(__name__)
 @app.route('/embed', methods=['POST'])
