@@ -1,5 +1,9 @@
 for windows : https://www.memurai.com/
 
+https://redis.io/redisinsight/
+
+install redis on docker install langfuse project https://github.com/langfuse/langfuse
+
 
 Make sure run the merumai server first:
 ==========================================
