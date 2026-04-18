@@ -1,0 +1,1 @@
+start cmd /k "C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts\activate && cd C:\WorkSpace\RAG\LOCAL_RAG_REST_API && python app.py"
