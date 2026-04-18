@@ -13,6 +13,8 @@ from model.SearchType import SearchType
 import logging
 import time   
 import json 
+from datetime import datetime
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -89,6 +91,8 @@ class RAGUI:
             st.html('<b>USER<b>: <span style="color:green">'+st.session_state.username +'</span' )
             st.html('<b>Role: <span style="color:green">'+roleName +'</span' )
             st.html('<hr>')
+            st.html('<hr>')
+            st.html('<a href="http://localhost:8080/health_check"> HealthCheck </a>')
             
         # Main interface
         tab1, tab2 = st.tabs(["📄 Document Upload", "🔍 Search"])
@@ -153,9 +157,7 @@ class RAGUI:
                 st.text(f"Error in processing Query From Vector DB:help ")      
 
 
-# def configure(binder):
-#     binder.bind(SearchController, to=SearchController)
-
+        
 if __name__ == "__main__":
     # set default state.
     if "authenticated" not in st.session_state:

@@ -9,6 +9,7 @@ class RetrieverConfig:
     sparse_weight: float = 0.5
     min_score_threshold: float = 0.0
     normalize_scores: bool = True
+    top_k:int=5
     
     def __post_init__(self):
         """Validate configuration."""

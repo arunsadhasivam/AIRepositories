@@ -43,4 +43,8 @@ class SearchService:
                 self.cache.set(querykey, None, response)  # or store embedding+result later
         return  response
     
-    
+    def healthCheck(self):
+        endPointQUery  = 'http://localhost:8080/health_check'
+        result =  requests.get(endPointQUery)
+       
+        return result

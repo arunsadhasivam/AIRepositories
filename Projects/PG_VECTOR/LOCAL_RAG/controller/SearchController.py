@@ -19,4 +19,7 @@ class SearchController:
         logging.info(f'::::: SEARCH CONTROLLER:searchQuery:::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
     
         return  self.service.searchQuery(query,search_type,user_role,pwd)
+    def healthCheck(self):
+        logging.info('::::: HEALTH CHECK:::::' )
+        return  self.service.healthCheck()
        

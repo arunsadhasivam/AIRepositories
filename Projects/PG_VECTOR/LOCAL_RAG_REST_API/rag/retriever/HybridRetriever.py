@@ -88,13 +88,12 @@ class HybridRetriever(BaseRetriever):
             RetrieverException: If retrieval fails
         """
         try:
+            if self.config.top_k:
+                top_k  = int(self.config.top_k) # *2 if want more  
             # Validate query
             self.validate_query(query)
-            
-            # Retrieve from both sources
-            # Use higher k for initial retrieval to ensure good coverage
-            fetch_k = max(top_k * 2, 20)
-            
+            fetch_k = max(top_k, 5)
+            logging.info(f'::::: HYBRID RETRIEVER ::: VECTOR RETRIEVER::::query={query}, top-k={fetch_k}')    
             vector_results = self._safe_retrieve(
                 self.vector_retriever, 
                 query, 
@@ -102,6 +101,7 @@ class HybridRetriever(BaseRetriever):
                 "vector"
             )
             
+            logging.info(f'::::: HYBRID RETRIEVER ::: SOLR SPARSE RETRIEVER::::query={query}, top-k={fetch_k}')    
             sparse_results = self._safe_retrieve(
                 self.sparse_retriever, 
                 query, 
@@ -114,6 +114,12 @@ class HybridRetriever(BaseRetriever):
                 vector_results, 
                 sparse_results
             )
+
+            vector_len = len(sparse_results)
+            sparse_solr_len = len(sparse_results)
+            totlen = vector_len + sparse_solr_len
+            logging.info(f'::::: HYBRID RETRIEVER ::: (SOLR SPARSE + VECTOR) COMBINED::::VECTOR Result={vector_len }, SPARSE SOLR RESULT={sparse_solr_len}, total ={totlen}')    
+
             
             # Apply score threshold if configured
             if self.config.min_score_threshold > 0:

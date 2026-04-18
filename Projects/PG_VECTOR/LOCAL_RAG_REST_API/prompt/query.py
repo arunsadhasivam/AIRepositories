@@ -14,16 +14,31 @@ from rag.guadrail.GuadRail import input_guardrail
 from rag.guadrail.GuadRail import output_guardrail
 from rag.guadrail.GuadRail import is_input_safe
 from rag.guadrail.GuadRail import is_output_safe
+from prompt.promptFactory import get_prompt
+from rag.kvcache.kvContext import getKVStableContext
+
+
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
-import phoenix as px
-from phoenix.client import Client
-
-client = Client()
+# import phoenix as px
+# from phoenix.client import Client
+# client = Client()
+from langfuse.callback import CallbackHandler
+from langfuse import Langfuse
 import os
+# initialize langfuse handler once
+langfuse_handler = CallbackHandler(
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    host=os.getenv("LANGFUSE_BASE_URL")
+)
+
+print("::::: LANGFUSE SK::::::", os.getenv("LANGFUSE_SECRET_KEY"))
+print("::::: LANGFUSE PK:::::", os.getenv("LANGFUSE_PUBLIC_KEY"))
+print("::::: LANGFUSE HOST:::::", os.getenv("LANGFUSE_BASE_URL"))
 
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
 GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
@@ -36,47 +51,33 @@ DB_NAME = os.getenv('DB_NAME', 'rag')
 DB_SUPERUSER = os.getenv('DB_SUPERUSER', '5432')
 DB_SUPERUSER_PWD = os.getenv('DB_SUPERUSER_PWD', '5432')
 SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
+SOLR_CORE = os.getenv('SOLR_CORE',default='rag_core')
 
+TOP_K = os.getenv('TOP_K',default=5)
+langfuse = Langfuse()
 
-def get_phoenix_prompt(name: str) -> dict:
-    prompts = client.prompts.list()
-    matched = next((p for p in prompts if p.name == name), None)
-    
-    if not matched:
-        logging.warning(f"::::: Phoenix prompt '{name}' not found, using default")
-        return None
-    
-    prompt_version = client.prompts.get(prompt_id=matched.id)
-    messages = prompt_version.template["messages"]
-    
-    result = {}
-    for msg in messages:
-        result[msg["role"]] = msg["content"]
-    
-    logging.info(f"::::: Phoenix prompt loaded: {name}")
-    return result
+ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
+# Get the prompt templates
+QUERY_PROMPT, prompt = get_prompt()
 
+def verify_langfuse():
+    check = langfuse.auth_check()
+    logging.info(f"::::: Langfuse auth check: {check}")
+    return check
+#verify_langfuse()
 
-# Function to get the prompt templates for generating alternative questions and answering based on context
-def get_prompt():
-    QUERY_PROMPT = PromptTemplate(
-        input_variables=["question"],
-        template="""You are an AI language model assistant. Your task is to generate five
-        different versions of the given user question to retrieve relevant documents from
-        a vector database. By generating multiple perspectives on the user question, your
-        goal is to help the user overcome some of the limitations of the distance-based
-        similarity search. Provide these alternative questions separated by newlines.
-        Original question: {question}""",
+def get_langfuse_prompt(name: str) -> PromptTemplate:
+    # pull prompt from Langfuse UI
+    prompt = langfuse.get_prompt(name)
+    # compile with variable
+    template = prompt.compile(query="{{query}}")
+    # convert to LangChain PromptTemplate
+    return PromptTemplate(
+        input_variables=["query"],
+        template=prompt.prompt  # raw template string
     )
 
-    template = """Answer the question based ONLY on the following context:
-    {context}
-    Question: {question}
-    """
-
-    prompt = ChatPromptTemplate.from_template(template)
-
-    return QUERY_PROMPT, prompt
 
 def getPgVectorStore(user_role,pwd):
         pg_vector_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={user_role} password={pwd}"
@@ -101,16 +102,14 @@ def query(query,search_type,user_role,pwd):
     try:
         if query:
             # Initialize the language model with the specified model name
-            ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
-            llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
+          
             hybridRetriever = None
             # ── INPUT GUADTRAIL ──
             input_result = input_guardrail(query, GUADRAIL_TOPIC_CONTENT)
             if not is_input_safe(input_result, query):
              return 'INPUT PROMPT VERIFIER:'+GUADRAIL_WARNING_MESSAGE  # blocked early, never hits ret
           
-            # Get the prompt templates
-            QUERY_PROMPT, prompt = get_prompt()
+          
             #agent
             MathClassificationAgent.init()
             math_executor = MathClassificationAgent.create_math_agent(llm)
@@ -130,13 +129,14 @@ def query(query,search_type,user_role,pwd):
                 sparseRetriever = SolrSparseRetriever(
                     host="localhost",
                     port=SOLR_PORT,
-                    core="rag_core",
+                    core=SOLR_CORE,
                     collection_id=None   # or pass specific collection if needed
                 )
                 # Step 3: Create config with weights
                 config = RetrieverConfig()
                 config.vector_weight = 0.7   # 70% semantic search
                 config.sparse_weight = 0.3   # 30% keyword search
+                config.top_k = TOP_K
                 # Step 4: Create HybridRetriever with both retrievers
                 hybridRetriever = HybridRetriever(vectorRetriever, sparseRetriever, config)
 
@@ -157,7 +157,9 @@ def query(query,search_type,user_role,pwd):
                 )
 
 
-            #math_prompt_template = get_phoenix_prompt("math_prompt")
+            #prompt = langfuse.get_prompt("math_prompt")
+            #math_prompt_template = langfuse.get_prompt("math_prompt",  label="latest")
+            #logging.info(f'::::: MATH TEMPLATE :::::::math_prompt_template:{math_prompt_template}')
             # GET RETRIEVER     
             classifier_prompt = PromptTemplate(
                 input_variables=["query"],
@@ -174,6 +176,7 @@ def query(query,search_type,user_role,pwd):
             )
     
             # Define the processing chain to retrieve context, generate the answer, and parse the output
+            langfuse.trace(name="math-prompt", input={"query": query})
             classification_response = classifier_chain.invoke(query)
             # Parse JSON response properly
             try:
@@ -189,20 +192,26 @@ def query(query,search_type,user_role,pwd):
                 response = MathClassificationAgent.math(query)
             else:
                 logging.debug('::::: OLLAMA RAG GENERATION:::::::::::::::')    
+                #chunk order stabilization - Deterministic Chunk Ordering for KV Cache Prefix Stability
+                # similar to sort A-z alphabets in array based on alphabet value (a-0 ,z -26)
+                # Same chunk content → same hash → same sort position → every time, guaranteed.
+                retrieved_docs = retriever.invoke(query)
+                # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
+                stable_context = getKVStableContext(retrieved_docs)
                 rag_chain = (
-                    {"context": retriever, "question": RunnablePassthrough()}
+                    {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
                     | prompt
                     | llm
                     | StrOutputParser()
                 )
-            response = rag_chain.invoke(query)
+            response = rag_chain.invoke({"context": stable_context, "question": query})
 
-            # ── OUTPUT GUADTRAIL ──
+            # ── OUTPUT GUADTRAIL guadtrail handler ──
             retrieved_context = retriever.invoke(query)
             retrieved_context_text = " ".join([doc.page_content for doc in retrieved_context])
             output_result = output_guardrail(query, retrieved_context_text, response)
             if not is_output_safe(output_result, response):
-                return 'OUTPUT :'+GUADTRAIL_WARNING_MESSAGE
+                return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
             # ── END ADD ──
             response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm)
 

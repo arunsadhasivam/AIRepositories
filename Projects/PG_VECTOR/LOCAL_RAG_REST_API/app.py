@@ -1,20 +1,20 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
-# tmp_path = os.getenv('PHOENIX_TMP_DIR')
+# if not os.environ.get("PHOENIX_WORKING_DIR"):
+#     os.environ["PHOENIX_WORKING_DIR"] = os.getenv('PHOENIX_TMP_DIR')
 # import phoenix as px
+# from phoenix.otel import register
 # px.launch_app()
-# Phoenix setup - MUST be before all other imports
-if not os.environ.get("PHOENIX_WORKING_DIR"):
-    os.environ["PHOENIX_WORKING_DIR"] = os.getenv('PHOENIX_TMP_DIR')
-import phoenix as px
-from phoenix.otel import register
-px.launch_app()
-tracer_provider = register(project_name="rag-pipeline")
+# tracer_provider = register(project_name="rag-pipeline")
 
 from flask import Flask, request, jsonify
 from embeddings.DocumentEmbedding import DocumentEmbedder
 from prompt.query import query
+from template.templateFactory import getAvailabilityTemplate
+from flask import render_template_string
+from datetime import datetime
+from healthCheck.AvailabilityChecker import getAvailabilityStatus
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
@@ -95,7 +95,17 @@ def route_delete():
     return jsonify({"message": "Collection deleted successfully"}), 200
 
 
-
+@app.route('/health_check',methods=['GET'])
+def health_monitor():
+    try:
+        statuses = getAvailabilityStatus()
+        logging.info(f'status:{statuses}')
+        html =  render_template_string(getAvailabilityTemplate(), statuses=statuses, now=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        content_type = {'Content-Type': 'text/html'}
+        return html, 200,content_type
+    except Exception as e:
+            logging.info(f"::::: HEALTH CHECK ERROR: {str(e)}", exc_info=True)
+            return str(e), 500
 @app.route('/admin/clear-cache', methods=['POST'])
 def admin_clear_cache():
     """
@@ -118,5 +128,11 @@ def admin_clear_cache():
             'message': str(e)
         }), 500
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080, debug=False)
-
+    statuses = getAvailabilityStatus()
+    failcount = 0
+    for service, status in statuses.items():
+        if status == False:
+            failcount = failcount+1
+    if failcount == 0:
+        app.run(host="0.0.0.0", port=8080, debug=False)
+   
