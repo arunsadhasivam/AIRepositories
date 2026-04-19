@@ -92,7 +92,7 @@ class HybridRetriever(BaseRetriever):
                 top_k  = int(self.config.top_k) # *2 if want more  
             # Validate query
             self.validate_query(query)
-            fetch_k = max(top_k, 5)
+            fetch_k = max(top_k, 1)
             logging.info(f'::::: HYBRID RETRIEVER ::: VECTOR RETRIEVER::::query={query}, top-k={fetch_k}')    
             vector_results = self._safe_retrieve(
                 self.vector_retriever, 

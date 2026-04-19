@@ -44,6 +44,14 @@ logging.basicConfig(level=logging.INFO)
 import os
 import requests
 def getKVStableContext(retrieved_docs):
+
+    # ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+    # response = requests.post(f"{ollama_base_url}/api/embeddings", json={
+    #     "model": "nomic-embed-text",
+    #     "keep_alive": 0,
+    #     "prompt": ""
+    # })
+    # logging.info(f'kvContext:::::getKVStableContext Unload Model in RAM:::::{response}')
     response = "\n---\n".join(
                     sorted([doc.page_content for doc in retrieved_docs],
                         key=lambda x: hashlib.md5(x.encode()).hexdigest())
