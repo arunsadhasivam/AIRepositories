@@ -87,6 +87,7 @@ Step 2 — expand both paths:
 Keep top 2: Path A (0.22), Path B (0.17)
 
 Final winner: "I am going to the store to buy groceries"
+
 ```
 
 Backtracking (keep all):        Beam Search (keep top-2 only):
@@ -99,8 +100,17 @@ Backtracking (keep all):        Beam Search (keep top-2 only):
                                  ↑ score  ↑ score
                                keep top-2 again, prune rest
 
-'''
 
+
+```
+
+
+Key difference from pure backtracking:
+=======================================
+
+Backtracking = explores ALL paths, prunes on constraint violation
+Beam Search = explores top-N paths only, prunes on score (probability)
+So beam search is bounded backtracking — same tree traversal idea but with a width limit (num_beams) instead of pruning on hard constraints.
 
 **Code:**
 ```python
