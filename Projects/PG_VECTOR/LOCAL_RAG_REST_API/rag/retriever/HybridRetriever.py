@@ -118,7 +118,7 @@ class HybridRetriever(BaseRetriever):
             vector_len = len(sparse_results)
             sparse_solr_len = len(sparse_results)
             totlen = vector_len + sparse_solr_len
-            logging.info(f'::::: HYBRID RETRIEVER ::: (SOLR SPARSE + VECTOR) COMBINED::::VECTOR Result={vector_len }, SPARSE SOLR RESULT={sparse_solr_len}, total ={totlen}')    
+            logging.info(f'::::: HYBRID RETRIEVER ::: (SOLR SPARSE + VECTOR) COMBINED::::VECTOR Result={vector_len}, SPARSE SOLR RESULT={sparse_solr_len}, total={totlen}')    
 
             
             # Apply score threshold if configured

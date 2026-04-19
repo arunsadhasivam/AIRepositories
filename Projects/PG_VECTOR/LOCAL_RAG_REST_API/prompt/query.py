@@ -197,6 +197,8 @@ def query(query,search_type,user_role,pwd):
                 # Same chunk content → same hash → same sort position → every time, guaranteed.
                 retrieved_docs = retriever.invoke(query)
                 # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
+                # kvStable context requires more memory always 7gb vram
+
                 stable_context = getKVStableContext(retrieved_docs)
                 rag_chain = (
                     {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
