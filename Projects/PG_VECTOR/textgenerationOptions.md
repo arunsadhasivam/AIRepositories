@@ -89,6 +89,19 @@ Keep top 2: Path A (0.22), Path B (0.17)
 Final winner: "I am going to the store to buy groceries"
 ```
 
+Backtracking (keep all):        Beam Search (keep top-2 only):
+
+       root                            root
+      /    \                          /    \
+   "store" "park"                 "store" "park"   ← keep top-2
+   /   \    /  \                  /   \    /  \
+ "to" "and" "to" "and"         "to" "and" "to" "and"
+                                 ↑ score  ↑ score
+                               keep top-2 again, prune rest
+
+
+
+
 **Code:**
 ```python
 output = model.generate(
