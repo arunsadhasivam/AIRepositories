@@ -14,7 +14,9 @@ make sure only 1 ollama running
 
 REST API PROJECT:
 ===================
-<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/2e132bef-e4d9-4220-bed4-c33f9f5f6947" />
 
+
+
+<img width="2800" height="1470" alt="image" src="https://github.com/user-attachments/assets/0d99b5c4-9c0a-496d-9cbb-000333f18e36" />
 
 
