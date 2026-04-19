@@ -158,3 +158,66 @@ KV Sorting   → Enable cross-query KV reuse. Only useful without Redis.
 ```
 
 For a local RAG pipeline with Redis cache already implemented — **rely on Redis, skip KV sorting**.
+
+
+# KV Cache vs Memoization
+
+## Memoization (Recursion)
+
+Key is the subproblem input — lookup is direct, order does not matter:
+
+```
+fibonacci(5) → cache miss → compute → store
+fibonacci(5) → cache hit  → return immediately
+fibonacci(3) → cache hit  → return immediately  (same key, direct hit)
+```
+
+---
+
+## KV Cache (Inside LLM)
+
+NOT a key-value lookup — it is a **sequential prefix match on token stream**.
+
+```
+Cached:  [Chunk A tokens] → [Chunk B tokens] → [Chunk C tokens]
+Query 2: [Chunk A tokens] → [Chunk B tokens] → [Chunk D tokens]
+                                                ↑
+                            reuses up to here, computes only from here
+```
+
+KV cache reads tokens **left to right sequentially**:
+
+```
+Cached:  A → B → C
+Query 2: B → A → C  ← breaks at position 1, zero reuse
+Query 2: A → B → D  ← reuses A+B, only computes D
+```
+
+---
+
+## Key Difference
+
+| | Memoization | KV Cache |
+|--|-------------|----------|
+| Lookup type | Direct key lookup | Sequential prefix match |
+| Order matters | ❌ No | ✅ Yes — must match from start |
+| Key | Subproblem input | Token sequence prefix |
+| Miss on reorder | ❌ No — same key | ✅ Yes — different prefix |
+
+---
+
+## Why Sorting is Required
+
+Without sorting — same chunks arrive in different order:
+```
+Query 1: [Chunk C] → [Chunk A] → [Chunk B]  ← cached
+Query 2: [Chunk A] → [Chunk C] → [Chunk B]  ← breaks at position 1, zero reuse
+```
+
+With deterministic sorting (MD5 hash):
+```
+Query 1: [Chunk A] → [Chunk B] → [Chunk C]  ← cached
+Query 2: [Chunk A] → [Chunk B] → [Chunk D]  ← reuses A+B, computes only D
+```
+
+**Sorting guarantees same chunks always appear at same position → stable prefix → KV cache hit.**
