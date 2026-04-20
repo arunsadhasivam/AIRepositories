@@ -107,7 +107,9 @@ def query(query,search_type,user_role,pwd):
         pwd: pg_vector password
         
     Returns:
-        tuple: (response, output_result)
+        retriever response
+    Raise :
+        Exception
     """
     try:
         if query:
@@ -145,7 +147,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
         vectorRetriever: vector retriever
         
     Returns:
-        tuple: (response, output_result)
+        response
     """
     retriever = None
     hybridRetriever = None
