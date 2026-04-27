@@ -22,6 +22,9 @@ main project:
         
 
 ```
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7178d831-14d2-49b7-b51c-625c154ecb24" />
+
+
 
 Start ollama:
 ==============
