@@ -329,3 +329,52 @@ print(answer)
 | **Risk** | Missing docs | Wrong hypothesis = worse results | High cost at scale |
 | **Prompt controls count** | N/A | N/A | Yes — "exactly N" in prompt |
 | **Recursive/infinite** | No | No | No — one level deep only |
+
+
+# RAG Retrieval Strategies - Order of Operations
+
+## Normal RAG
+Vector first, LLM last.
+
+| Step | Action |
+|---|---|
+| 1 | User query → Embed query |
+| 2 | Embed → Vector DB search |
+| 3 | Retrieved docs → LLM → Answer |
+
+---
+
+## HyDE
+LLM first to generate hypothesis, then Vector search, then LLM again for answer.
+
+| Step | Action |
+|---|---|
+| 1 | User query → LLM → Generate hypothesis |
+| 2 | Hypothesis → Embed → Vector DB search |
+| 3 | Retrieved docs + Original query → LLM → Answer |
+
+---
+
+## MultiQueryRetriever
+LLM first to generate variations, then Vector search for each, then LLM for answer.
+
+| Step | Action |
+|---|---|
+| 1 | User query → LLM → Generate N query variations |
+| 2 | Each variation → Embed → Vector DB search |
+| 3 | Merge + Deduplicate all results |
+| 4 | Merged docs + Original query → LLM → Answer |
+
+---
+
+## Summary
+
+| | Normal RAG | HyDE | MultiQueryRetriever |
+|---|---|---|---|
+| **Order** | Vector first, LLM last | LLM first, Vector second, LLM last | LLM first, Vector second, LLM last |
+| **Extra LLM calls** | 0 | 1 | 1 |
+| **Vector DB searches** | 1 | 1 | N |
+| **Result merging** | No | No | Yes |
+| **Cost** | Low | Medium | Medium-High |
+
+
