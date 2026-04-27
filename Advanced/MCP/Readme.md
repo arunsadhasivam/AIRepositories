@@ -81,7 +81,7 @@ Agent Card is that **discovery file** — a JSON the server publishes about itse
 | No version info | Version declared — clients check compatibility |
 
 ### 3. How it Relates
-> **Spring Boot Analogy:** Agent Card = `application.properties` + `@SpringBootApplication`.  
+> **Spring Boot Analogy:** Agent Card = `web.xml / application.properties` + `@SpringBootApplication`.  
 > Just as Spring reads config on startup to know what beans/routes exist,  
 > MCP client reads Agent Card to know what tools exist.
 
