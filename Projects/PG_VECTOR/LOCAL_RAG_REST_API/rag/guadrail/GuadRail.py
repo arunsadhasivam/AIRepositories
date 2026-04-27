@@ -51,7 +51,7 @@ def input_guardrail(user_query: str, topic_context: str) -> dict:
     
     Prompt injection examples: "ignore previous instructions", "act as", "jailbreak", "forget your instructions"
     """
-    
+    #chat is enough no need to connect to ollama with endpoint
     # Call Mistral via Ollama with temperature 0 for deterministic output
     response = ollama.chat(
         model=LLM_MODEL,
