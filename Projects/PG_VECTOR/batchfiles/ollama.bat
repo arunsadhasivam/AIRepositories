@@ -5,6 +5,8 @@
 taskkill /F /IM ollama.exe 2>nul
 timeout /t 2
 
-set OLLAMA_MAX_LOADED_MODELS=1
+set OLLAMA_MAX_LOADED_MODELS=2
 set OLLAMA_NUM_PARALLEL=1
+set OLLAMA_KEEP_ALIVE=10m
+set OLLAMA_CONTEXT_LENGTH=2048
 start "" cmd /k "C:\Users\%USERNAME%\AppData\Local\Programs\Ollama\ollama.exe serve"
