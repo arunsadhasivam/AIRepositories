@@ -22,7 +22,7 @@ main project:
         
 
 ```
-<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7178d831-14d2-49b7-b51c-625c154ecb24" />
+ <img width="2795" height="1452" alt="image" src="https://github.com/user-attachments/assets/624b5b8c-6c87-4390-b3ea-0b492aa45989" />
 
 
 
