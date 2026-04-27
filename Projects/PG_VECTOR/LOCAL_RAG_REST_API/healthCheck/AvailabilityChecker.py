@@ -3,7 +3,7 @@ import sys
 import logging
 import requests
 import redis
-LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+LLM_MODEL = os.getenv('LLM_MODEL', 'mistral:7b-instruct-q2_K')
 GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
 GUADRAIL_TOPIC_CONTENT=os.getenv('GUADRAIL_TOPIC_CONTENT')
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')

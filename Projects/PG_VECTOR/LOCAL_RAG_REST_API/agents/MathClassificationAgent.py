@@ -81,7 +81,7 @@ class MathClassificationAgent:
         # Log initialization
         logging.debug('INIT::::')
         # Initialize requires_math flag
-        self.requires_math = False
+        self.REQUIRESMATH = False
     
     @staticmethod
     def init():

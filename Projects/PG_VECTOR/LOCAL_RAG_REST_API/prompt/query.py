@@ -1,9 +1,11 @@
 import os
+from dotenv import load_dotenv
+load_dotenv() 
 from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import  PromptTemplate
 from langchain_community.embeddings import OllamaEmbeddings
 from rag.judge.JudgePipeline import run_judge_pipeline
 from rag.vectorstore.DistanceMetric import DistanceMetric
@@ -26,21 +28,20 @@ logging.basicConfig(level=logging.INFO)
 # import phoenix as px
 # from phoenix.client import Client
 # client = Client()
-from langfuse.callback import CallbackHandler
-from langfuse import Langfuse
-import os
+#from langfuse.callback import CallbackHandler
+#from langfuse import Langfuse
 # initialize langfuse handler once
-langfuse_handler = CallbackHandler(
-    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
-    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
-    host=os.getenv("LANGFUSE_BASE_URL")
-)
+# langfuse_handler = CallbackHandler(
+#     secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+#     public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+#     host=os.getenv("LANGFUSE_BASE_URL")
+# )
 
-print("::::: LANGFUSE SK::::::", os.getenv("LANGFUSE_SECRET_KEY"))
-print("::::: LANGFUSE PK:::::", os.getenv("LANGFUSE_PUBLIC_KEY"))
-print("::::: LANGFUSE HOST:::::", os.getenv("LANGFUSE_BASE_URL"))
+# print("::::: LANGFUSE SK::::::", os.getenv("LANGFUSE_SECRET_KEY"))
+# print("::::: LANGFUSE PK:::::", os.getenv("LANGFUSE_PUBLIC_KEY"))
+# print("::::: LANGFUSE HOST:::::", os.getenv("LANGFUSE_BASE_URL"))
 
-LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+LLM_MODEL = os.getenv('LLM_MODEL', 'mistral:7b-instruct-q2_K')
 GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
 GUADRAIL_TOPIC_CONTENT=os.getenv('GUADRAIL_TOPIC_CONTENT')
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'nomic-embed-text')
@@ -54,12 +55,14 @@ SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
 SOLR_CORE = os.getenv('SOLR_CORE',default='rag_core')
 
 TOP_K = os.getenv('TOP_K',default=5)
-langfuse = Langfuse()
+#langfuse = Langfuse()
 
 ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
 llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
 # Get the prompt templates
 QUERY_PROMPT, prompt = get_prompt()
+MULTIQUERY_MAX_QUERY_GEN_LIMIT=os.getenv('MULTIQUERY_MAX_QUERY_GEN_LIMIT',2)
+
 
 def verify_langfuse():
     check = langfuse.auth_check()
@@ -98,6 +101,7 @@ def getPgVectorStore(user_role,pwd):
 
 # Main function to handle the query process
 def query(query,search_type,user_role,pwd):
+    logging.info("-----------------------PROMPT.QUERY BEGIN--------------------------------------")
     """
     handle query and process input prompt using retriever (based on configured hybrid or cosine or other).
     Args:
@@ -115,9 +119,9 @@ def query(query,search_type,user_role,pwd):
         if query:
             # Initialize the language model with the specified model name
             # ── INPUT GUADTRAIL ──
-            input_result = input_guardrail(query, GUADRAIL_TOPIC_CONTENT)
-            if not is_input_safe(input_result, query):
-             return 'INPUT PROMPT VERIFIER:'+GUADRAIL_WARNING_MESSAGE  # blocked early, never hits ret
+            # input_result = input_guardrail(query, GUADRAIL_TOPIC_CONTENT)
+            # if not is_input_safe(input_result, query):
+            #  return 'INPUT PROMPT VERIFIER:'+GUADRAIL_WARNING_MESSAGE  # blocked early, never hits ret
             #agent
             MathClassificationAgent.init()
             math_executor = MathClassificationAgent.create_math_agent(llm)
@@ -131,7 +135,11 @@ def query(query,search_type,user_role,pwd):
                 embedding_model=embedding_model,  # embedding model instance
                 search_type="similarity"
             )
-            return configureAndProcessRetriever(query=query, search_type=search_type,  vectorRetriever=vectorRetriever)
+            
+            response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
+            logging.info("-----------------------PROMPT.QUERY END--------------------------------------")
+
+            return response
     except Exception as e:
         logging.error(f"'::::: Error processing query: {str(e)}")
         raise
@@ -153,7 +161,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     hybridRetriever = None
     if search_type==DistanceMetric.HYBRID.value:
         # Step 2: Create sparse (BM25/keyword) retriever
-        sparseRetriever = SolrSparseRetriever(
+        sparseSolrRetriever = SolrSparseRetriever(
             host="localhost",
             port=SOLR_PORT,
             core=SOLR_CORE,
@@ -165,7 +173,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
         config.sparse_weight = 0.3   # 30% keyword search
         config.top_k = TOP_K
         # Step 4: Create HybridRetriever with both retrievers
-        hybridRetriever = HybridRetriever(vectorRetriever, sparseRetriever, config)
+        hybridRetriever = HybridRetriever(vectorRetriever, sparseSolrRetriever, config)
             # Step 5: Use hybridRetriever as the LangChain retriever
         retriever = MultiQueryRetriever.from_llm(
             hybridRetriever.as_langchain_retriever(),  # wrap to LangChain compatible
@@ -179,10 +187,11 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
             llm,
             prompt=QUERY_PROMPT
         )
-    response ,output_result = getRetrieverAndGuadRailResponse(retriever,query)
+    response ,output_result,retrieved_docs = getRetrieverAndGuadRailResponse(retriever,query)
     if output_result is not None and not is_output_safe(output_result, response):
         return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
-    response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm)
+    response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
+    logging.info(':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::')
 
     return response
 
@@ -206,7 +215,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         input_variables=["query"],
         template="""Analyze this query and determine if it requires mathematical calculation.
         Query: {query}
-        Respond with a JSON object with a single field "requires_math" set to true if the query needs mathematical calculation, 
+        Respond with a JSON object with a single field "REQUIRESMATH" set to true if the query needs mathematical calculation, 
         or false if it's a general knowledge or information retrieval question.
         JSON response:"""
     )
@@ -216,23 +225,22 @@ def getRetrieverAndGuadRailResponse(retriever,query):
             | StrOutputParser()
     )
     # Define the processing chain to retrieve context, generate the answer, and parse the output
-    langfuse.trace(name="math-prompt", input={"query": query})
+    #langfuse.trace(name="math-prompt", input={"query": query})
     classification_response = classifier_chain.invoke(query)
     # Parse JSON response properly
     try:
         classification_result = json.loads(classification_response.strip())
-        requires_math = classification_result.get("requires_math", False)
+        requires_math = classification_result.get("REQUIRESMATH", False)
     except json.JSONDecodeError:
         # Fallback: check for boolean keywords
         requires_math = 'true' in classification_response.lower()
         logging.warning(f"::::: Failed to parse JSON, using fallback: {classification_response}")
 
-        
+    output_result = None  # add this    
     if requires_math:
         logging.debug(':::::  LOCAL PYTHON MATH FUNCTION:::::::::::')
         response = MathClassificationAgent.math(query)
         retrieved_docs = []  # add this
-        output_result = None  # add this
     else:
         logging.debug('::::: OLLAMA RAG GENERATION:::::::::::::::')    
         #chunk order stabilization - Deterministic Chunk Ordering for KV Cache Prefix Stability
@@ -241,30 +249,32 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         retrieved_docs = retriever.invoke(query)
         # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
         # kvStable context requires more memory always 7gb vram
-        stable_context = getKVStableContext(retrieved_docs)
+        #stable_context = getKVStableContext(retrieved_docs)
+        # join chunk content into single context string
+        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
         rag_chain = (
             {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
             | prompt
             | llm
             | StrOutputParser()
         )
-        response = rag_chain.invoke({"context": stable_context, "question": query})
+        response = rag_chain.invoke({"context": context, "question": query})
         # ── OUTPUT GUADTRAIL guadtrail handler ──
         retrieved_context_text = " ".join([doc.page_content for doc in retrieved_docs])
         output_result = output_guardrail(query, retrieved_context_text, response)
-      
-    return response,output_result
+    logging.debug(f'::::: GUADRAIL RESPONSE:::::::::::::::')    
+    return response,output_result,retrieved_docs
 
 
-def getJudgeResponse(retriever,hybridRetriever,query,response,llm):
+def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs):
     # Step 2 — Retrieve docs separately for judge context
     try:
-        docs = retriever.invoke(query)
+        #docs = retriever.invoke(query)
         # Step 3 — Run judge pipeline
         judge_result = run_judge_pipeline(
             query=query,
             answer=response,
-            context_chunks=[doc.page_content for doc in docs],
+            context_chunks=[doc.page_content for doc in retrieved_docs],
             primary_retriever=hybridRetriever,
             llm=llm
         )
@@ -278,36 +288,10 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm):
         else:
             logging.debug(f"::::: JUDGE PASSED: {judge_result['scores']}")
             response = judge_result["answer"]   # use judge-approved answer
+        
+        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {judge_result['reason']}")
         return response
     except Exception as e:
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
         raise 
 
-  # Function to dynamically route between math agent and RAG chain
-def dynamic_router(query):
-    try:
-        # Let the model decide if the query requires math
-        classification_result = classifier_chain.invoke({"query": query})
-        
-        # Parse the JSON response
-        try:
-            classification = json.loads(classification_result)
-            requires_math = classification.get("requires_math", False)
-        except json.JSONDecodeError:
-            # Fallback if the model doesn't return proper JSON
-            requires_math = "true" in classification_result.lower() and "requires_math" in classification_result.lower()
-        
-        # Route based on classification
-        if requires_math:
-            logging.log('::::: MATH EXECUTOR::::::::::::::')
-            return math_executor.run(query)
-        else:
-            logging.log("::::: OLLAMA LLM EXECUTOR:::::::::::::::::::")
-            return rag_chain.invoke(query)
-            
-    except Exception as e:
-        # Fallback to regular chain if anything fails
-        logging.log(f"::::: Router error: {str(e)}")
-        return rag_chain.invoke(query)
-
-    return dynamic_router    

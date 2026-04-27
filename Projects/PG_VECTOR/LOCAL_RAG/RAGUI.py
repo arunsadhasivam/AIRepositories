@@ -91,8 +91,8 @@ class RAGUI:
             st.html('<b>USER<b>: <span style="color:green">'+st.session_state.username +'</span' )
             st.html('<b>Role: <span style="color:green">'+roleName +'</span' )
             st.html('<hr>')
-            st.html('<hr>')
             st.html('<a href="http://localhost:8080/health_check"> HealthCheck </a>')
+            st.html('<hr>')
             
         # Main interface
         tab1, tab2 = st.tabs(["📄 Document Upload", "🔍 Search"])

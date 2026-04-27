@@ -87,6 +87,8 @@ class HybridRetriever(BaseRetriever):
             ValueError: If query is invalid
             RetrieverException: If retrieval fails
         """
+        logging.info(f"-----------------------RAG.HYBRID.RETRIEVER BEGIN--------------------------------------")
+
         try:
             if self.config.top_k:
                 top_k  = int(self.config.top_k) # *2 if want more  
@@ -141,7 +143,8 @@ class HybridRetriever(BaseRetriever):
                 len(sparse_results), 
                 len(final_docs)
             )
-            
+            logging.info(f"-----------------------RAG.HYBRID.RETRIEVER END--------------------------------------\n")
+
             return final_docs
             
         except ValueError as ve:
@@ -150,7 +153,7 @@ class HybridRetriever(BaseRetriever):
         except Exception as e:
             logger.error(f"Hybrid retrieval failed: {str(e)}")
             raise RetrieverException(f"Hybrid retrieval error: {str(e)}")
-    
+
     def _safe_retrieve(self, 
                        retriever: BaseRetriever, 
                        query: str, 

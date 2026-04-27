@@ -11,13 +11,10 @@ from rag.retriever.Document import Document as RetrieverDocument
 logger = logging.getLogger(__name__)
 
 # Config
-LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+LLM_MODEL = os.getenv('LLM_MODEL', 'mistral:7b-instruct-q2_K')
 FAITHFULNESS_HARD_BLOCK = 0.4
 OVERALL_PASS_THRESHOLD = 0.8
 OVERALL_RETRY_THRESHOLD = 0.5
-SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
-ES_HOST = os.getenv('ES_HOST', 'http://localhost:')+SOLR_PORT
-ES_INDEX = "llm_judge_logs"
 solrIndexer = SolrIndexer()
 
 
