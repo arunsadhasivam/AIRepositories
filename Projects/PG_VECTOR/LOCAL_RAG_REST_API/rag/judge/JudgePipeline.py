@@ -43,7 +43,8 @@ Respond ONLY in JSON:
         response = ollama.chat(
             model=LLM_MODEL,
             messages=[{"role": "user", "content": prompt}],
-            format="json"
+            format="json",
+            timeout=30  # seconds
         )
         raw = response["message"]["content"]
 

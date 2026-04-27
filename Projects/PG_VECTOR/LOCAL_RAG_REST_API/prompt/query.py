@@ -187,6 +187,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
             llm,
             prompt=QUERY_PROMPT
         )
+         
     response ,output_result,retrieved_docs = getRetrieverAndGuadRailResponse(retriever,query)
     if output_result is not None and not is_output_safe(output_result, response):
         return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
@@ -207,6 +208,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
     Returns:
         tuple: (response, output_result)
     """
+    logging.info(':::::: GUARD RAIL BEGIN :::::')
     #prompt = langfuse.get_prompt("math_prompt")
     #math_prompt_template = langfuse.get_prompt("math_prompt",  label="latest")
     #logging.info(f'::::: MATH TEMPLATE :::::::math_prompt_template:{math_prompt_template}')
@@ -269,6 +271,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
 def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs):
     # Step 2 — Retrieve docs separately for judge context
     try:
+        logging.info(':::::: JUDGE RESPONSE BEGIN :::::')
         #docs = retriever.invoke(query)
         # Step 3 — Run judge pipeline
         judge_result = run_judge_pipeline(

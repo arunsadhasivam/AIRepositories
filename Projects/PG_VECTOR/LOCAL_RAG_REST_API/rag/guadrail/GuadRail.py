@@ -56,7 +56,8 @@ def input_guardrail(user_query: str, topic_context: str) -> dict:
     response = ollama.chat(
         model=LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
-        options={"temperature": 0}
+        options={"temperature": 0},
+        timeout=30  # seconds
     )
     
     # Extract raw text from Mistral response
@@ -120,7 +121,8 @@ def output_guardrail(user_query: str, retrieved_context: str, llm_response: str)
     response = ollama.chat(
         model=LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
-        options={"temperature": 0}
+        options={"temperature": 0},
+        timeout=30  # seconds
     )
     
     # Extract raw text from Mistral response
