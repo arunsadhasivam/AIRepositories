@@ -44,7 +44,7 @@ Respond ONLY in JSON:
             model=LLM_MODEL,
             messages=[{"role": "user", "content": prompt}],
             format="json",
-            timeout=30  # seconds
+            keep_alive="1m"
         )
         raw = response["message"]["content"]
 

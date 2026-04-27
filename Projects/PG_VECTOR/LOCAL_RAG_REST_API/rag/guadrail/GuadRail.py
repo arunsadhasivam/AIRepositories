@@ -57,7 +57,7 @@ def input_guardrail(user_query: str, topic_context: str) -> dict:
         model=LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
         options={"temperature": 0},
-        timeout=30  # seconds
+        keep_alive="3m"
     )
     
     # Extract raw text from Mistral response
@@ -122,7 +122,7 @@ def output_guardrail(user_query: str, retrieved_context: str, llm_response: str)
         model=LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
         options={"temperature": 0},
-        timeout=30  # seconds
+        keep_alive="3m"
     )
     
     # Extract raw text from Mistral response
