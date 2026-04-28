@@ -27,3 +27,11 @@ MCP VS Agent.json:
 
   - A2A:        /.well-known/agent.json  ← static discovery file
   - MCP:        JSON-RPC initialize()    ← dynamic handshake
+
+
+Flow:
+=======
+
+
+
+<img width="765" height="679" alt="image" src="https://github.com/user-attachments/assets/dacce399-7913-4a2d-91d8-178d61f51081" />
