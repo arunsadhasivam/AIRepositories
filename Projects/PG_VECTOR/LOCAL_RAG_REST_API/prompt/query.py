@@ -292,7 +292,7 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs
             logging.debug(f"::::: JUDGE PASSED: {judge_result['scores']}")
             response = judge_result["answer"]   # use judge-approved answer
         
-        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {judge_result['reason']}")
+        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {response}")
         return response
     except Exception as e:
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
