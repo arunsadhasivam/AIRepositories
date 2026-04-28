@@ -29,8 +29,8 @@ MCP VS Agent.json:
   - MCP:        JSON-RPC initialize()    ← dynamic handshake
 
 
-Flow:
-=======
+Sequence Flow:
+===============
 
 
 
