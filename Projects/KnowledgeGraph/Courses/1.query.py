@@ -19,7 +19,7 @@ kg = Neo4jGraph(
 )
 
 ### Querying the movie knowledge graph 
-```
+ 
 cypher = """
   MATCH (n) 
   RETURN count(n)
@@ -37,11 +37,9 @@ result = kg.query(cypher)
 result
 
 print(f"There are {result[0]['numberOfNodes']} nodes in this graph.")
-
-```
+ 
 # Match only the `Movie` nodes by specifying the node label
-
-```
+ 
 cypher = """
   MATCH (n:Movie) 
   RETURN count(n) AS numberOfMovies
@@ -62,38 +60,37 @@ cypher = """
 kg.query(cypher)
 
 
-```
+ 
 ## Match a single person by specifying the value of the `name` property on the `Person` node
 
-```
+ 
 cypher = """
   MATCH (tom:Person {name:"Tom Hanks"}) 
   RETURN tom
   """
 kg.query(cypher)
 
-```
+ 
 
 
 ## - Match a single `Movie` by specifying the value of the `title` property
-```
+
 cypher = """
   MATCH (cloudAtlas:Movie {title:"Cloud Atlas"}) 
   RETURN cloudAtlas
   """
 kg.query(cypher)
 
-```
+ 
 
 
 #  Return only the `released` property of the matched `Movie` node
-```
 cypher = """
   MATCH (cloudAtlas:Movie {title:"Cloud Atlas"}) 
   RETURN cloudAtlas.released
   """
 kg.query(cypher)
-```
+ 
 # Return two properties
 
 
@@ -108,8 +105,7 @@ cypher = """
   """
 
 kg.query(cypher)
-
-```
+ 
 
 
 
