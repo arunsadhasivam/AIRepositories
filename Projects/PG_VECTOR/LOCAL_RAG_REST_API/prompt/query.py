@@ -300,3 +300,4 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
         raise 
 
+ 
