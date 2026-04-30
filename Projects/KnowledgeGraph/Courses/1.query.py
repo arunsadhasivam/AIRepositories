@@ -96,7 +96,6 @@ kg.query(cypher)
 
 ### Cypher patterns with conditional matching
 
-```
 cypher = """
   MATCH (nineties:Movie) 
   WHERE nineties.released >= 1990 
@@ -111,7 +110,7 @@ kg.query(cypher)
 
 ### Pattern matching with multiple nodes
 
-```
+
 cypher = """
   MATCH (actor:Person)-[:ACTED_IN]->(movie:Movie) 
   RETURN actor.name, movie.title LIMIT 10
@@ -135,7 +134,7 @@ kg.query(cypher)
 ### Delete data from the graph
 
 
-```
+
 cypher = """
 MATCH (emil:Person {name:"Emil Eifrem"})-[actedIn:ACTED_IN]->(movie:Movie)
 RETURN emil.name, movie.title
@@ -149,12 +148,10 @@ DELETE actedIn
 """
 kg.query(cypher)
 
-```
 
 ### Adding data to the graph
 
 
-```
 cypher = """
 CREATE (andreas:Person {name:"Andreas"})
 RETURN andreas
