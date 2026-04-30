@@ -248,7 +248,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         #chunk order stabilization - Deterministic Chunk Ordering for KV Cache Prefix Stability
         # similar to sort A-z alphabets in array based on alphabet value (a-0 ,z -26)
         # Same chunk content → same hash → same sort position → every time, guaranteed.
-        retrieved_docs = retriever.invoke(query)
+        retrieved_docs = retriever.invoke(query) #VECTORIZE internally (only operation need vector)
         # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
         # kvStable context requires more memory always 7gb vram
         #stable_context = getKVStableContext(retrieved_docs)
@@ -263,7 +263,9 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         response = rag_chain.invoke({"context": context, "question": query})
         # ── OUTPUT GUADTRAIL guadtrail handler ──
         retrieved_context_text = " ".join([doc.page_content for doc in retrieved_docs])
-        output_result = output_guardrail(query, retrieved_context_text, response)
+
+        # as guadrail takes time - gpu VRAM usage didn't recover within timeout commented.
+        #output_result = output_guardrail(query, retrieved_context_text, response)
     logging.debug(f'::::: GUADRAIL RESPONSE:::::::::::::::')    
     return response,output_result,retrieved_docs
 
@@ -292,7 +294,7 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs
             logging.debug(f"::::: JUDGE PASSED: {judge_result['scores']}")
             response = judge_result["answer"]   # use judge-approved answer
         
-        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {judge_result['reason']}")
+        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {response}")
         return response
     except Exception as e:
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
