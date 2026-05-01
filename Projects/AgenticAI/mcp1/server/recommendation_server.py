@@ -56,8 +56,8 @@ print(f"[MCP1] Loaded mcp_config MCP2 SERVER URL: {_MCP_SERVER2_URL}")
 # ── FastMCP server (port 8001) ─────────────────────────────────────────────────
 mcp = FastMCP("recommendation-server")
 
-
-@mcp.tool()
+# bind with tool_process_text, even changing mcp_config.json does not matter, it still works.
+@mcp.tool() 
 def tool_process_text(text: str) -> dict:
     """
     Tool 1: Process raw text → word frequency dict.
