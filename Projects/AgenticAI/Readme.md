@@ -90,13 +90,13 @@ python main.py # test full flow.
 
 
 
-<details> <summary>METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
-</summary>
+<details> <summary>METHOD 1: Direct MCP1 call (MCP client → MCP1 server)</summary>
   <p>
-     [1] Calling tool_process_text with: 'apple banana apple orange banana apple mango'
-     C:\Arun\Python\Python3.11\Lib\contextlib.py:105: DeprecationWarning: Use `streamable_http_client` instead.
-       self.gen = func(*args, **kwds)
-         Result: {'apple': 3, 'banana': 2, 'orange': 1, 'mango': 1}
+     
+       [1] Calling tool_process_text with: 'apple banana apple orange banana apple mango'
+          C:\Arun\Python\Python3.11\Lib\contextlib.py:105: DeprecationWarning: Use `streamable_http_client` instead.
+            self.gen = func(*args, **kwds)
+              Result: {'apple': 3, 'banana': 2, 'orange': 1, 'mango': 1}
      
      [2] Calling tool_get_count...
          Result: {'total_words': 7, 'unique_words': 4}
@@ -184,9 +184,9 @@ python main.py # test full flow.
 
  
 
-<p>
-<details><summary>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</summary>
 
+<details><summary>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</summary>
+<p>
      [MCP1] Processing text: 'python java python go rust java python scala python go'
        word_counts: {'python': 4, 'java': 2, 'go': 2, 'rust': 1, 'scala': 1}
      
