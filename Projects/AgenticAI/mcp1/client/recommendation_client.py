@@ -36,6 +36,7 @@ class RecommendationMCPClient:
 
     async def math_tool_add_via_mcp2(self, a: float, b: float):
         async with Client(self.server_url) as client:
+            #tool_multiply also works event not delegated in mcp_config.json
             result = await client.call_tool("tool_add_from_mcp2", {"a": a, "b": b})
             return self._parse(result)
         
@@ -55,12 +56,4 @@ async def _demo():
 if __name__ == "__main__":
     asyncio.run(_demo())
     
-    async def add_from_mcp2(self, a: float, b: float):
-        """
-        Call tool_add_from_mcp2 on MCP1 server.
-        MCP1 server internally calls MCP2 add directly (no A2A).
-        Flow: this client → MCP1 (8001) → MCP2 (8002) → result
-        """
-        async with Client(self.server_url) as client:
-            result = await client.call_tool("tool_add_from_mcp2", {"a": a, "b": b})
-            return self._parse(result)
+   
