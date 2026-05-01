@@ -86,13 +86,16 @@ python main.py # test full flow.
      
 
 
-============================================================
-METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
-============================================================
 
 
-<p>
-<details>
+
+
+<details> <summary>
+     ============================================================
+     METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
+     ============================================================
+</summary>
+  <p>
      [1] Calling tool_process_text with: 'apple banana apple orange banana apple mango'
      C:\Arun\Python\Python3.11\Lib\contextlib.py:105: DeprecationWarning: Use `streamable_http_client` instead.
        self.gen = func(*args, **kwds)
