@@ -8,7 +8,8 @@
                instead of add 3 tools to we can delegate entirely to company1 -> which is a composite service 
                it process text, count, html and provide to you.
     
-    A2A - is something we do bank verification and delegate booking to payment service(payment gateway of bank)
+    A2A - is something like airlines do user verification and delegate booking to payment Gateway and track status 
+           if paid or not paid.
      
 
 ## Architecture
