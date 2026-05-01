@@ -51,6 +51,7 @@ print(f"[MCP1] Loaded agent card: {_AGENT_CARD['name']}")
 print(f"[MCP1] Loaded mcp_config: {_MCP_CONFIG['server']['name']}")
 
 _MCP_SERVER2_URL = _MCP_CONFIG['delegates_to']['mcp2']['endpoint']
+print(f"[MCP1] Loaded mcp_config MCP2 SERVER URL: {_MCP_SERVER2_URL}")
 
 # ── FastMCP server (port 8001) ─────────────────────────────────────────────────
 mcp = FastMCP("recommendation-server")
