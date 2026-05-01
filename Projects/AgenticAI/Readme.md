@@ -51,8 +51,10 @@ Add Agent and MCP to web:
 =========================
 
 ```
+   from aiohttp import web
    app = web.Application()
-    app.router.add_get("/.well-known/agent.json", handle_agent_card)  # A2A discovery
-    app.router.add_get("/config", handle_mcp_config)                   # MCP config
+   app.router.add_get("/.well-known/agent.json", handle_agent_card)  # A2A discovery
+   app.router.add_get("/config", handle_mcp_config)                   # MCP config
+   web.run_app(app, host="0.0.0.0", port=8011, loop=loop)
 
 ```
