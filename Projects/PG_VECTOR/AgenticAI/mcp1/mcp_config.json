@@ -1,0 +1,79 @@
+{
+  "server": {
+    "name": "recommendation-server",
+    "version": "1.0.0",
+    "description": "FastMCP server for text recommendation tools",
+    "host": "0.0.0.0",
+    "port": 8001,
+    "transport": "streamable-http",
+    "endpoint": "http://localhost:8001/mcp"
+  },
+  "tools": [
+    {
+      "name": "tool_process_text",
+      "description": "Tokenize raw input text and return word frequency dict",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Raw input text to process"
+          }
+        },
+        "required": ["text"]
+      },
+      "output_schema": {
+        "type": "object",
+        "description": "Word frequency dict e.g. {\"apple\": 3, \"banana\": 1}"
+      }
+    },
+    {
+      "name": "tool_get_count",
+      "description": "Return total and unique word counts from a word frequency dict",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "word_counts": {
+            "type": "object",
+            "description": "Word frequency dict from tool_process_text"
+          }
+        },
+        "required": ["word_counts"]
+      },
+      "output_schema": {
+        "type": "object",
+        "description": "e.g. {\"total_words\": 10, \"unique_words\": 6}"
+      }
+    },
+    {
+      "name": "tool_print_count_html",
+      "description": "Render word frequency dict as an HTML table string",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "word_counts": {
+            "type": "object",
+            "description": "Word frequency dict from tool_process_text"
+          }
+        },
+        "required": ["word_counts"]
+      },
+      "output_schema": {
+        "type": "string",
+        "description": "Full HTML string with styled word frequency table"
+      }
+    }
+  ],
+  "dependencies": {
+    "fastmcp": ">=2.0.0"
+  },
+  "delegates_to": {
+    "mcp2": {
+      "name": "math-server",
+      "endpoint": "http://localhost:8002/mcp",
+      "transport": "streamable-http",
+      "reason": "MCP1 delegates math operations to MCP2 directly via MCP client",
+      "tools_used": ["tool_add"]
+    }
+  }
+}

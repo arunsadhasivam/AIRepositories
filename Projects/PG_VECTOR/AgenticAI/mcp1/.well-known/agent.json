@@ -1,0 +1,33 @@
+{
+  "name": "RecommendationMCPServer",
+  "description": "MCP server exposing text recommendation tools: process_text, get_count, print_count_html",
+  "version": "1.0.0",
+  "url": "http://localhost:8001",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "process_text",
+      "name": "Process Text",
+      "description": "Tokenize raw input text and return word frequency dict",
+      "inputModes": ["text"],
+      "outputModes": ["text"]
+    },
+    {
+      "id": "get_count",
+      "name": "Get Count",
+      "description": "Return total and unique word counts from a word frequency dict",
+      "inputModes": ["text"],
+      "outputModes": ["text"]
+    },
+    {
+      "id": "print_count_html",
+      "name": "Print Count HTML",
+      "description": "Render word frequency dict as an HTML table string",
+      "inputModes": ["text"],
+      "outputModes": ["text"]
+    }
+  ]
+}
