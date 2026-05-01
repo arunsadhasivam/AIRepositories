@@ -125,11 +125,13 @@ python main.py # test full flow.
 
 <details><summary><b>METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)</b></summary>
  <p>    
-          [1] tool_add(10, 25)         = 35.0
-          [2] tool_multiply(6, 7)      = 42.0
-          [3] tool_power(2, 10)        = 1024.0
-          [4] tool_average([10,20,30]) = 20.0
+        
       
+     [1] tool_add(10, 25)         = 35.0
+     [2] tool_multiply(6, 7)      = 42.0
+     [3] tool_power(2, 10)        = 1024.0
+     [4] tool_average([10,20,30]) = 20.0
+ 
 </p>
 </details>
 
