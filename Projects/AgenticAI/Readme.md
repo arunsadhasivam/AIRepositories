@@ -53,8 +53,6 @@ python a2a/server/recommendation_agent_server.py
 python a2a/server/math_agent_server.py
 
 python main.py # test full flow.
-1) METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
-2) METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)
 ============================================================
 ```
 Add Agent and MCP to web:
@@ -213,3 +211,12 @@ python main.py # test full flow.
 </p>
 </details>
 
+<details><summary><b>METHOD 6:MCP1 calls MCP2 (recommendation server to math server via MCP protocol) </b></summary>
+
+          
+          METHOD 6: MCP1 → MCP2 direct (no A2A)
+          Flow: client → MCP1(8001) → MCP2(8002)
+          [MCP1→MCP2] math_tool_add_via_mcp2(10, 25)
+            Result: 35.0
+</p>
+</details>
