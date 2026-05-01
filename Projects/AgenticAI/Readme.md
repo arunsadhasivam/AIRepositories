@@ -89,11 +89,10 @@ python main.py # test full flow.
 
 
 
-
-<details> <summary>
-     ============================================================
-     METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
-     ============================================================
+============================================================
+METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
+============================================================
+<details> <summary>METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
 </summary>
   <p>
      [1] Calling tool_process_text with: 'apple banana apple orange banana apple mango'
@@ -120,8 +119,8 @@ python main.py # test full flow.
          <tr><td>ap
      
          HTML saved to output_method1.html
-</details>
 </p>
+</details>
 
 
 ============================================================
@@ -129,24 +128,25 @@ METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)
 ============================================================
 
 
-<p>
-<details>
-     
+<details><summary> METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)</summary>
+ <p>    
           [1] tool_add(10, 25)         = 35.0
           [2] tool_multiply(6, 7)      = 42.0
           [3] tool_power(2, 10)        = 1024.0
           [4] tool_average([10,20,30]) = 20.0
-
-</details>
 </p>
+</details>
+
 
 ============================================================
 METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)
 ============================================================
 
 
-<p>
-<details>
+
+<details><summary>METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)</summary>
+
+<p>       
      [MCP2 Math] tool_multiply(3, 7) = 21.0
      
      [A2A] Discovering agent capabilities...
@@ -172,8 +172,10 @@ METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)
          <tr><td>py
      
        HTML saved to output_method3.html
-</detail>
-</p>
+
+     </p>
+</details>
+
 
      
 ============================================================
@@ -181,24 +183,23 @@ METHOD 4: Mixed (MCP2 math + A2A recommendation combined)
 ============================================================
 
 
-<p>
-<details>
-     
+<details><summary>METHOD 4: Mixed (MCP2 math + A2A recommendation combined)</summary>
+  <p>    
   word_counts     : {'apple': 3, 'banana': 2, 'orange': 1, 'grape': 1}
   count values    : [3, 2, 1, 1]
   average (MCP2)  : 1.75
   total (from A2A): {'total_words': 7, 'unique_words': 4}
 
-  
+ </p>
 </details>
-</p>
+
 
 ============================================================
 METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)
 ============================================================
 
 <p>
-<details>
+<details><summary>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</summary>
 
      [MCP1] Processing text: 'python java python go rust java python scala python go'
        word_counts: {'python': 4, 'java': 2, 'go': 2, 'rust': 1, 'scala': 1}
@@ -217,6 +218,6 @@ METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)
          word_counts     = {'python': 4, 'java': 2, 'go': 2, 'rust': 1, 'scala': 1}
          avg_frequency   = 2.0  (via A2A → MCP2)
          total_words^2   = 100   (via A2A → MCP2)
-
-</details>
 </p>
+</details>
+
