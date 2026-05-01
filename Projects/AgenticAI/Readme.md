@@ -1,9 +1,8 @@
 MCP and A2A(config)
 ===================
 
-'''
+```
 # agent card
-
 curl http://localhost:8011/.well-known/agent.json
 
 # mcp config
@@ -19,7 +18,7 @@ curl http://localhost:8011/.well-known/agent.json | python -m json.tool
 http://localhost:8011/.well-known/agent.json
 http://localhost:8011/config
 
-'''
+```
 
 Console:
 =============
