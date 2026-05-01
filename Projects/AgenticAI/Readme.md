@@ -13,6 +13,11 @@ curl http://localhost:8011/config
 
 curl http://localhost:8011/.well-known/agent.json | python -m json.tool
 
+#important :
+
+/.well-known/agent.json -> localhost:8011/.well-known/agent.json -  Follow A2A protocol standard — other A2A agents expect this path for auto-discovery
+Although you can use anything like  **localhost:8011/discovery**
+
 # Browser
 
 http://localhost:8011/.well-known/agent.json
