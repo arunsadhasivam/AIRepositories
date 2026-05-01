@@ -45,7 +45,6 @@ python mcp2/server/math_server.py
 
 python a2a/server/recommendation_agent_server.py
 python a2a/server/math_agent_server.py
-
 ```
 Add Agent and MCP to web:
 =========================
@@ -56,5 +55,4 @@ Add Agent and MCP to web:
  app.router.add_get("/.well-known/agent.json", handle_agent_card)  # A2A discovery
  app.router.add_get("/config", handle_mcp_config)                   # MCP config
  web.run_app(app, host="0.0.0.0", port=8011, loop=loop)
-
 ```
