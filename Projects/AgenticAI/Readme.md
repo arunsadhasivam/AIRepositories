@@ -89,9 +89,7 @@ python main.py # test full flow.
 
 
 
-============================================================
-METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
-============================================================
+
 <details> <summary>METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
 </summary>
   <p>
@@ -122,10 +120,7 @@ METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
 </p>
 </details>
 
-
-============================================================
-METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)
-============================================================
+ 
 
 
 <details><summary> METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)</summary>
@@ -137,10 +132,6 @@ METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)
 </p>
 </details>
 
-
-============================================================
-METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)
-============================================================
 
 
 
@@ -177,10 +168,7 @@ METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)
 </details>
 
 
-     
-============================================================
-METHOD 4: Mixed (MCP2 math + A2A recommendation combined)
-============================================================
+    
 
 
 <details><summary>METHOD 4: Mixed (MCP2 math + A2A recommendation combined)</summary>
@@ -194,9 +182,7 @@ METHOD 4: Mixed (MCP2 math + A2A recommendation combined)
 </details>
 
 
-============================================================
-METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)
-============================================================
+ 
 
 <p>
 <details><summary>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</summary>
