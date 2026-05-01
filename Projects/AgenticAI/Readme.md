@@ -89,6 +89,8 @@ python main.py # test full flow.
 ============================================================
 METHOD 1: Direct MCP1 call (MCP client → MCP1 server)
 ============================================================
+
+
 <p>
 <details>
      [1] Calling tool_process_text with: 'apple banana apple orange banana apple mango'
