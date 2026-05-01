@@ -123,7 +123,7 @@ python main.py # test full flow.
  
 
 
-<details><summary> METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)</summary>
+<details><summary><b>METHOD 2: Direct MCP2 call (MCP client → MCP2 math server)</b></summary>
  <p>    
           [1] tool_add(10, 25)         = 35.0
           [2] tool_multiply(6, 7)      = 42.0
@@ -136,9 +136,10 @@ python main.py # test full flow.
 
 
 
-<details><summary>METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)</summary>
+<details><summary><b>METHOD 3: A2A delegation (MCP2 caller → A2A agent → MCP1 tools)</b></summary>
 
-<p>       
+<p>    
+     
           [MCP2 Math] tool_multiply(3, 7) = 21.0
           [A2A] Discovering agent capabilities...
           [A2A Client] Discovered agent: RecommendationAgent - Orchestrates text processing: process_text → get_count → print_count_html
@@ -171,8 +172,9 @@ python main.py # test full flow.
     
 
 
-<details><summary>METHOD 4: Mixed (MCP2 math + A2A recommendation combined)</summary>
+<details><summary><b>METHOD 4: Mixed (MCP2 math + A2A recommendation combined)</b></summary>
   <p>    
+       
        word_counts     : {'apple': 3, 'banana': 2, 'orange': 1, 'grape': 1}
        count values    : [3, 2, 1, 1]
        average (MCP2)  : 1.75
@@ -185,8 +187,9 @@ python main.py # test full flow.
  
 
 
-<details><summary>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</summary>
+<details><summary><b>METHOD 5: Reverse A2A (MCP1 caller → A2A → MCP2 math tools)</b></summary>
 <p>
+     
      [MCP1] Processing text: 'python java python go rust java python scala python go'
        word_counts: {'python': 4, 'java': 2, 'go': 2, 'rust': 1, 'scala': 1}
      
@@ -204,6 +207,7 @@ python main.py # test full flow.
          word_counts     = {'python': 4, 'java': 2, 'go': 2, 'rust': 1, 'scala': 1}
          avg_frequency   = 2.0  (via A2A → MCP2)
          total_words^2   = 100   (via A2A → MCP2)
+         
 </p>
 </details>
 
