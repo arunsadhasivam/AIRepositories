@@ -50,6 +50,7 @@ with open(_MCP_CONFIG_PATH) as f:
 print(f"[MCP1] Loaded agent card: {_AGENT_CARD['name']}")
 print(f"[MCP1] Loaded mcp_config: {_MCP_CONFIG['server']['name']}")
 
+_MCP_SERVER2_URL = _MCP_CONFIG['delegates_to']['mcp2']['endpoint']
 
 # ── FastMCP server (port 8001) ─────────────────────────────────────────────────
 mcp = FastMCP("recommendation-server")
@@ -96,7 +97,7 @@ def tool_print_count_html(word_counts: dict) -> str:
 
  
 @mcp.tool()
-async def tool_multiply_from_mcp2(a: float, b: float) -> float:
+async def tool_add_from_mcp2(a: float, b: float) -> float:
     """
     Tool 5: MCP1 calls MCP2 multiply tool directly via MCP client.
     MCP1 → MCP2 (port 8002) → returns a * b
@@ -105,8 +106,8 @@ async def tool_multiply_from_mcp2(a: float, b: float) -> float:
     from fastmcp import Client
  
     # Connect directly to MCP2 math server
-    async with Client("http://localhost:8002/mcp") as client:
-        result = await client.call_tool("tool_multiply", {"a": a, "b": b})
+    async with Client(_MCP_SERVER2_URL) as client:
+        result = await client.call_tool("tool_add", {"a": a, "b": b})
  
     raw = result.content[0].text
     try:

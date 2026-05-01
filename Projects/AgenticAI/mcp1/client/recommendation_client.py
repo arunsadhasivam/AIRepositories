@@ -35,9 +35,8 @@ class RecommendationMCPClient:
             return self._parse(result)
 
     async def math_tool_add_via_mcp2(self, a: float, b: float):
-        self.server_url='http://localhost:8002/mcp'
         async with Client(self.server_url) as client:
-            result = await client.call_tool("tool_add", {"a": a, "b": b})
+            result = await client.call_tool("tool_add_from_mcp2", {"a": a, "b": b})
             return self._parse(result)
         
     
