@@ -1,14 +1,14 @@
 # MCP + A2A Protocol Demo
 
-  company 1 - recommendation service ( math-add,multiply here) mcp
-  company 2 - math service
-  
-  use MCP - to call say add just 1 tools you can embed in company2 via mcp
-  use A2A - if tools is composite (orchestrate) - > we process text, count, generate html all we need 
-             instead of add 3 tools to we can delegate entirely to company1 -> which is a composite service 
-             it process text, count, html and provide to you.
-  
-  A2A - is something we do bank verification and delegate booking to payment service(payment gateway of bank)
+    company 1 - recommendation service ( math-add,multiply here) mcp
+    company 2 - math service
+    
+    use MCP - to call say add just 1 tools you can embed in company2 via mcp
+    use A2A - if tools is composite (orchestrate) - > we process text, count, generate html all we need 
+               instead of add 3 tools to we can delegate entirely to company1 -> which is a composite service 
+               it process text, count, html and provide to you.
+    
+    A2A - is something we do bank verification and delegate booking to payment service(payment gateway of bank)
      
 
 ## Architecture
