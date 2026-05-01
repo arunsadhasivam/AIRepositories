@@ -2,7 +2,7 @@
 mcp1/server/recommendation_server.py
 --------------------------------------
 FastMCP server that exposes 3 recommendation tools:
-  - process_text
+  - tool_process_text (this name below @tool method name only matter , mcp_config.json changed it still works by @tools method name)
   - get_count
   - print_count_html
 
@@ -56,7 +56,6 @@ print(f"[MCP1] Loaded mcp_config MCP2 SERVER URL: {_MCP_SERVER2_URL}")
 # ── FastMCP server (port 8001) ─────────────────────────────────────────────────
 mcp = FastMCP("recommendation-server")
 
-# bind with tool_process_text, even changing mcp_config.json does not matter, it still works.
 @mcp.tool() 
 def tool_process_text(text: str) -> dict:
     """
