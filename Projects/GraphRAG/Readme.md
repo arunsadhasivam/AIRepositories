@@ -20,3 +20,8 @@ r - relationship
 m - no of edges.
 
  <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/2936e1f0-6045-4335-86ec-2907949399a8" />
+
+Graph RAG Architecture:
+======================== 
+
+<img width="3085" height="1765" alt="image" src="https://github.com/user-attachments/assets/4cfdf41f-7338-4cde-821a-3e4be80a3e7c" />
