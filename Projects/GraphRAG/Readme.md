@@ -23,6 +23,14 @@ if got error:
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/a8c088b1-24e0-4922-aed1-7d5d98f9c617" />
 
+
+
+table structure view in neo4j:
+================================
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/16b09c94-fa35-4d07-85ae-4795c0f00af8" />
+
+
 n,r,m
 =======
 
