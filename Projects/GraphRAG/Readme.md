@@ -11,6 +11,17 @@
  
  <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/cabffe18-09ae-414b-aa6f-22f11e87918f" />
 
+install apoc:
+=============
+
+if got error:
+
+    File "C:\Arun\PythonEnv\GRAPHRAG\Lib\site-packages\langchain_community\graphs\neo4j_graph.py", line 387, in __init__
+        raise ValueError(
+    ValueError: Could not use APOC procedures. Please ensure the APOC plugin is installed in Neo4j and that 'apoc.meta.data()' is allowed in Neo4j configuration 
+
+
+<img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/a8c088b1-24e0-4922-aed1-7d5d98f9c617" />
 
 n,r,m
 =======
