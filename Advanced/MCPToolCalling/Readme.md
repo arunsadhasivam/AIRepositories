@@ -1,285 +1,287 @@
-# Remote MCP + Ollama Tool Call — Complete Guide
+# Claude Desktop Config + MCP Transport Types — Complete Guide
 
-## First: Clear the Confusion on Tool Naming
+---
 
-This is what confuses most people. Let me be 100% clear.
+## Part 1: Claude Desktop Config File
 
-```
-QUESTION: When LLM calls a tool, does it use:
-
-  OPTION A:  "http://localhost:8080/mcp1/pdf-tool"   ← full URL?
-  OPTION B:  "pdf_extract_text"                      ← just the tool name?
-
-ANSWER:  OPTION B. Always just the tool name.
-```
-
-The LLM **never knows** the URL of the MCP server.
-The LLM only sees tool names and descriptions.
-YOUR APP is responsible for knowing which MCP server hosts which tool,
-and routing the call to the right server URL.
+### Exact File Name and Location
 
 ```
-┌────────────────────────────────────────────────────────────────────┐
-│                        WHAT LLM SEES                               │
-│                                                                     │
-│   tools = [                                                        │
-│     { name: "pdf_extract_text",  description: "Extract PDF..." }, │
-│     { name: "html_scrape_url",   description: "Scrape URL..."  }, │
-│   ]                                                                │
-│                                                                     │
-│   LLM picks:  "pdf_extract_text"   ← just the name               │
-│   LLM has NO idea about:  http://localhost:8080/sse               │
-└────────────────────────────────────────────────────────────────────┘
+The file is NOT called mcp.json.
+The file is NOT called mcp1.json.
+Claude Desktop accepts ONLY one exact filename:
 
-┌────────────────────────────────────────────────────────────────────┐
-│                        WHAT YOUR APP DOES                          │
-│                                                                     │
-│   LLM said: call "pdf_extract_text"                               │
-│   Your app looks up: which MCP server has this tool?              │
-│   Your app knows:    pdf_extract_text → http://localhost:8080/sse │
-│   Your app calls:    POST http://localhost:8080/messages          │
-└────────────────────────────────────────────────────────────────────┘
+  claude_desktop_config.json
+```
+
+| OS | Exact File Path |
+|---|---|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
+
+```
+%APPDATA% on Windows typically resolves to:
+C:\Users\YourName\AppData\Roaming\Claude\claude_desktop_config.json
+```
+
+Any other filename (`mcp.json`, `mcp1.json`, `config.json`) is completely ignored by Claude Desktop.
+
+---
+
+### Full claude_desktop_config.json Format
+
+```json
+{
+  "mcpServers": {
+
+    "pdf-tools": {
+      "command": "python",
+      "args": ["C:/WorkSpace/servers/pdf_server.py"],
+      "env": {
+        "PDF_TEMP_DIR": "C:/tmp/pdf"
+      }
+    },
+
+    "remote-html-tools": {
+      "url": "http://192.168.1.100:8081/sse",
+      "headers": {
+        "Authorization": "Bearer your-token-here"
+      }
+    }
+
+  }
+}
+```
+
+The key inside `mcpServers` (like `"pdf-tools"`, `"remote-html-tools"`) is just a label you choose. It can be anything. Claude Desktop shows it in the UI.
+
+---
+
+## Part 2: MCP Transport Types
+
+There are **3 transport types** in MCP. SSE is not the only one.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    3 MCP TRANSPORT TYPES                            │
+├──────────────────┬──────────────────┬───────────────────────────────┤
+│   stdio          │   SSE            │   Streamable HTTP             │
+│   (local only)   │   (remote/local) │   (remote, newest standard)   │
+├──────────────────┼──────────────────┼───────────────────────────────┤
+│ Launched as      │ Runs as HTTP     │ Runs as HTTP server           │
+│ child process    │ server with      │ Single endpoint for           │
+│ stdin/stdout     │ two endpoints:   │ everything:                   │
+│                  │ GET /sse         │ POST /mcp                     │
+│                  │ POST /messages   │                               │
+├──────────────────┼──────────────────┼───────────────────────────────┤
+│ Use when:        │ Use when:        │ Use when:                     │
+│ Same machine     │ Remote server,   │ Remote server,                │
+│ No firewall      │ older MCP SDK    │ MCP SDK >= 1.0                │
+│                  │                  │ Preferred for new projects    │
+└──────────────────┴──────────────────┴───────────────────────────────┘
 ```
 
 ---
 
-## Architecture: Multiple MCP Servers + Ollama
+## Transport 1: stdio (Local Only)
+
+### How it works
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                        YOUR APP (app.py)                             │
-│                                                                      │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  TOOL REGISTRY  (your app maintains this)                   │    │
-│  │                                                             │    │
-│  │  "pdf_extract_text"  → session_A (mcp-server-1:8080)       │    │
-│  │  "pdf_extract_tables"→ session_A (mcp-server-1:8080)       │    │
-│  │  "html_scrape_url"   → session_B (mcp-server-2:8081)       │    │
-│  │  "html_to_text"      → session_B (mcp-server-2:8081)       │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                      │
-│  Step 1: Connect to all MCP servers, fetch all tools               │
-│  Step 2: Pass all tool names+schemas to Ollama                     │
-│  Step 3: Ollama says "call pdf_extract_text"                       │
-│  Step 4: App looks up registry → routes to mcp-server-1:8080      │
-│  Step 5: Send result back to Ollama                                │
-└──────┬──────────────────────┬───────────────────────┬──────────────┘
-       │                      │                       │
-       ▼                      ▼                       ▼
-┌─────────────┐      ┌─────────────────┐     ┌──────────────┐
-│   OLLAMA    │      │  MCP SERVER 1   │     │ MCP SERVER 2 │
-│ :11434      │      │  :8080          │     │ :8081        │
-│             │      │                 │     │              │
-│ mistral     │      │ pdf_extract_text│     │html_scrape   │
-│ llama3.1    │      │ pdf_extract_    │     │html_to_text  │
-│             │      │   tables        │     │              │
-└─────────────┘      └─────────────────┘     └──────────────┘
+Claude Desktop / Your App
+        │
+        │  spawns as child process
+        ▼
+  python pdf_server.py
+        │
+   communicates via
+   stdin / stdout
+   (no HTTP, no port)
 ```
 
----
+No HTTP server needed. No port. No SSE. MCP messages go through standard input/output of the process.
 
-## Project Structure
-
-```
-project/
-├── servers/
-│   ├── pdf_server.py        ← MCP Server 1 (runs on :8080)  PDF tools
-│   └── html_server.py       ← MCP Server 2 (runs on :8081)  HTML tools
-├── client/
-│   └── app.py               ← Your app: connects MCP + Ollama
-└── requirements.txt
-```
-
----
-
-## Part 1: PDF MCP Server (runs on port 8080)
+### Server code — stdio
 
 ```python
-# servers/pdf_server.py
-# Runs at: http://localhost:8080
-# Exposes:  pdf_extract_text, pdf_extract_tables
-# Your app connects here via:  http://localhost:8080/sse
+# pdf_server_stdio.py
+# No HTTP server needed. No uvicorn. No port.
+# Claude Desktop spawns this as a child process.
 
+import asyncio
 import json
-import uvicorn
 import pdfplumber
 from mcp.server import Server
-from mcp.server.sse import SseServerTransport
+from mcp.server.stdio import stdio_server          # ← stdio transport
 from mcp.types import Tool, TextContent
-from starlette.applications import Starlette
-from starlette.routing import Route
-from starlette.requests import Request
 
-# ── Create MCP server ─────────────────────────────────────────────────────────
-mcp = Server("pdf-server")
+mcp = Server("pdf-tools-stdio")
 
-# ── Declare tools ─────────────────────────────────────────────────────────────
 @mcp.list_tools()
 async def list_tools() -> list[Tool]:
     return [
         Tool(
             name="pdf_extract_text",
-            description="Extract plain text from a PDF file. Use when user wants to read or summarize a PDF.",
+            description="Extract plain text from a PDF file.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "file_path": {
-                        "type": "string",
-                        "description": "Absolute path to the PDF file"
-                    }
-                },
-                "required": ["file_path"]
-            }
-        ),
-        Tool(
-            name="pdf_extract_tables",
-            description="Extract all tables from a PDF file as JSON. Use when user wants structured data from a PDF.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "file_path": {
-                        "type": "string",
-                        "description": "Absolute path to the PDF file"
-                    }
+                    "file_path": {"type": "string"}
                 },
                 "required": ["file_path"]
             }
         )
     ]
 
-# ── Execute tools ─────────────────────────────────────────────────────────────
 @mcp.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
-
     if name == "pdf_extract_text":
-        file_path = arguments["file_path"]
-        pages_text = {}
-        with pdfplumber.open(file_path) as pdf:
-            for i, page in enumerate(pdf.pages):
-                pages_text[f"page_{i+1}"] = page.extract_text() or ""
-        result = {"file": file_path, "pages": pages_text}
-        return [TextContent(type="text", text=json.dumps(result))]
+        with pdfplumber.open(arguments["file_path"]) as pdf:
+            text = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        return [TextContent(type="text", text=json.dumps({"text": text}))]
+    return [TextContent(type="text", text=json.dumps({"error": "unknown tool"}))]
 
-    elif name == "pdf_extract_tables":
-        file_path = arguments["file_path"]
-        all_tables = {}
-        with pdfplumber.open(file_path) as pdf:
-            for i, page in enumerate(pdf.pages):
-                tables = page.extract_tables()
-                if tables:
-                    all_tables[f"page_{i+1}"] = tables
-        result = {"file": file_path, "tables": all_tables}
-        return [TextContent(type="text", text=json.dumps(result))]
-
-    return [TextContent(type="text", text=json.dumps({"error": f"Unknown tool: {name}"}))]
-
-# ── SSE transport wiring ──────────────────────────────────────────────────────
-sse = SseServerTransport("/messages")
-
-async def handle_sse(request: Request):
-    async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
-        await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
-
-async def handle_messages(request: Request):
-    await sse.handle_post_message(request.scope, request.receive, request._send)
-
-http_app = Starlette(routes=[
-    Route("/sse",      endpoint=handle_sse),
-    Route("/messages", endpoint=handle_messages, methods=["POST"]),
-])
+async def main():
+    # stdio_server() reads from stdin, writes to stdout
+    # No HTTP. No port. Claude Desktop pipes directly.
+    async with stdio_server() as (read_stream, write_stream):
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
 
 if __name__ == "__main__":
-    uvicorn.run(http_app, host="0.0.0.0", port=8080)   # ← runs on port 8080
+    asyncio.run(main())
+```
+
+### claude_desktop_config.json — stdio
+
+```json
+{
+  "mcpServers": {
+    "pdf-tools": {
+      "command": "python",
+      "args": ["C:/WorkSpace/servers/pdf_server_stdio.py"],
+      "env": {
+        "PYTHONPATH": "C:/WorkSpace"
+      }
+    }
+  }
+}
+```
+
+Claude Desktop reads this, spawns `python pdf_server_stdio.py` as a child process, and pipes MCP messages through stdin/stdout. No URL needed. No HTTP.
+
+### Python app — stdio client
+
+```python
+# If your own Python app (not Claude Desktop) uses a stdio MCP server
+import asyncio
+from mcp import ClientSession
+from mcp.client.stdio import stdio_client          # ← stdio client
+from mcp import StdioServerParameters
+
+async def run():
+    # Tell the client how to launch the server process
+    server_params = StdioServerParameters(
+        command="python",
+        args=["C:/WorkSpace/servers/pdf_server_stdio.py"],
+        env=None
+    )
+
+    # stdio_client spawns the process and pipes to it
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            result = await session.call_tool(
+                "pdf_extract_text",
+                {"file_path": "C:/tmp/report.pdf"}
+            )
+            print(result.content[0].text)
+
+asyncio.run(run())
 ```
 
 ---
 
-## Part 2: HTML MCP Server (runs on port 8081)
+## Transport 2: SSE (HTTP — Remote or Local)
+
+### How it works
+
+```
+Your App / Claude Desktop
+        │
+        │  HTTP connection
+        │
+        ├── GET  /sse       ← open persistent SSE stream
+        └── POST /messages  ← send tool calls here
+                │
+                ▼
+        MCP Server (any machine)
+        running uvicorn on a port
+```
+
+Two separate HTTP endpoints required on the server. The SSE stream stays open for the lifetime of the session.
+
+### Server code — SSE
 
 ```python
-# servers/html_server.py
-# Runs at: http://localhost:8081
-# Exposes:  html_scrape_url, html_to_text
-# Your app connects here via:  http://localhost:8081/sse
+# pdf_server_sse.py
+# Runs as HTTP server. Reachable from any machine.
+# TWO endpoints required:
+#   GET  /sse       → opens SSE stream
+#   POST /messages  → receives tool calls
 
+import asyncio
 import json
 import uvicorn
-import requests
-from bs4 import BeautifulSoup
+import pdfplumber
 from mcp.server import Server
-from mcp.server.sse import SseServerTransport
+from mcp.server.sse import SseServerTransport      # ← SSE transport
 from mcp.types import Tool, TextContent
 from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.requests import Request
 
-mcp = Server("html-server")
+mcp = Server("pdf-tools-sse")
 
 @mcp.list_tools()
 async def list_tools() -> list[Tool]:
     return [
         Tool(
-            name="html_scrape_url",
-            description="Fetch a live URL and return its plain text content. Use when user provides a URL to scrape.",
+            name="pdf_extract_text",
+            description="Extract plain text from a PDF file.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "url": {
-                        "type": "string",
-                        "description": "Full URL starting with http:// or https://"
-                    }
+                    "file_path": {"type": "string"}
                 },
-                "required": ["url"]
-            }
-        ),
-        Tool(
-            name="html_to_text",
-            description="Convert a raw HTML string to clean plain text. Use when you already have HTML content.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "html": {
-                        "type": "string",
-                        "description": "Raw HTML string to convert"
-                    }
-                },
-                "required": ["html"]
+                "required": ["file_path"]
             }
         )
     ]
 
 @mcp.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+    if name == "pdf_extract_text":
+        with pdfplumber.open(arguments["file_path"]) as pdf:
+            text = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        return [TextContent(type="text", text=json.dumps({"text": text}))]
+    return [TextContent(type="text", text=json.dumps({"error": "unknown tool"}))]
 
-    if name == "html_scrape_url":
-        url = arguments["url"]
-        resp = requests.get(url, timeout=30, headers={"User-Agent": "MCP-Bot/1.0"})
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
-        for tag in soup(["script", "style", "nav", "footer"]):
-            tag.decompose()
-        text = soup.get_text(separator="\n", strip=True)[:5000]
-        result = {"url": url, "title": soup.title.string if soup.title else None, "text": text}
-        return [TextContent(type="text", text=json.dumps(result))]
-
-    elif name == "html_to_text":
-        html = arguments["html"]
-        soup = BeautifulSoup(html, "html.parser")
-        for tag in soup(["script", "style"]):
-            tag.decompose()
-        text = soup.get_text(separator="\n", strip=True)
-        result = {"text": text, "char_count": len(text)}
-        return [TextContent(type="text", text=json.dumps(result))]
-
-    return [TextContent(type="text", text=json.dumps({"error": f"Unknown tool: {name}"}))]
-
-sse = SseServerTransport("/messages")
+# ── SSE transport setup ───────────────────────────────────────────────────────
+# SseServerTransport("/messages") tells it:
+#   tool call results go back via SSE stream
+#   tool call requests come in via POST /messages
+sse = SseServerTransport("/messages")               # ← param is the POST endpoint path
 
 async def handle_sse(request: Request):
-    async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
+    # Client hits GET /sse → this opens the persistent SSE stream
+    async with sse.connect_sse(
+        request.scope, request.receive, request._send
+    ) as streams:
         await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
 
 async def handle_messages(request: Request):
+    # Client hits POST /messages → this receives the tool call and executes it
     await sse.handle_post_message(request.scope, request.receive, request._send)
 
 http_app = Starlette(routes=[
@@ -288,414 +290,212 @@ http_app = Starlette(routes=[
 ])
 
 if __name__ == "__main__":
-    uvicorn.run(http_app, host="0.0.0.0", port=8081)   # ← runs on port 8081
+    uvicorn.run(http_app, host="0.0.0.0", port=8080)
 ```
 
----
+### claude_desktop_config.json — SSE remote server
 
-## Part 3: Your App — Ollama + Multi-MCP Routing
-
-```python
-# client/app.py
-# ─────────────────────────────────────────────────────────────────────────────
-# YOUR APPLICATION
-#
-# Connects to:
-#   MCP Server 1: http://localhost:8080/sse  (PDF tools)
-#   MCP Server 2: http://localhost:8081/sse  (HTML tools)
-#   Ollama:       http://localhost:11434     (local LLM)
-#
-# KEY POINT:
-#   Ollama only sees tool NAMES like "pdf_extract_text"
-#   Your app maintains a registry: tool name → which MCP session to use
-#   When Ollama says "call pdf_extract_text", app looks up registry
-#   and calls the right MCP server
-# ─────────────────────────────────────────────────────────────────────────────
-
-import asyncio
-import json
-import ollama                               # pip install ollama
-from mcp import ClientSession
-from mcp.client.sse import sse_client
-
-# ── MCP server URLs ───────────────────────────────────────────────────────────
-PDF_MCP_URL  = "http://localhost:8080/sse"  # PDF server SSE endpoint
-HTML_MCP_URL = "http://localhost:8081/sse"  # HTML server SSE endpoint
-
-# ── Ollama config ─────────────────────────────────────────────────────────────
-OLLAMA_MODEL = "mistral"                    # must support tool calling
-                                            # alternatives: llama3.1, qwen2.5
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION A: MCP CALLS
-# Talk to remote MCP servers — nothing to do with Ollama here
-# ═════════════════════════════════════════════════════════════════════════════
-
-async def mcp_fetch_tools(session: ClientSession, server_label: str) -> list[dict]:
-    """
-    MCP CALL: Ask one MCP server what tools it has.
-    Returns tools in Ollama format.
-
-    Ollama tool format:
-    {
-      "type": "function",
-      "function": {
-        "name": "pdf_extract_text",
-        "description": "...",
-        "parameters": { ...json schema... }
+```json
+{
+  "mcpServers": {
+    "remote-pdf-tools": {
+      "url": "http://192.168.1.100:8080/sse",
+      "headers": {
+        "Authorization": "Bearer your-token"
       }
     }
-    """
-    print(f"[MCP] Fetching tools from {server_label}...")
-    response = await session.list_tools()
+  }
+}
+```
 
-    ollama_tools = []
-    for tool in response.tools:
-        # Convert MCP format → Ollama format
-        # MCP:    { name, description, inputSchema }
-        # Ollama: { type: "function", function: { name, description, parameters } }
-        ollama_tools.append({
-            "type": "function",
-            "function": {
-                "name":        tool.name,
-                "description": tool.description,
-                "parameters":  tool.inputSchema   # inputSchema IS the JSON schema
+No `command` field. Just `url` pointing to the remote SSE endpoint.
+
+### Python app — SSE client
+
+```python
+import asyncio
+from mcp import ClientSession
+from mcp.client.sse import sse_client              # ← SSE client
+
+async def run():
+    async with sse_client(
+        url="http://192.168.1.100:8080/sse",       # ← full remote URL required
+        headers={"Authorization": "Bearer token"}
+    ) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.call_tool(
+                "pdf_extract_text",
+                {"file_path": "/remote/path/report.pdf"}
+            )
+            print(result.content[0].text)
+
+asyncio.run(run())
+```
+
+---
+
+## Transport 3: Streamable HTTP (Newest — Recommended for New Projects)
+
+### How it works
+
+```
+Your App / Claude Desktop
+        │
+        │  HTTP connection
+        │
+        └── POST /mcp      ← single endpoint for everything
+                            (list tools, call tools, all via this one endpoint)
+                │
+                ▼
+        MCP Server (any machine)
+```
+
+One endpoint only. Simpler than SSE. Supported from MCP SDK 1.0+. This is the direction MCP is moving toward.
+
+### Server code — Streamable HTTP
+
+```python
+# pdf_server_streamable.py
+# ONE endpoint only: POST /mcp
+# Simpler than SSE (no separate /sse + /messages split)
+# Requires: mcp >= 1.0.0
+
+import json
+import uvicorn
+import pdfplumber
+from mcp.server import Server
+from mcp.server.streamable_http import StreamableHTTPServerTransport  # ← new transport
+from mcp.types import Tool, TextContent
+from starlette.applications import Starlette
+from starlette.routing import Route
+from starlette.requests import Request
+
+mcp = Server("pdf-tools-streamable")
+
+@mcp.list_tools()
+async def list_tools() -> list[Tool]:
+    return [
+        Tool(
+            name="pdf_extract_text",
+            description="Extract plain text from a PDF file.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "file_path": {"type": "string"}
+                },
+                "required": ["file_path"]
             }
-        })
+        )
+    ]
 
-    print(f"[MCP] Got {len(ollama_tools)} tools from {server_label}: "
-          f"{[t['function']['name'] for t in ollama_tools]}")
-    return ollama_tools
+@mcp.call_tool()
+async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+    if name == "pdf_extract_text":
+        with pdfplumber.open(arguments["file_path"]) as pdf:
+            text = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        return [TextContent(type="text", text=json.dumps({"text": text}))]
+    return [TextContent(type="text", text=json.dumps({"error": "unknown tool"}))]
 
+# ── Streamable HTTP transport setup ──────────────────────────────────────────
+# Only ONE endpoint needed: POST /mcp
+# No separate /sse GET endpoint. No /messages POST endpoint.
+transport = StreamableHTTPServerTransport(mcp_endpoint="/mcp")  # ← single endpoint path
 
-async def mcp_execute_tool(
-    tool_name: str,
-    tool_args: dict,
-    tool_registry: dict          # maps tool_name → ClientSession
-) -> str:
-    """
-    MCP CALL: Execute a specific tool on the correct MCP server.
+async def handle_mcp(request: Request):
+    async with transport.connect(request.scope, request.receive, request._send) as streams:
+        await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
 
-    tool_registry tells us:
-      "pdf_extract_text"  → session connected to :8080
-      "html_scrape_url"   → session connected to :8081
+http_app = Starlette(routes=[
+    Route("/mcp", endpoint=handle_mcp, methods=["POST"]),  # ← single route only
+])
 
-    Ollama told us to call "pdf_extract_text"
-    We look up registry → find session for :8080
-    We POST the tool call to :8080/messages
-    Result comes back via SSE stream
-    """
-    # ── Look up which MCP server has this tool ────────────────────────────────
-    session = tool_registry.get(tool_name)
-    if not session:
-        return json.dumps({"error": f"No MCP server found for tool: {tool_name}"})
-
-    print(f"\n[MCP] Executing tool '{tool_name}'")
-    print(f"[MCP] Arguments: {json.dumps(tool_args, indent=2)}")
-
-    # ── Call the tool on the correct MCP server ───────────────────────────────
-    # Internally this does: POST http://localhost:808x/messages
-    # with body: { method: "tools/call", params: { name, arguments } }
-    result = await session.call_tool(tool_name, tool_args)
-
-    # Extract text from result content blocks
-    output = "\n".join(
-        block.text for block in result.content if hasattr(block, "text")
-    )
-
-    print(f"[MCP] Tool result: {output[:200]}{'...' if len(output) > 200 else ''}")
-    return output
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION B: OLLAMA CALLS
-# Talk to local Ollama — nothing to do with MCP connection here
-# ═════════════════════════════════════════════════════════════════════════════
-
-def ollama_chat(messages: list[dict], tools: list[dict]) -> dict:
-    """
-    LLM CALL: Send conversation + available tools to Ollama.
-
-    Ollama endpoint called internally: POST http://localhost:11434/api/chat
-
-    Returns Ollama response dict. Two possible outcomes:
-      1. response has tool_calls  → Ollama wants to call a tool
-      2. response has no tool_calls → Ollama gave final text answer
-    """
-    print(f"\n[OLLAMA] Calling model '{OLLAMA_MODEL}'...")
-
-    response = ollama.chat(
-        model=OLLAMA_MODEL,
-        messages=messages,
-        tools=tools            # ← all tools from all MCP servers go here
-                               # Ollama sees: pdf_extract_text, html_scrape_url etc.
-                               # Ollama does NOT see: localhost:8080 or localhost:8081
-    )
-
-    # response["message"] contains:
-    #   { "role": "assistant",
-    #     "content": "some text",           ← final answer (if no tool call)
-    #     "tool_calls": [                   ← tool call request (if LLM wants a tool)
-    #       { "function": {
-    #           "name": "pdf_extract_text",
-    #           "arguments": { "file_path": "/tmp/doc.pdf" }
-    #       }}
-    #     ]
-    #   }
-
-    has_tool_calls = bool(response["message"].get("tool_calls"))
-    print(f"[OLLAMA] Response has tool_calls: {has_tool_calls}")
-    return response
-
-
-def ollama_extract_tool_calls(response: dict) -> list[dict]:
-    """
-    Parse Ollama response to get list of tool calls.
-    Each item: { name: str, arguments: dict }
-    """
-    tool_calls = []
-    for tc in response["message"].get("tool_calls", []):
-        tool_calls.append({
-            "name":      tc["function"]["name"],       # e.g. "pdf_extract_text"
-            "arguments": tc["function"]["arguments"]   # e.g. {"file_path": "/tmp/x.pdf"}
-        })
-    return tool_calls
-
-
-def ollama_extract_text(response: dict) -> str:
-    """Extract final text answer from Ollama response."""
-    return response["message"].get("content", "")
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION C: AGENTIC LOOP
-# Connects MCP and Ollama. Loops until Ollama gives final answer.
-# ═════════════════════════════════════════════════════════════════════════════
-
-async def run(user_message: str):
-    """
-    Full flow:
-    1. Connect to both MCP servers
-    2. Fetch tools from each → build combined tool list + registry
-    3. Pass all tools to Ollama
-    4. Loop: Ollama picks tool → app routes to right MCP server → result back to Ollama
-    5. Ollama gives final answer
-    """
-
-    print(f"\n{'='*60}")
-    print(f"User: {user_message}")
-    print(f"{'='*60}")
-
-    # tool_registry maps:  tool_name (str) → ClientSession
-    # This is how your app knows WHICH MCP server to call for each tool
-    tool_registry = {}
-
-    # all_tools is the combined list passed to Ollama
-    all_tools = []
-
-    # ── Step 1: Connect to MCP Server 1 (PDF tools on :8080) ─────────────────
-    async with sse_client(url=PDF_MCP_URL) as (r1, w1):
-        async with ClientSession(r1, w1) as pdf_session:
-            await pdf_session.initialize()
-
-            # Fetch PDF tools
-            pdf_tools = await mcp_fetch_tools(pdf_session, "PDF-Server(:8080)")
-
-            # Register: each PDF tool name → pdf_session
-            for tool in pdf_tools:
-                tool_name = tool["function"]["name"]
-                tool_registry[tool_name] = pdf_session
-                # tool_registry now has:
-                #   "pdf_extract_text"   → pdf_session (points to :8080)
-                #   "pdf_extract_tables" → pdf_session (points to :8080)
-
-            all_tools.extend(pdf_tools)
-
-            # ── Step 2: Connect to MCP Server 2 (HTML tools on :8081) ─────────
-            async with sse_client(url=HTML_MCP_URL) as (r2, w2):
-                async with ClientSession(r2, w2) as html_session:
-                    await html_session.initialize()
-
-                    # Fetch HTML tools
-                    html_tools = await mcp_fetch_tools(html_session, "HTML-Server(:8081)")
-
-                    # Register: each HTML tool name → html_session
-                    for tool in html_tools:
-                        tool_name = tool["function"]["name"]
-                        tool_registry[tool_name] = html_session
-                        # tool_registry now has:
-                        #   "html_scrape_url" → html_session (points to :8081)
-                        #   "html_to_text"    → html_session (points to :8081)
-
-                    all_tools.extend(html_tools)
-
-                    # ── At this point tool_registry looks like: ────────────────
-                    # {
-                    #   "pdf_extract_text":   <Session → :8080>,
-                    #   "pdf_extract_tables": <Session → :8080>,
-                    #   "html_scrape_url":    <Session → :8081>,
-                    #   "html_to_text":       <Session → :8081>,
-                    # }
-                    #
-                    # Ollama sees only the names in all_tools.
-                    # It picks a name. App uses registry to find right session.
-
-                    print(f"\n[APP] Total tools available to Ollama: {len(all_tools)}")
-                    print(f"[APP] Tool registry: {list(tool_registry.keys())}")
-
-                    # ── Step 3: Build conversation history ─────────────────────
-                    messages = [
-                        {"role": "user", "content": user_message}
-                    ]
-
-                    # ── Step 4: Agentic loop ────────────────────────────────────
-                    turn = 0
-                    while True:
-                        turn += 1
-                        print(f"\n[APP] ── Turn {turn} ──────────────────────────")
-
-                        # ── OLLAMA CALL: send messages + all tools ────────────
-                        response = ollama_chat(messages, all_tools)
-                        assistant_message = response["message"]
-
-                        # Add Ollama's response to history
-                        messages.append(assistant_message)
-
-                        # ── CASE A: No tool calls → Ollama gave final answer ──
-                        if not assistant_message.get("tool_calls"):
-                            final_answer = ollama_extract_text(response)
-                            print(f"\n[APP] Done after {turn} turns.")
-                            print(f"\n{'='*60}")
-                            print(f"Final Answer:\n{final_answer}")
-                            print(f"{'='*60}")
-                            return final_answer
-
-                        # ── CASE B: Ollama wants to call tools ────────────────
-                        tool_calls = ollama_extract_tool_calls(response)
-                        print(f"[APP] Ollama requested tools: "
-                              f"{[tc['name'] for tc in tool_calls]}")
-
-                        for tc in tool_calls:
-                            tool_name = tc["name"]      # e.g. "html_scrape_url"
-                            tool_args = tc["arguments"] # e.g. {"url": "https://..."}
-
-                            # ── MCP CALL: route to correct MCP server ─────────
-                            # App looks up: "html_scrape_url" → html_session → :8081
-                            # App does NOT call :8080 (that would be wrong server)
-                            result = await mcp_execute_tool(
-                                tool_name,
-                                tool_args,
-                                tool_registry   # ← routing map lives here
-                            )
-
-                            # Add tool result to conversation history
-                            # Ollama reads this in next turn to continue reasoning
-                            messages.append({
-                                "role":    "tool",
-                                "content": result
-                            })
-
-                        # Loop → Ollama will now read tool results and continue
-
-
-# ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    asyncio.run(run(
-        "Scrape https://docs.python.org and summarize what you find"
-    ))
+    uvicorn.run(http_app, host="0.0.0.0", port=8080)
+```
+
+### claude_desktop_config.json — Streamable HTTP
+
+```json
+{
+  "mcpServers": {
+    "remote-pdf-tools": {
+      "url": "http://192.168.1.100:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer your-token"
+      }
+    }
+  }
+}
+```
+
+Same format as SSE in config. Claude Desktop detects the transport type automatically.
+
+### Python app — Streamable HTTP client
+
+```python
+import asyncio
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client    # ← new client
+
+async def run():
+    async with streamable_http_client(
+        url="http://192.168.1.100:8080/mcp",       # ← single endpoint URL
+        headers={"Authorization": "Bearer token"}
+    ) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.call_tool(
+                "pdf_extract_text",
+                {"file_path": "/remote/path/report.pdf"}
+            )
+            print(result.content[0].text)
+
+asyncio.run(run())
 ```
 
 ---
 
-## Exact Network Calls Happening Behind the Scenes
+## Side-by-Side Comparison
 
 ```
-YOUR APP                    PDF MCP (:8080)     HTML MCP (:8081)     OLLAMA (:11434)
-    │                            │                    │                    │
-    │── GET /sse ───────────────►│                    │                    │
-    │   (connect pdf session)    │                    │                    │
-    │                            │                    │                    │
-    │── GET /sse ────────────────────────────────────►│                    │
-    │   (connect html session)   │                    │                    │
-    │                            │                    │                    │
-    │── list_tools() ───────────►│                    │                    │
-    │◄── [pdf_extract_text,      │                    │                    │
-    │     pdf_extract_tables] ───│                    │                    │
-    │                            │                    │                    │
-    │── list_tools() ────────────────────────────────►│                    │
-    │◄── [html_scrape_url,       │                    │                    │
-    │     html_to_text] ─────────────────────────────│                    │
-    │                            │                    │                    │
-    │── POST /api/chat ──────────────────────────────────────────────────►│
-    │   tools: [pdf_extract_text,│                    │  (Ollama sees      │
-    │           html_scrape_url, │                    │   only names,      │
-    │           ...]             │                    │   no URLs)         │
-    │◄── tool_use: "html_scrape_url" { url: "..." } ─────────────────────│
-    │                            │                    │                    │
-    │   (app looks up registry)  │                    │                    │
-    │   "html_scrape_url" → :8081│                    │                    │
-    │                            │                    │                    │
-    │── POST /messages ──────────────────────────────►│                    │
-    │   call html_scrape_url     │                    │                    │
-    │◄── { text: "scraped..." } ─────────────────────│                    │
-    │                            │                    │                    │
-    │── POST /api/chat (with tool result) ───────────────────────────────►│
-    │◄── "Here is the summary..." ───────────────────────────────────────│
+                stdio              SSE                 Streamable HTTP
+                ─────              ───                 ───────────────
+Server runs     same machine       any machine         any machine
+as              child process      HTTP server         HTTP server
+
+Server import   stdio_server()     SseServerTransport  StreamableHTTPServerTransport
+
+HTTP endpoints  none               GET  /sse           POST /mcp
+                                   POST /messages      (one endpoint only)
+
+Client import   stdio_client()     sse_client()        streamable_http_client()
+
+Config in       command + args     url: ".../sse"      url: ".../mcp"
+claude config
+
+Auth            none               headers: {}         headers: {}
+
+MCP SDK req     any                any                 >= 1.0.0
+
+Best for        local dev,         remote, legacy      remote, new projects
+                scripts            compatibility
 ```
 
 ---
 
-## Tool Name vs URL — Final Summary
+## Quick Answer to Your Questions
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  WHAT OLLAMA SEES          │  WHAT YOUR APP KNOWS               │
-│  (just tool names)         │  (full routing map)                │
-├──────────────────────────────────────────────────────────────────┤
-│  "pdf_extract_text"        │  → POST http://localhost:8080/msg  │
-│  "pdf_extract_tables"      │  → POST http://localhost:8080/msg  │
-│  "html_scrape_url"         │  → POST http://localhost:8081/msg  │
-│  "html_to_text"            │  → POST http://localhost:8081/msg  │
-└──────────────────────────────────────────────────────────────────┘
+**Q: Does mcp.json work or must it be a specific name?**
+Only `claude_desktop_config.json` works. Any other name is ignored.
 
-Ollama calls:   "html_scrape_url"          ← just the name
-App routes to:  http://localhost:8081/messages  ← full URL
-```
+**Q: Is SSE the only way to invoke remote MCP?**
+No. Three options:
+- `stdio` — local only, no HTTP
+- `SSE` — remote, two endpoints (`GET /sse` + `POST /messages`)
+- `Streamable HTTP` — remote, one endpoint (`POST /mcp`), preferred for new projects
 
-The LLM (Ollama) never touches an MCP URL.
-Your app's `tool_registry` dict is the bridge between the two worlds.
-
----
-
-## How to Run
-
-```bash
-# Terminal 1: Start PDF MCP server
-python servers/pdf_server.py
-# Listening on http://localhost:8080
-
-# Terminal 2: Start HTML MCP server
-python servers/html_server.py
-# Listening on http://localhost:8081
-
-# Terminal 3: Make sure Ollama is running with a tool-capable model
-ollama pull mistral
-ollama serve
-# Listening on http://localhost:11434
-
-# Terminal 4: Run your app
-python client/app.py
-```
-
-## requirements.txt
-
-```
-mcp>=1.0.0
-ollama>=0.2.0
-pdfplumber>=0.10.0
-beautifulsoup4>=4.12.0
-requests>=2.31.0
-uvicorn>=0.24.0
-starlette>=0.27.0
-```
+**Q: Do I set any special param on the server to enable SSE?**
+Yes. On the server you import `SseServerTransport` and create two routes.
+On the client you import `sse_client` and pass the full remote URL.
+Without both sides using the matching transport, connection fails.
