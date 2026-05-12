@@ -73,3 +73,97 @@ judge = create_structured_output(OpenAI())
 
 **Copy this into `README.md`** - ready for GitHub/LinkedIn. Shows **production thinking** + **cost awareness**.
 
+
+
+from typing import TypedDict, Annotated, List
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+import operator
+
+class RAGState(TypedDict):
+    messages: Annotated[List, add_messages]
+    query: str
+    context: List[str]
+    retries: int
+    max_retries: int
+    needles: List[str]  # Expected terms from planner
+
+# Dummy retriever/LLM (replace with real ones)
+def dummy_retrieve(query: str, state: RAGState) -> RAGState:
+    """Simulate retrieval - empty first time, good second time"""
+    if state["query"] == "leg pin" and state["retries"] == 0:
+        return {**state, "context": [], "retries": 1}
+    return {**state, "context": ["Leg pain from pinched nerve in leg..."]}
+
+def planner(state: RAGState) -> RAGState:
+    """Planner defines expected needles for success criteria"""
+    return {
+        **state,
+        "query": state["query"],
+        "needles": ["leg pain", "nerve", "pins needles"],
+        "retries": 0,
+        "max_retries": 1
+    }
+
+def judge_context(state: RAGState) -> str:
+    """Route: good context? rewrite? or fail"""
+    if not state["context"]:
+        return "rewrite"
+    if any(needle in " ".join(state["context"]) for needle in state["needles"]):
+        return "answer"
+    return "fail"
+
+def rewrite_query(state: RAGState) -> RAGState:
+    """Rewrite logic for common failures"""
+    rewrite_map = {
+        "leg pin": "leg pain OR pinched nerve leg OR pins and needles leg"
+    }
+    new_query = rewrite_map.get(state["query"], state["query"] + " symptoms")
+    return {**state, "query": new_query}
+
+def generate_answer(state: RAGState) -> RAGState:
+    """Final answer generation"""
+    context = " ".join(state["context"])
+    answer = f"Based on context: {context}
+Answer: Leg pain likely from pinched nerve."
+    state["messages"].append({"role": "assistant", "content": answer})
+    return state
+
+# Build the graph
+workflow = StateGraph(RAGState)
+
+# Add nodes
+workflow.add_node("planner", planner)
+workflow.add_node("retrieve", dummy_retrieve)
+workflow.add_node("rewrite", rewrite_query)
+workflow.add_node("answer", generate_answer)
+
+# Edges
+workflow.add_edge(START, "planner")
+workflow.add_edge("planner", "retrieve")
+workflow.add_edge("retrieve", "judge")
+
+# Conditional routing
+workflow.add_conditional_edges(
+    "judge",
+    judge_context,
+    {
+        "rewrite": "rewrite",
+        "answer": "answer", 
+        "fail": END
+    }
+)
+workflow.add_edge("rewrite", "retrieve")
+workflow.add_edge("answer", END)
+
+# Compile
+app = workflow.compile()
+
+# Run
+result = app.invoke({
+    "messages": [{"role": "user", "content": "leg pin"}],
+    "query": "leg pin"
+})
+
+print(result["messages"][-1]["content"])
+
