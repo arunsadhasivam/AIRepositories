@@ -99,7 +99,8 @@ def getAvailabilityStatus():
         "Ollama"    : check_ollama(),
         "Solr"      : check_solr(),
         "Redis"     : check_redis(),
-        "PostgreSQL": check_postgres()
+        "PostgreSQL": check_postgres(),
+        "Celery"    : check_celery()
     }
 
     # find any failed checks
@@ -114,3 +115,24 @@ def getAvailabilityStatus():
 
     logging.info("::::: ALL HEALTH CHECKS PASSED — Starting app :::::")
     return results
+
+# ── check Celery workers are running ──
+def check_celery():
+    try:
+        # Import your Celery app instance from tasks.py
+        from rag.processor.tasks import app as celery_app
+
+        # inspect() pings all active workers — timeout 3s
+        inspector = celery_app.control.inspect(timeout=3)
+
+        # active_queues() returns dict of {worker: [queues]} if workers are up
+        active = inspector.active_queues()
+
+        if active:
+            # Log how many workers responded
+            logging.info(f"::::: HEALTH CHECK — Celery        : UP ✅ workers={list(active.keys())}")
+            return True
+    except Exception:
+        pass
+    logging.error("::::: HEALTH CHECK — Celery        : DOWN ❌")
+    return False

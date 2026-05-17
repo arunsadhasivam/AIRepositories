@@ -15,6 +15,7 @@ from template.templateFactory import getAvailabilityTemplate
 from flask import render_template_string
 from datetime import datetime
 from healthCheck.AvailabilityChecker import getAvailabilityStatus
+from rag.processor.tasks import embed_task
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
@@ -55,11 +56,13 @@ def route_embed():
     if(user_role=='' or pwd ==''):
          return jsonify({"error": "enter valid user/pwd"}), 400
     docEmbed = DocumentEmbedder()
+     # ── CHANGE 1: save file before dispatch — Flask file not serializable by Celery
+    file_path = docEmbed.save_file(file)
 
-    embedded = docEmbed.embed(file,user_role,pwd)
-
-    if embedded:
-        return jsonify({"message": "File embedded successfully"}), 200
+    # ── CHANGE 2: dispatch to Celery worker instead of calling embed() directly
+    task = embed_task.delay(file_path, user_role, pwd)
+    if task:
+        return jsonify({"task_id": task.id, "status": "File Queued for Embedding successfully"}), 202
 
     return jsonify({"error": "File embedded unsuccessfully"}), 400
 

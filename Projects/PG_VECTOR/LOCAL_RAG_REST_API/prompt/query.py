@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 load_dotenv() 
+from typing import TypedDict
 from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -18,7 +19,7 @@ from rag.guadrail.GuadRail import is_input_safe
 from rag.guadrail.GuadRail import is_output_safe
 from prompt.promptFactory import get_prompt
 from rag.kvcache.kvContext import getKVStableContext
-
+from prompt.router.GraphRouter import GraphBasedRetriever
 
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
@@ -137,6 +138,7 @@ def query(query,search_type,user_role,pwd):
             )
             
             response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
+            #response = configureAndProcessRetriever(query, vectorRetriever)
             logging.info("-----------------------PROMPT.QUERY END--------------------------------------")
 
             return response
@@ -175,6 +177,8 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
         # Step 4: Create HybridRetriever with both retrievers
         hybridRetriever = HybridRetriever(vectorRetriever, sparseSolrRetriever, config)
             # Step 5: Use hybridRetriever as the LangChain retriever
+
+        #retriever = GraphBasedRetriever(query,vectorRetriever)    
         retriever = MultiQueryRetriever.from_llm(
             hybridRetriever.as_langchain_retriever(),  # wrap to LangChain compatible
             llm,
@@ -251,16 +255,16 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         retrieved_docs = retriever.invoke(query) #VECTORIZE internally (only operation need vector)
         # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
         # kvStable context requires more memory always 7gb vram
-        #stable_context = getKVStableContext(retrieved_docs)
+        stable_context = getKVStableContext(retrieved_docs)
         # join chunk content into single context string
-        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+        #context = "\n\n".join([doc.page_content for doc in retrieved_docs])
         rag_chain = (
             {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
             | prompt
             | llm
             | StrOutputParser()
         )
-        response = rag_chain.invoke({"context": context, "question": query})
+        response = rag_chain.invoke({"context": stable_context, "question": query})
         # ── OUTPUT GUADTRAIL guadtrail handler ──
         retrieved_context_text = " ".join([doc.page_content for doc in retrieved_docs])
 
@@ -299,4 +303,4 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs
     except Exception as e:
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
         raise 
-    
+
