@@ -112,25 +112,25 @@ class RAGUI:
             text = ""
             if st.button("Process Documents"):
                 with st.spinner("Processing documents..."):
-                    st.html(f"processing....")
                     for file in uploaded_files:
                         os.makedirs(temp_dir, exist_ok=True)
                         file_path = os.path.join(temp_dir, file.name)
 
                         with open(file_path, "wb") as f:
                             f.write(file.getbuffer())
+                        msg = st.empty() 
                         try:    
                             user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
                             logging.info(f'::::: RAG UPDATE KNOWLEDGE BASE WITH USER ROLE={user_role}')
                             response =   self.controller.route_embed(file_path,user_role,st.session_state.password)
                             
                             if response is not None: 
-                              st.html(f"<span style='color:green'>File saved at: {response}</span>")
+                              msg.html(f"<span style='color:green'>File saved at: {response}</span>")
                             else :
-                              st.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
+                              msg.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
 
                         except Exception as e:
-                             st.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
+                             msg.html(f"<span style='color:red'>* No privilege to update Knowledge Base </span>")
                     if url:
                         st.success(f"Processed {url}")
         
