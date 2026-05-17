@@ -112,6 +112,7 @@ class RAGUI:
             text = ""
             if st.button("Process Documents"):
                 with st.spinner("Processing documents..."):
+                    st.html(f"processing....")
                     for file in uploaded_files:
                         os.makedirs(temp_dir, exist_ok=True)
                         file_path = os.path.join(temp_dir, file.name)
@@ -148,6 +149,7 @@ class RAGUI:
             #st.button("Search") 
             try :
                 if query and st.button("Search"):
+                  st.text(f"Error in processing Query From Vector DB:help ")      
                   user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
                   response =   self.controller.searchQuery(query,search_type,user_role,st.session_state.password)
                   logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS:{response}")
