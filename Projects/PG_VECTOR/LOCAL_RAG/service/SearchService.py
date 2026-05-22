@@ -4,7 +4,7 @@ import logging
 from cache.RedisRagCache import RedisRagCache
 class SearchService:
     """Service layer to handle business logic."""
-    #C:\Windows\System32\drivers\etc\hosts has localhost if used sometimes localhost not working.
+    #C:\Windows\System32\drivers\etc\hosts has localhost added. sometimes localhost not working.
     def __init__(self,cache: RedisRagCache):
         self.end_point_url='http://127.0.0.1:8080'
         self.cache = cache
