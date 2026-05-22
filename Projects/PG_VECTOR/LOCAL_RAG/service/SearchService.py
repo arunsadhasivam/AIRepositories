@@ -4,13 +4,14 @@ import logging
 from cache.RedisRagCache import RedisRagCache
 class SearchService:
     """Service layer to handle business logic."""
+    #C:\Windows\System32\drivers\etc\hosts has localhost if used sometimes localhost not working.
     def __init__(self,cache: RedisRagCache):
-        self.end_point_url='http://localhost:8080'
+        self.end_point_url='http://127.0.0.1:8080'
         self.cache = cache
 
     def route_embed(self,file_path,user,pwd):
         logging.info(f'::::: SEARCHSERVICE:route_embed:BEGIN:file_path:{file_path} ,user={user}')
-        endPointQUery  = 'http://localhost:8080/embed'
+        endPointQUery  = 'http://127.0.0.1:8080/embed'
         with open(file_path, 'rb') as file:
             file = {"file": (file_path, file)}
             data=  { "user_role":user,"password":pwd }
@@ -31,7 +32,7 @@ class SearchService:
                 logging.info(f"::::: RETURNED FROM REDIScache:::::::::::::::::::{result}")
                 return result
         
-            endPointQUery  = 'http://localhost:8080/query?query='+query
+            endPointQUery  = 'http://127.0.0.1:8080/query?query='+query
             result = requests.post(endPointQUery,headers={"Content-Type": "application/json"},json={'query':query,'search_type':search_type,'user_role':user_role,'pwd':pwd})
             try:
                 response = result.json().get('message')
@@ -44,7 +45,7 @@ class SearchService:
         return  response
     
     def healthCheck(self):
-        endPointQUery  = 'http://localhost:8080/health_check'
+        endPointQUery  = 'http://127.0.0.1:8080/health_check'
         result =  requests.get(endPointQUery)
        
         return result
