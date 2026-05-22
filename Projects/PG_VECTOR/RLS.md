@@ -36,17 +36,17 @@ Scripts:
           GRANT CONNECT ON DATABASE rag TO app_admin;
 
           -- grant permission to app_admin only to select,update,delete
-          GRANT SELECT, INSERT, UPDATE, DELETE ON langchain_pg_embedding TO app_admin;
-          GRANT SELECT ON langchain_pg_embedding TO app_user;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON local_rag TO app_admin;
+          GRANT SELECT ON local_rag TO app_user;
 
           
-          GRANT SELECT, INSERT, UPDATE, DELETE ON public.langchain_pg_collection TO app_admin;
-          GRANT SELECT ON public.langchain_pg_collection TO app_user;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON public.local_rag TO app_admin;
+          GRANT SELECT ON public.local_rag TO app_user;
 
            
-          GRANT SELECT ON langchain_pg_collection TO app_user;
+          GRANT SELECT ON local_rag TO app_user;
           -- Revoke default public access
-          REVOKE ALL ON langchain_pg_collection FROM PUBLIC;
+          REVOKE ALL ON local_rag FROM PUBLIC;
 
           
           -- Optional: prevent superusers from default access
@@ -55,8 +55,8 @@ Scripts:
           -- =========================
           -- 3️⃣ Enable RLS
           -- =========================
-          ALTER TABLE langchain_pg_embedding ENABLE ROW LEVEL SECURITY;
-          ALTER TABLE langchain_pg_embedding FORCE ROW LEVEL SECURITY;
+          ALTER TABLE local_rag ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE local_rag FORCE ROW LEVEL SECURITY;
           
           -- ========================================
           -- 4️⃣ Create policies - ROW LEVEL SECURITY
@@ -64,7 +64,7 @@ Scripts:
           
           -- Admin: full CRUD (SELECT, INSERT, UPDATE, DELETE)
           CREATE POLICY admin_full_access
-          ON langchain_pg_embedding
+          ON local_rag
           FOR ALL
           TO app_admin
           USING (true)
@@ -72,7 +72,7 @@ Scripts:
           
           -- Normal users: read-only (SELECT)
           CREATE POLICY user_read_only
-          ON langchain_pg_embedding
+          ON local_rag
           FOR SELECT
           TO app_user
           USING (true);
@@ -80,16 +80,16 @@ Scripts:
           -- =========================
           -- 5️⃣ Revoke default access from public
           -- =========================
-          REVOKE ALL ON langchain_pg_embedding FROM PUBLIC;
+          REVOKE ALL ON local_rag FROM PUBLIC;
           
           -- ==============================================
           -- 6️⃣ Grant usage - TABLE LEVEL SECURITY
           -- =================================================
           -- Admin gets all rights (optional but recommended)
-          GRANT SELECT, INSERT, UPDATE, DELETE ON langchain_pg_embedding TO app_admin; 
+          GRANT SELECT, INSERT, UPDATE, DELETE ON local_rag TO app_admin; 
           
           -- Users get only read access
-          GRANT SELECT ON langchain_pg_embedding TO app_user;
+          GRANT SELECT ON local_rag TO app_user;
 
 
 
