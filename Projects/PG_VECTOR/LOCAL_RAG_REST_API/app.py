@@ -17,6 +17,7 @@ from datetime import datetime
 from healthCheck.AvailabilityChecker import getAvailabilityStatus
 from rag.processor.tasks import embed_task
 import logging
+import warnings
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -32,6 +33,9 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 logging.getLogger("unstructured").setLevel(logging.WARNING)
 logging.getLogger("filelock").setLevel(logging.WARNING)
 logging.getLogger(":pikepdf._core").setLevel(logging.WARNING)
+logging.getLogger("CreditCardRecognizer").setLevel(logging.WARNING)
+# Suppress Python warnings from presidio modules
+warnings.filterwarnings("ignore", module="presidio*")
 
 TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
 os.makedirs(TEMP_FOLDER, exist_ok=True)
