@@ -1,6 +1,5 @@
 import os
 import logging
-import requests
 from cache.RedisRagCache import RedisRagCache
 import logging
 from service.SearchService import SearchService
@@ -8,7 +7,6 @@ from service.SearchService import SearchService
 class SearchController:    
   
     def __init__(self,service:SearchService):
-        self.end_point_url='http://localhost:8080'
         self.service=service
         
     def route_embed(self,file_path,user_role,pwd):

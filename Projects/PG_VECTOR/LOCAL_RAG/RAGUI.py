@@ -123,6 +123,7 @@ class RAGUI:
                             user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
                             logging.info(f'::::: RAG UPDATE KNOWLEDGE BASE WITH USER ROLE={user_role}')
                             response =   self.controller.route_embed(file_path,user_role,st.session_state.password)
+                            logging.info(f'::::: RAG UPDATE KNOWLEDGE RESPONSE={response}')
                             
                             if response is not None: 
                               msg.html(f"<span style='color:green'>File saved at: {response}</span>")

@@ -103,7 +103,7 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
     Async Celery task wrapping your existing embed() pipeline.
     Caller dispatches with embed_task.delay(file_path, user_role, pwd)
     and gets task_id back immediately — no blocking.
-
+    
     Args:
         file_path         : Absolute path to temp file saved by caller before dispatch
         user_role         : DB role for RLS (row-level security)
@@ -111,6 +111,10 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
         enable_pii_masking: Whether to run PII masking on chunks
     """
 
+    # example retry error message
+    # if variable wrong fie_path
+    #rag.processor.tasks - WARNING - embed_task:RETRY | attempt=1/3 | error=name 'fie_path' is not defined
+    # retry allows robust chunking to avoid ingestion failure knowledge source never get missed because of network issue.
     try:
 
         # ══════════════════════════════════════════════════════════════════════
@@ -119,7 +123,7 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
         # ══════════════════════════════════════════════════════════════════════
 
         # Log start of embedding process
-        logging.info(f'::::: EMBEDDING TO VECTOR DB:BEGIN:::{user_role}')
+        logging.info(f'::::: QUEUE TASK TO BEGIN EMBEDDING TO VECTOR DB:BEGIN:::{user_role}')
 
         # Validate that file exists at path (replaces your file object check)
         if not file_path or not os.path.exists(file_path):
@@ -129,7 +133,7 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
             return False
 
         # Load document and split into chunks using Docling
-        embedder = DocumentEmbedding()                    # Your existing service class
+        embedder = DocumentEmbedding.DocumentEmbedder()                    # Your existing service class
         chunks = embedder.load_and_split_data(file_path)
 
         # Validate that chunks were created
@@ -165,10 +169,14 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
         embedding_model = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL, show_progress=True)
         vectors = embedding_model.embed_documents([doc.content for doc in rag_docs])
         numpy_vectors = [np.array(v, dtype=np.float32) for v in vectors]  # convert list → numpy array
-
         # Step 3 - Insert into PgVectorStore
         logging.info(f'::::: INSERT TO VECTOR DB:BEGIN {user_role} :::::')
-        db.add_documents(rag_docs, embeddings=numpy_vectors)
+        try:
+            db.add_documents(rag_docs, embeddings=numpy_vectors)
+        except ProgrammingError as e:
+            logging.info(f'::::: INSERT TO SOLR DB FAILED :::::')
+            return False
+
         logging.info(f'::::: INSERT TO SOLR DB:END {user_role} :::::')
 
         # Validate database connection was established
@@ -190,6 +198,7 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
         except ProgrammingError as e:
             # Log database programming error
             logging.error(f'Database programming error: {str(e)}')
+            print(str(e))
             # Check if error is permission-related
             if "row-level security" in str(e).lower() or "permission denied" in str(e).lower():
                 # Log permission error
@@ -198,19 +207,21 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
                 return False
             else:
                 # Re-raise — retriable, caught by outer except below
-                raise
+                return False
 
         except psycopg2.errors.InsufficientPrivilege as e:
             # Log insufficient privilege error
+            print(f'InsufficientPrivilege :: {str(e)}')
             logging.error(f'Insufficient database privileges: {str(e)}')
             # Non-retriable — return False directly
             return False
 
         except OperationalError as e:
             # Log operational error — retriable (DB connection blip)
+            print(f'OperationalError :: {str(e)}')
             logging.error(f'Database operational error: {str(e)}')
             # Re-raise — caught by outer except below, triggers retry
-            raise
+            return False
 
         # Log successful embedding with chunk count
         logging.info(f'Successfully embedded {len(chunks)} chunks for user: {user_role}')

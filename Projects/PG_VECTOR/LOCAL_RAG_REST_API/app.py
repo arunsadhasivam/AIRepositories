@@ -64,9 +64,13 @@ def route_embed():
     file_path = docEmbed.save_file(file)
 
     # ── CHANGE 2: dispatch to Celery worker instead of calling embed() directly
-    task = embed_task.delay(file_path, user_role, pwd)
+    #embed_task.dely or embed_task.apply_async(file_path,user_role,pwd) to get task.id
+    #else it wont return task.id
+    task = embed_task(file_path, user_role, pwd)
+    logging.info(f'::::: QUEUED TASK STATUS: FILE={task}, user_role={user_role}, pwd={pwd}')
+
     if task:
-        return jsonify({"task_id": task.id, "status": "File Queued for Embedding successfully"}), 202
+        return jsonify({"task": task, "message": "File Queued for Embedding successfully"}), 202
 
     return jsonify({"error": "File embedded unsuccessfully"}), 400
 
