@@ -25,6 +25,39 @@ Action executed safely
 
 ---
 
+## Full Outline
+
+```
+[LAYER 1] Tool Validation
+          ├── Parameter validation (types, ranges, format)
+          ├── Schema validation (nested fields, enums, business types)
+          ├── Policy checks (user × role × action)
+          ├── Budget validation (per-request, per-user, per-day)
+          └── Authorization (row-level rights on target entity)
+
+[LAYER 2] Guardrails
+          ├── Prompt guardrails (injection, scope, policy)
+          ├── Output guardrails (profanity, jailbreaks, fabrication)
+          ├── Compliance checks (domain-specific rules)
+          ├── PII protection (detect, mask, audit)
+          └── Hallucination reduction (citation validation)
+
+[LAYER 3] Observability
+          ├── Structured per-request traces
+          ├── Immutable tool-call log (post-mortem basis)
+          ├── Token + cost telemetry (per req / user / tenant / feature)
+          ├── Stage-level latency (p50, p95, p99 per stage)
+          └── Failure tracking by class with thresholds + alerts
+
+[LAYER 4] Human Approval  — trigger when ANY one is true
+          ├── Irreversible action
+          ├── Large blast radius
+          └── Low agent confidence
+          → Queue carries: evidence, alternatives, confidence → training data
+```
+
+---
+
 ## Layer 1 — Tool Validation
 > *"The model proposes. The validator disposes."*
 
