@@ -27,34 +27,33 @@ Action executed safely
 
 ## Full Outline
 
-```
-[LAYER 1] Tool Validation
-          ├── Parameter validation (types, ranges, format)
-          ├── Schema validation (nested fields, enums, business types)
-          ├── Policy checks (user × role × action)
-          ├── Budget validation (per-request, per-user, per-day)
-          └── Authorization (row-level rights on target entity)
+### Layer 1 — Tool Validation
+1. Parameter validation (types, ranges, format)
+2. Schema validation (nested fields, enums, business types)
+3. Policy checks (user × role × action)
+4. Budget validation (per-request, per-user, per-day)
+5. Authorization (row-level rights on target entity)
 
-[LAYER 2] Guardrails
-          ├── Prompt guardrails (injection, scope, policy)
-          ├── Output guardrails (profanity, jailbreaks, fabrication)
-          ├── Compliance checks (domain-specific rules)
-          ├── PII protection (detect, mask, audit)
-          └── Hallucination reduction (citation validation)
+### Layer 2 — Guardrails
+1. Prompt guardrails (injection, scope, policy)
+2. Output guardrails (profanity, jailbreaks, fabrication)
+3. Compliance checks (domain-specific rules)
+4. PII protection (detect, mask, audit)
+5. Hallucination reduction (citation validation)
 
-[LAYER 3] Observability
-          ├── Structured per-request traces
-          ├── Immutable tool-call log (post-mortem basis)
-          ├── Token + cost telemetry (per req / user / tenant / feature)
-          ├── Stage-level latency (p50, p95, p99 per stage)
-          └── Failure tracking by class with thresholds + alerts
+### Layer 3 — Observability
+1. Structured per-request traces
+2. Immutable tool-call log (post-mortem basis)
+3. Token + cost telemetry (per req / user / tenant / feature)
+4. Stage-level latency (p50, p95, p99 per stage)
+5. Failure tracking by class with thresholds + alerts
 
-[LAYER 4] Human Approval  — trigger when ANY one is true
-          ├── Irreversible action
-          ├── Large blast radius
-          └── Low agent confidence
-          → Queue carries: evidence, alternatives, confidence → training data
-```
+### Layer 4 — Human Approval
+1. Irreversible action
+2. Large blast radius
+3. Low agent confidence
+
+> Queue carries: evidence, alternatives, confidence score → human decisions become training data
 
 ---
 
@@ -412,3 +411,4 @@ It arrives with: the evidence used, the alternatives considered, and the agent's
 | Layer 2 — Guardrails | Not glamorous. The difference between shipped and pulled. |
 | Layer 3 — Observability | You cannot operate what you cannot see. |
 | Layer 4 — Human Approval | Some decisions are too important to automate. |
+
