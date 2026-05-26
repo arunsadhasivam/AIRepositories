@@ -1015,6 +1015,77 @@ MCP Tools                   ████░░░░░░░░░░░░░�
 | Your current RAG pipeline (single app) | LangChain `@tool` + LangGraph — right call today |
 | Long term as you add more agents | MCP + LangGraph — direction industry is moving |
 
+
+## Performance — LangChain `@tool` vs MCP Tools
+
+### Key Difference — Local vs Remote Call
+
+```
+LangChain @tool   →  in-process function call  →  ~0ms overhead
+MCP Tool          →  cross-process remote call  →  ~1ms (local) to ~100ms (remote)
+```
+
+This is the **only real performance difference** between the two.
+The LLM call, token cost, and LangGraph overhead are identical.
+
+---
+
+### Latency Breakdown Per Tool Call
+
+| Step | LangChain `@tool` | MCP Tool (local server) | MCP Tool (remote server) |
+|---|---|---|---|
+| LLM decides which tool | Same | Same | Same |
+| Tool call overhead | ~0ms | ~1–5ms | ~10–100ms |
+| Tool execution time | Depends on your function | Depends on your function | Depends on your function |
+| Result back to LLM | ~0ms | ~1–5ms | ~10–100ms |
+| LLM generates answer | Same | Same | Same |
+
+> **Tool execution time dominates** — if your tool queries a database (50ms) or calls an API (200ms),
+> the MCP overhead (~5ms local) is negligible.
+
+---
+
+### When Performance Difference Actually Matters
+
+| Situation | Impact |
+|---|---|
+| Tool calls a slow DB / API (>50ms) | MCP overhead irrelevant — DB is the bottleneck |
+| Tool is a fast in-memory lookup (<1ms) | MCP adds noticeable overhead — use `@tool` |
+| MCP server on same machine (localhost) | Overhead ~1–5ms — negligible |
+| MCP server on remote machine | Overhead ~10–100ms — consider if latency-sensitive |
+| High frequency tool calls (100+ per request) | MCP overhead compounds — prefer `@tool` |
+
+---
+
+### Performance by Invocation Way
+
+| Way | Performance | Notes |
+|---|---|---|
+| Way 1 — AgentExecutor | Slowest | Extra abstraction layers, verbose logging overhead |
+| Way 2 — bind_tools + LCEL | Fast | Minimal overhead — direct chain |
+| Way 3 — Manual loop | Fast | You control everything — no hidden overhead |
+| Way 4 — LangGraph | Fast | Small graph state overhead (~1–2ms) — worth it for control |
+
+---
+
+### Bottom Line on Performance
+
+```
+LangGraph + @tool    →  fastest overall
+LangGraph + MCP      →  ~1–5ms slower per tool call (localhost MCP)
+                         ~10–100ms slower per tool call (remote MCP)
+
+In practice:
+  LLM call         = 500ms – 3000ms   (dominates everything)
+  DB / API call    = 50ms – 500ms     (second biggest factor)
+  MCP overhead     = 1ms – 100ms      (usually negligible)
+```
+
+> **For your RAG pipeline** — LLM call is 500ms+.
+> MCP overhead of 5ms is less than 1% of total latency.
+> Performance is NOT a reason to choose one over the other.
+> Choose based on architecture need — single app vs shared tools.
+
 ---
 
 ## Full Comparison Summary
@@ -1029,5 +1100,6 @@ MCP Tools                   ████░░░░░░░░░░░░░�
 | Tool schema tokens? | Yes — per call | Yes — per call |
 | Cacheable? | Yes | Yes |
 | Token cost difference? | Same | Same |
+| Performance difference? | Faster by ~1–5ms per tool call | ~1–5ms slower (localhost) |
 | Best for | Single app, fast dev | Shared tools, multi-app, microservices |
 | Prod invocation | LangGraph Custom Graph | LangGraph Custom Graph |
