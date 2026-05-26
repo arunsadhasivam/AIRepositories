@@ -412,3 +412,8 @@ It arrives with: the evidence used, the alternatives considered, and the agent's
 | Layer 3 — Observability | You cannot operate what you cannot see. |
 | Layer 4 — Human Approval | Some decisions are too important to automate. |
 
+
+MCP Agent vs Langchain Agent:
+=============================
+
+https://github.com/arunsadhasivam/AIRepositories/blob/master/Advanced/MCPToolCalling/McpVsLangchainToolCalling.md
