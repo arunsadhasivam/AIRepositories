@@ -350,39 +350,59 @@ What gets sent to LLM every single request:
 > Rule: **Every tool you register adds tokens to every LLM call** — even if that tool is never called.
 
 ---
-
 ### Can You Cache Tool Tokens? Yes — Prompt Caching
 
 Both MCP tools and LangChain tools support **prompt caching** (e.g. Anthropic prompt caching, OpenAI prompt caching).
 
 **How it works:**
 ```
-First request:
-System prompt + tool schemas → sent to LLM → cached on provider side
-                                              (tokens billed at full rate)
+WITHOUT CACHE — every single request:
+  System prompt (500 tokens)   → billed at full price every call
+  Tool schemas (1000 tokens)   → billed at full price every call
+  User query (50 tokens)       → billed at full price every call
+  Total: 1550 tokens full price
 
-Second request (same system + tools):
-System prompt + tool schemas → cache HIT → not reprocessed
-                                           (tokens billed at ~10% rate)
-User query only → processed fresh → full token cost
+WITH CACHE:
+  First request:
+    System prompt (500 tokens) → full price → CACHED on provider side
+    Tool schemas (1000 tokens) → full price → CACHED on provider side
+    User query (50 tokens)     → full price (unique every request)
+
+  Second request onwards — cache HIT:
+    System prompt (500 tokens) → ~10% of full price ✅ (saved 90%)
+    Tool schemas (1000 tokens) → ~10% of full price ✅ (saved 90%)
+    User query (50 tokens)     → full price (changes every request — cannot cache)
 ```
+
+**What "~10% rate" means:**
+> If full price = $0.003 per 1K tokens
+> Cached price = $0.0003 per 1K tokens (10x cheaper)
+> System prompt + tool schemas go from $0.0045 → $0.00045 from second request onwards
 
 **Result of caching:**
 
-| | Without Cache | With Cache |
+| | Without Cache | With Cache (2nd request+) |
 |---|---|---|
-| System prompt (500 tokens) | Billed every call | Billed once, ~10% after |
-| Tool schemas (1000 tokens) | Billed every call | Billed once, ~10% after |
-| User query (50 tokens) | Billed every call | Always billed (changes every call) |
-| Tool result tokens | Billed every call | Always billed (changes every call) |
+| System prompt (500 tokens) | Full price every call | ~10% of full price |
+| Tool schemas (1000 tokens) | Full price every call | ~10% of full price |
+| User query (50 tokens) | Full price every call | Always full price — changes every call |
+| Tool result tokens | Full price every call | Always full price — new content every call |
+| LLM response tokens | Full price every call | Always full price — new content every call |
+
+**Simple rule:**
+```
+Can be cached   → content that NEVER changes between requests
+                  system prompt ✅  tool schemas ✅
+
+Cannot be cached → content that CHANGES every request
+                   user query ❌   tool result ❌   LLM response ❌
+```
 
 **Important:** Tool schemas are ideal for caching because they **never change between requests**.
 
 ---
 
 ### Does Caching Prevent Tool Execution Tokens?
-
-**No.** Caching only saves the cost of re-reading the tool schema.
 
 ```
 Cached:    system prompt + tool definitions  → cheap
@@ -453,12 +473,16 @@ Way 1 AgentExecutor → OpenAI / Azure OpenAI only
 Ollama models WITH tool calling support   → Way 2, 3, 4 work ✅
   mistral, llama3.1, llama3.2, qwen2.5, phi3
 
-Ollama models WITHOUT tool calling        → no tool calling at all ❌
-  nomic-embed-text  (embedding only — no chat, no tools)
-  mxbai-embed-large (embedding only — no chat, no tools)
+Ollama models — embedding only            → NO chat, NO tool calling ❌
+  nomic-embed-text  → only generates embeddings (vectors), cannot chat or call tools
+  mxbai-embed-large → only generates embeddings (vectors), cannot chat or call tools
+
+  These are NOT chat models — they convert text to numbers (vectors) for similarity search.
+  They have NO concept of tool calling, function calling, or generating a response.
 ```
 
 > Rule: check `ollama show <model>` — if it lists `tools` capability → Ways 2, 3, 4 work.
+> If it only lists `embedding` → it is an embedding model, cannot be used for tool calling at all.
 
 ---
 
