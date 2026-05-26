@@ -965,3 +965,10 @@ Are you in prod with multi-step, multi-agent, or HITL?
 | Token cost difference? | Same | Same |
 | Best for | Single app, fast dev | Shared tools, multi-app, microservices |
 | Prod invocation | LangGraph Custom Graph | LangGraph Custom Graph |
+
+
+Ollama models WITH tool support    → Way 2, 3, 4 work
+  e.g. mistral, llama3.1, qwen2.5
+
+Ollama models WITHOUT tool support → no tool calling at all
+  e.g. nomic-embed-text (embedding only)
