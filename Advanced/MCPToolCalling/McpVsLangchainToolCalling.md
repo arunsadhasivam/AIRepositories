@@ -134,7 +134,7 @@ while True:
 
 final_answer = messages[-1].content
 ```
-> ✅ Full control. ✅ Add guardrails between steps. ❌ Most boilerplate. Best for: production RAG pipelines.
+
 
 ---
 
@@ -252,7 +252,7 @@ while True:
 
 final_answer = messages[-1].content
 ```
-> ✅ Full control. ✅ Add guardrails between remote calls. ❌ Most boilerplate. Best for: production.
+
 
 ---
 
@@ -598,12 +598,14 @@ You control the full loop:
 
 | Pros | Cons |
 |---|---|
-| Maximum control | Most code to write and maintain |
-| Works with OpenAI, Azure, Claude, Ollama | You handle all edge cases yourself |
-| Add Layer 1-4 guardrails between each step | Risk of infinite loop if not careful |
-| Can inject HITL at any point | |
+| Maximum control over every step | Most code to write and maintain yourself |
+| Works with OpenAI, Azure, Claude, Ollama | You are responsible for all edge cases |
+| Can add guardrails between each step | Risk of infinite loop if break condition missed |
+| Can inject HITL at any point | Not recommended if LangGraph is an option |
 
-**Best for:** Production when team is not yet on LangGraph. Any LLM vendor.
+> ⚠️ **Best for:** Transitional step — use this only if your team is **not yet on LangGraph**.
+> Once on LangGraph — Way 4 replaces this with less code and more structure.
+> Do NOT use Way 3 and call it "best for prod" — Way 4 LangGraph is better for prod in every way.
 
 ---
 
@@ -702,12 +704,16 @@ graph = create_react_agent(llm, tools)
 
 ## Advantages vs Disadvantages Summary
 
-| Way | Advantage | Disadvantage | Use When |
-|---|---|---|---|
-| AgentExecutor | Simple, auto loop | No step control, older style | Prototypes, simple agents |
-| bind_tools + LCEL | Modern, clean, flexible | Manual tool handling | Single step, custom logic |
-| bind_tools + manual loop | Full control, prod-ready | Most boilerplate | Prod RAG with guardrails |
-| LangGraph | Best for complex flows, HITL | Steeper learning curve | Multi-step, multi-agent, prod |
+| Way | Advantage | Disadvantage | Use When | Prod? |
+|---|---|---|---|---|
+| AgentExecutor | Simple, auto loop, least code | No step control, OpenAI only, older style | Prototypes only | ❌ |
+| bind_tools + LCEL | Modern, clean, any LLM vendor | You handle tool result manually | Single step, no loop needed | ⚠️ Simple only |
+| bind_tools + manual loop | Full control, any LLM vendor | Most code to write — you own every edge case | Transitional — use until team adopts LangGraph | ⚠️ Not preferred |
+| LangGraph Custom Graph | Less code than manual loop, structured, guardrails, HITL, checkpointing, any LLM vendor | Steeper learning curve | Everything prod | ✅ Recommended |
+
+> **Correction from earlier:** Way 3 manual loop is NOT "best for prod."
+> It was listed that way because it gives control — but LangGraph gives the same control
+> with less code and more structure. Way 4 LangGraph is the correct prod choice.
 
 ---
 
