@@ -78,16 +78,83 @@ agent = create_openai_functions_agent(llm, [search_orders], prompt)
 executor = AgentExecutor(agent=agent, tools=[search_orders])
 ```
 
-**Step 3: Invoke**
+**Step 3: Invoke — 4 Ways**
+
+#### Way 1 — AgentExecutor (Auto Loop)
 ```python
+from langchain.agents import create_openai_functions_agent, AgentExecutor
+
+agent = create_openai_functions_agent(llm, [search_orders], prompt)
+executor = AgentExecutor(agent=agent, tools=[search_orders])
+
+# single invoke — AgentExecutor loops automatically
 result = executor.invoke({"input": "What is the status of order 123?"})
 ```
+> ✅ Least code. ❌ No control between steps. Best for: prototypes.
 
-**What happens internally:**
+---
+
+#### Way 2 — bind_tools + LCEL Chain (Modern)
+```python
+llm_with_tools = llm.bind_tools([search_orders])
+chain = prompt | llm_with_tools
+
+# returns AIMessage — you check if tool was called
+response = chain.invoke({"input": "What is the status of order 123?"})
+
+if response.tool_calls:
+    tool_result = search_orders.invoke(response.tool_calls[0]["args"])
+```
+> ✅ Modern LCEL style. ✅ Works with Ollama. ❌ You handle tool result manually. Best for: single tool call, custom logic.
+
+---
+
+#### Way 3 — bind_tools + Manual Loop (Full Control)
+```python
+from langchain_core.messages import HumanMessage, ToolMessage
+
+llm_with_tools = llm.bind_tools([search_orders])
+messages = [HumanMessage(content="What is the status of order 123?")]
+
+tools_map = {"search_orders": search_orders}
+
+while True:
+    response = llm_with_tools.invoke(messages)
+    messages.append(response)
+
+    if not response.tool_calls:
+        break  # LLM is done
+
+    for tool_call in response.tool_calls:
+        result = tools_map[tool_call["name"]].invoke(tool_call["args"])
+        messages.append(ToolMessage(
+            content=str(result),
+            tool_call_id=tool_call["id"]
+        ))
+
+final_answer = messages[-1].content
+```
+> ✅ Full control. ✅ Add guardrails between steps. ❌ Most boilerplate. Best for: production RAG pipelines.
+
+---
+
+#### Way 4 — LangGraph (Recommended for Prod)
+```python
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage
+
+graph = create_react_agent(llm, [search_orders])
+result = graph.invoke({"messages": [HumanMessage(content="What is the status of order 123?")]})
+```
+> ✅ Best for complex flows. ✅ Native HITL. ✅ State management. ❌ Steeper learning curve. Best for: multi-step, multi-agent, prod.
+
+---
+
+**What happens internally (all 4 ways — same flow):**
 ```
 1. User input sent to LLM with tool schema
 2. LLM responds: "I need to call search_orders(order_id='123')"
-3. AgentExecutor calls your local Python function search_orders('123')
+3. Tool executor calls your local Python function search_orders('123')
 4. Result returned to LLM
 5. LLM generates final answer
 ```
@@ -128,22 +195,86 @@ server_params = StdioServerParameters(
 
 async with stdio_client(server_params) as (read, write):
     async with ClientSession(read, write) as session:
-
-        # MCP tools converted to LangChain tool format
+        # load MCP tools — converts to LangChain tool format
         tools = await load_mcp_tools(session)
-
-        # From here — identical to LangChain agent tools
-        agent = create_openai_functions_agent(llm, tools, prompt)
-        executor = AgentExecutor(agent=agent, tools=tools)
-        result = await executor.ainvoke({"input": "What is the status of order 123?"})
 ```
 
-**What happens internally:**
+**Step 3: Invoke — same 4 ways as LangChain tools**
+
+#### Way 1 — AgentExecutor (Auto Loop)
+```python
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+
+result = await executor.ainvoke({"input": "What is the status of order 123?"})
+```
+> ✅ Least code. ❌ No control between steps. Best for: prototypes.
+
+---
+
+#### Way 2 — bind_tools + LCEL Chain (Modern)
+```python
+llm_with_tools = llm.bind_tools(tools)
+chain = prompt | llm_with_tools
+
+response = await chain.ainvoke({"input": "What is the status of order 123?"})
+
+if response.tool_calls:
+    # tools here are MCP tools — remote call happens here
+    tool_result = await tools[0].ainvoke(response.tool_calls[0]["args"])
+```
+> ✅ Modern LCEL style. ✅ Works with Ollama. ❌ You handle tool result manually. Best for: single tool call.
+
+---
+
+#### Way 3 — bind_tools + Manual Loop (Full Control)
+```python
+from langchain_core.messages import HumanMessage, ToolMessage
+
+llm_with_tools = llm.bind_tools(tools)
+tools_map = {t.name: t for t in tools}  # MCP tools mapped by name
+messages = [HumanMessage(content="What is the status of order 123?")]
+
+while True:
+    response = await llm_with_tools.ainvoke(messages)
+    messages.append(response)
+
+    if not response.tool_calls:
+        break
+
+    for tool_call in response.tool_calls:
+        # this triggers the remote MCP server call
+        result = await tools_map[tool_call["name"]].ainvoke(tool_call["args"])
+        messages.append(ToolMessage(
+            content=str(result),
+            tool_call_id=tool_call["id"]
+        ))
+
+final_answer = messages[-1].content
+```
+> ✅ Full control. ✅ Add guardrails between remote calls. ❌ Most boilerplate. Best for: production.
+
+---
+
+#### Way 4 — LangGraph (Recommended for Prod)
+```python
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage
+
+# MCP tools passed directly — LangGraph handles remote calls
+graph = create_react_agent(llm, tools)
+result = await graph.ainvoke({"messages": [HumanMessage(content="What is the status of order 123?")]})
+```
+> ✅ Best for complex flows. ✅ Native HITL. ✅ State management. Best for: multi-step prod agents.
+
+---
+
+**What happens internally (all 4 ways — MCP remote call):**
 ```
 1. User input sent to LLM with tool schema
 2. LLM responds: "I need to call search_orders(order_id='123')"
-3. AgentExecutor calls MCP client → HTTP/stdio call → MCP server executes function
-4. Result returned across the wire → back to AgentExecutor → back to LLM
+3. Tool executor → MCP client → HTTP/stdio → MCP server executes function
+4. Result returned across the wire → back to executor → back to LLM
 5. LLM generates final answer
 ```
 
@@ -281,6 +412,545 @@ the LLM sees identical tool schemas either way.
 
 ---
 
+## Different Ways to Invoke Tools
+
+### Why Do Different Ways Exist?
+
+Different ways exist because **not every situation needs the same level of control.**
+
+| Situation | Problem With One-Size-Fits-All | Solution |
+|---|---|---|
+| Prototype in 10 min | Writing a full graph is overkill | AgentExecutor — 3 lines |
+| Single tool, no loop | AgentExecutor runs a loop you don't need | bind_tools + LCEL — clean and direct |
+| Prod with guardrails | No place to insert logic between steps | Manual loop — you control every step |
+| Complex multi-step | Manual loop gets messy and error-prone | LangGraph — structured graph with nodes |
+
+> Think of it like Java: you can use a `while` loop, an `Iterator`, a `Stream`, or a `CompletableFuture` — all iterate, but each fits a different situation.
+
+---
+
+### LLM Vendor Compatibility — Which Way Works With Which LLM?
+
+| Way | OpenAI / Azure OpenAI | Anthropic Claude | Ollama (local) | Google Gemini | Notes |
+|---|---|---|---|---|---|
+| Way 1 — AgentExecutor | ✅ | ✅ | ⚠️ Partial | ✅ | Uses `create_openai_functions_agent` — works best with OpenAI-style function calling |
+| Way 2 — bind_tools + LCEL | ✅ | ✅ | ✅ | ✅ | Works with any LLM that supports `bind_tools()` |
+| Way 3 — Manual Loop | ✅ | ✅ | ✅ | ✅ | Works with any LLM — you control everything |
+| Way 4 — LangGraph | ✅ | ✅ | ✅ | ✅ | Works with any LLM that supports `bind_tools()` |
+
+**Ollama details:**
+- AgentExecutor with `create_openai_functions_agent` — **does not work reliably** with Ollama because Ollama does not fully support OpenAI function-calling format
+- `bind_tools()` + LCEL or LangGraph — **works with Ollama** as long as the model supports tool calling (e.g. `mistral`, `llama3.1`, `qwen2.5`)
+- Models like `nomic-embed-text` are embedding-only — **no tool calling**
+
+**Anthropic Claude details:**
+- All 4 ways work with Claude via `langchain_anthropic.ChatAnthropic`
+- Claude has native tool use — works cleanly with `bind_tools()` and LangGraph
+
+**Key rule:**
+> If your LLM supports `bind_tools()` → Way 2, 3, 4 all work.
+> Way 1 AgentExecutor → safest with OpenAI / Azure OpenAI only.
+
+---
+
+There are 4 ways to invoke tools in LangChain — works the same for both LangChain `@tool` and MCP tools.
+
+---
+
+### Way 1 — AgentExecutor (Classic Loop)
+
+> ⚠️ **LLM Vendor:** Works best with **OpenAI / Azure OpenAI only**.
+> Uses `create_openai_functions_agent` which relies on OpenAI function-calling format.
+> **Does NOT work reliably with Ollama or Anthropic Claude** via this exact setup.
+> For Ollama or Claude → use Way 2, 3, or 4 instead.
+
+```python
+from langchain.agents import create_openai_functions_agent, AgentExecutor
+
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+result = executor.invoke({"input": "find order 123"})
+```
+
+**How it works:**
+```
+invoke() → LLM thinks → calls tool → result → LLM thinks → calls tool → final answer
+           (AgentExecutor loops automatically until done)
+```
+
+| Pros | Cons |
+|---|---|
+| Auto handles multi-step tool calls | Less control over each step |
+| Built-in error handling and retries | Hard to intercept between steps |
+| Verbose mode shows full reasoning | Older style — being replaced by LangGraph |
+| Simple to set up | Can run infinite loops if no stop condition |
+| | ⚠️ OpenAI / Azure only — not Ollama, not Claude |
+
+**Best for:** Quick prototypes using OpenAI or Azure OpenAI only.
+
+---
+
+### Way 2 — `llm.bind_tools()` + LCEL Chain (Modern Style)
+
+> ✅ **LLM Vendor:** Works with **any LLM that supports `bind_tools()`**
+> OpenAI ✅ | Azure OpenAI ✅ | Anthropic Claude ✅ | Ollama ✅ (mistral, llama3.1, qwen2.5)
+> ⚠️ Ollama embedding-only models like `nomic-embed-text` — **no tool calling support**
+
+```python
+# bind tools directly to LLM
+llm_with_tools = llm.bind_tools(tools)
+
+# LCEL chain — prompt | llm
+chain = prompt | llm_with_tools
+
+# invoke — returns AIMessage with tool_calls if LLM wants a tool
+response = chain.invoke({"input": "find order 123"})
+
+# YOU check and handle the tool call manually
+if response.tool_calls:
+    for tool_call in response.tool_calls:
+        tool_name = tool_call["name"]          # which tool LLM chose
+        tool_args = tool_call["args"]           # what args LLM passed
+        tool_result = tools_map[tool_name].invoke(tool_args)
+        # send result back to LLM yourself
+```
+
+**How it works:**
+```
+chain.invoke() → LLM responds with tool_call intent
+YOU check response.tool_calls
+YOU execute the tool
+YOU send result back to LLM
+YOU decide when to stop
+```
+
+| Pros | Cons |
+|---|---|
+| Works with OpenAI, Azure, Claude, Ollama | You write the tool result handling |
+| Modern LCEL style | Easy to forget edge cases |
+| Can add logic between steps | Need to handle multi-step manually |
+| Can add observability at each step | |
+
+**Best for:** Single tool call with custom logic. Any LLM vendor.
+
+---
+
+### Way 3 — `llm.bind_tools()` + Manual Loop (Full Control)
+
+> ✅ **LLM Vendor:** Works with **any LLM that supports `bind_tools()`**
+> OpenAI ✅ | Azure OpenAI ✅ | Anthropic Claude ✅ | Ollama ✅ (tool-capable models only)
+> Same rule as Way 2 — if the model supports `bind_tools()` this works.
+
+```python
+llm_with_tools = llm.bind_tools(tools)
+messages = [HumanMessage(content="find order 123 and check if it shipped")]
+
+# manual think → act → observe loop
+while True:
+    response = llm_with_tools.invoke(messages)
+    messages.append(response)
+
+    # no more tool calls → LLM is done
+    if not response.tool_calls:
+        break
+
+    # execute each tool call
+    for tool_call in response.tool_calls:
+        tool_result = tools_map[tool_call["name"]].invoke(tool_call["args"])
+        messages.append(ToolMessage(
+            content=str(tool_result),
+            tool_call_id=tool_call["id"]
+        ))
+
+final_answer = messages[-1].content
+```
+
+**How it works:**
+```
+You control the full loop:
+  → call LLM
+  → if tool_calls: execute tools, append results, loop again
+  → if no tool_calls: done
+```
+
+| Pros | Cons |
+|---|---|
+| Maximum control | Most code to write and maintain |
+| Works with OpenAI, Azure, Claude, Ollama | You handle all edge cases yourself |
+| Add Layer 1-4 guardrails between each step | Risk of infinite loop if not careful |
+| Can inject HITL at any point | |
+
+**Best for:** Production when team is not yet on LangGraph. Any LLM vendor.
+
+---
+
+### Way 4 — LangGraph (Modern Agentic Orchestration)
+
+> ✅ **LLM Vendor:** Works with **any LLM that supports `bind_tools()`**
+> OpenAI ✅ | Azure OpenAI ✅ | Anthropic Claude ✅ | Ollama ✅ (tool-capable models only)
+> LangGraph internally calls `llm.bind_tools()` — same vendor rules as Way 2 and 3.
+
+```python
+from langgraph.prebuilt import create_react_agent
+
+# LangGraph manages the loop as a state graph
+graph = create_react_agent(llm, tools)
+
+result = graph.invoke({"messages": [HumanMessage(content="find order 123")]})
+```
+
+Or custom graph:
+```python
+from langgraph.graph import StateGraph, MessagesState
+
+graph = StateGraph(MessagesState)
+graph.add_node("llm", call_llm)
+graph.add_node("tools", call_tools)
+graph.add_conditional_edges("llm", should_call_tool)
+graph.add_edge("tools", "llm")
+
+app = graph.compile()
+result = app.invoke({"messages": [HumanMessage(content="find order 123")]})
+```
+
+**How it works:**
+```
+State graph with nodes:
+  llm node → decides tool
+  tools node → executes tool
+  conditional edge → loop or stop
+  (LangGraph manages state between nodes)
+```
+
+| Pros | Cons |
+|---|---|
+| Works with OpenAI, Azure, Claude, Ollama | Steeper learning curve |
+| Best for complex multi-agent workflows | More setup than AgentExecutor |
+| Built-in state management | Overkill for simple single-tool use |
+| Supports parallel tool calls | |
+| Supports human-in-the-loop natively | |
+| Recommended by LangChain team for prod | |
+| Checkpointing — resume from any step | |
+
+**Best for:** Complex prod agents, multi-agent pipelines, workflows that need HITL, branching, or parallel execution. Any LLM vendor.
+
+---
+
+## Which Way — For Which Purpose
+
+| Purpose | Best Way | LLM Vendor | Why |
+|---|---|---|---|
+| Quick prototype / demo | AgentExecutor | OpenAI / Azure only | Least code, works immediately |
+| Single tool call, no loop | `bind_tools()` + LCEL | Any | Clean, no loop overhead |
+| Need control between steps | Manual loop | Any | You insert guardrails/logging |
+| Production RAG pipeline | LangGraph Custom Graph | Any | Full control, structured, prod-ready |
+| Multi-agent / parallel tools | LangGraph | Any | Built for this |
+| Human-in-the-loop required | LangGraph | Any | Native HITL support |
+| Using Ollama local LLM | Way 2, 3, or 4 only | Ollama only | AgentExecutor does NOT work with Ollama |
+| Using Anthropic Claude | Way 2, 3, or 4 | Anthropic only | Claude has native tool use via `bind_tools()` |
+| MCP tools | Any of the 4 ways | Any | `load_mcp_tools()` first — then identical |
+
+---
+
+## MCP Tools — Which Invocation Way Works
+
+```python
+# Step 1: Load MCP tools — same for ALL 4 ways
+tools = await load_mcp_tools(session)
+
+# Step 2: Use any invocation style — identical from here
+# Way 1 — AgentExecutor
+executor = AgentExecutor(agent=create_openai_functions_agent(llm, tools, prompt), tools=tools)
+
+# Way 2 — bind_tools LCEL
+chain = prompt | llm.bind_tools(tools)
+
+# Way 3 — manual loop
+llm_with_tools = llm.bind_tools(tools)
+
+# Way 4 — LangGraph
+graph = create_react_agent(llm, tools)
+```
+
+> Once MCP tools are loaded via `load_mcp_tools()` they become standard LangChain tools.
+> All 4 invocation ways work identically with MCP tools and local `@tool` tools.
+
+---
+
+## Advantages vs Disadvantages Summary
+
+| Way | Advantage | Disadvantage | Use When |
+|---|---|---|---|
+| AgentExecutor | Simple, auto loop | No step control, older style | Prototypes, simple agents |
+| bind_tools + LCEL | Modern, clean, flexible | Manual tool handling | Single step, custom logic |
+| bind_tools + manual loop | Full control, prod-ready | Most boilerplate | Prod RAG with guardrails |
+| LangGraph | Best for complex flows, HITL | Steeper learning curve | Multi-step, multi-agent, prod |
+
+---
+
+## LangGraph — Production Grade Tool Calling (Recommended)
+
+> LangGraph is the recommended way for production.
+> It works identically for both LangChain `@tool` and MCP tools.
+> The only difference is how you load the tools — everything else is the same.
+
+---
+
+### LangGraph Flow
+
+```
+User Input
+    ↓
+[llm_node]  → LLM decides: call tool or answer?
+    ↓
+[conditional edge] → tool_calls exist? → YES → [tools_node]
+                                       → NO  → END
+    ↓
+[tools_node] → executes tool (local or MCP remote)
+    ↓
+back to [llm_node] → LLM sees result → decides again
+    ↓
+END → final answer
+```
+
+---
+
+### Way 1 — LangGraph Prebuilt (Simplest Prod Setup)
+
+**With LangChain `@tool`:**
+```python
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage
+from langchain.tools import tool
+
+# Step 1: define local tool
+@tool
+def search_orders(order_id: str) -> str:
+    """Search for an order by ID."""
+    return db.query(order_id)
+
+# Step 2: create react agent — LangGraph manages the loop
+graph = create_react_agent(llm, tools=[search_orders])
+
+# Step 3: invoke
+result = graph.invoke({
+    "messages": [HumanMessage(content="find order 123")]
+})
+
+print(result["messages"][-1].content)  # final answer
+```
+
+**With MCP Tools — only Step 1 changes:**
+```python
+from langgraph.prebuilt import create_react_agent
+from langchain_mcp_adapters.tools import load_mcp_tools
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+# Step 1: load MCP tools — connects to remote MCP server
+server_params = StdioServerParameters(
+    command="python",
+    args=["orders_mcp_server.py"]
+)
+
+async with stdio_client(server_params) as (read, write):
+    async with ClientSession(read, write) as session:
+        tools = await load_mcp_tools(session)  # MCP → LangChain format
+
+        # Step 2: identical from here — LangGraph does not care where tools came from
+        graph = create_react_agent(llm, tools=tools)
+
+        # Step 3: invoke
+        result = await graph.ainvoke({
+            "messages": [HumanMessage(content="find order 123")]
+        })
+
+        print(result["messages"][-1].content)
+```
+
+---
+
+### Way 2 — LangGraph Custom Graph (Full Prod Control)
+
+Use this when you need guardrails, observability, or HITL between steps.
+
+**Works identically for both LangChain tools and MCP tools — only tool loading differs.**
+
+```python
+from langgraph.graph import StateGraph, MessagesState, END
+from langgraph.prebuilt import ToolNode
+from langchain_core.messages import HumanMessage
+from typing import Literal
+
+# --- tool loading ---
+# LangChain tool:  tools = [search_orders]
+# MCP tool:        tools = await load_mcp_tools(session)
+
+# Step 1: bind tools to LLM
+llm_with_tools = llm.bind_tools(tools)
+
+# Step 2: define LLM node
+def llm_node(state: MessagesState):
+    # → add Layer 2 input guardrail here before LLM call
+    response = llm_with_tools.invoke(state["messages"])
+    # → add Layer 2 output guardrail here after LLM call
+    # → log to Langfuse here (Layer 3 observability)
+    return {"messages": [response]}
+
+# Step 3: define tool node — LangGraph executes tools here
+# ToolNode handles both local @tool and MCP tools identically
+tool_node = ToolNode(tools)
+
+# Step 4: conditional edge — should we call a tool or stop?
+def should_call_tool(state: MessagesState) -> Literal["tools", END]:
+    last_message = state["messages"][-1]
+
+    if last_message.tool_calls:
+        # → add Layer 1 tool validation here (budget, schema, policy)
+        # → add Layer 4 HITL check here (blast radius, confidence)
+        return "tools"
+
+    return END
+
+# Step 5: build the graph
+graph_builder = StateGraph(MessagesState)
+
+graph_builder.add_node("llm",   llm_node)
+graph_builder.add_node("tools", tool_node)
+
+graph_builder.set_entry_point("llm")
+
+graph_builder.add_conditional_edges(
+    "llm",
+    should_call_tool  # decides: call tool or end
+)
+
+graph_builder.add_edge("tools", "llm")  # after tool → back to LLM
+
+graph = graph_builder.compile()
+
+# Step 6: invoke
+result = graph.invoke({
+    "messages": [HumanMessage(content="find order 123")]
+})
+
+print(result["messages"][-1].content)
+```
+
+**Where to plug in your prod layers:**
+```
+llm_node()
+    → BEFORE llm call  : Layer 2 input guardrail, PII masking
+    → AFTER llm call   : Layer 2 output guardrail, Langfuse trace
+
+should_call_tool()
+    → BEFORE tool call : Layer 1 budget check, schema validation, RBAC
+    → BEFORE tool call : Layer 4 HITL — irreversible? blast radius? low confidence?
+
+tool_node
+    → executes tool    : local @tool OR MCP remote call — same node
+```
+
+---
+
+### Way 3 — LangGraph with Checkpointing (Resume on Failure)
+
+```python
+from langgraph.checkpoint.memory import MemorySaver
+
+# add checkpointer — saves state after every node
+checkpointer = MemorySaver()
+graph = graph_builder.compile(checkpointer=checkpointer)
+
+# invoke with thread_id — can resume this exact conversation later
+config = {"configurable": {"thread_id": "order-session-123"}}
+
+result = graph.invoke(
+    {"messages": [HumanMessage(content="find order 123")]},
+    config=config
+)
+
+# if it fails mid-way — resume from last checkpoint
+result = graph.invoke(
+    {"messages": [HumanMessage(content="continue")]},
+    config=config  # same thread_id — picks up where it left off
+)
+```
+
+> ✅ If LLM call fails mid-pipeline → resumes from last saved state
+> ✅ User can pause and resume a long-running workflow
+> ✅ Works with both LangChain tools and MCP tools
+
+---
+
+### LangGraph Prod Summary
+
+| Feature | Prebuilt `create_react_agent` | Custom Graph |
+|---|---|---|
+| Setup effort | Minimal | More code |
+| Guardrails between steps | ❌ Hard to add | ✅ Add anywhere |
+| Observability per step | ❌ Hard to add | ✅ Add in each node |
+| HITL support | ❌ | ✅ In conditional edge |
+| Checkpointing | ✅ Add checkpointer | ✅ Add checkpointer |
+| Works with LangChain tools | ✅ | ✅ |
+| Works with MCP tools | ✅ | ✅ |
+| Best for | Simple prod agent | Full prod pipeline |
+
+---
+
+## Which Way is Preferred for Production — Final Summary
+
+### By Invocation Way
+
+| Way | Prod Ready? | Preferred? | Why |
+|---|---|---|---|
+| Way 1 — AgentExecutor | ⚠️ Not recommended | ❌ | No step control, older style, being deprecated |
+| Way 2 — bind_tools + LCEL | ✅ OK for simple | ⚠️ Only if single step | You manage tool result manually — easy to miss edge cases |
+| Way 3 — bind_tools + Manual Loop | ✅ Yes | ⚠️ Only if no LangGraph | Full control but you write and maintain all edge case handling yourself |
+| Way 4 — LangGraph Custom Graph | ✅ Yes | ✅ **Recommended** | Structured, guardrails pluggable, HITL native, checkpointing, less error-prone |
+
+---
+
+### By Tool Type — Which Invocation to Use in Prod
+
+| Tool Type | Recommended Prod Way | Why |
+|---|---|---|
+| LangChain `@tool` | **LangGraph Custom Graph** | Full control, guardrails at each node, no boilerplate loop to maintain |
+| MCP Tools | **LangGraph Custom Graph** | Same as above — `load_mcp_tools()` then identical LangGraph setup |
+| Both mixed together | **LangGraph Custom Graph** | LangGraph ToolNode handles local and MCP tools in the same node |
+
+---
+
+### Decision Tree — What to Use
+
+```
+Are you prototyping?
+    YES → Way 1 AgentExecutor (fastest to set up)
+
+Are you in prod with a single simple tool call?
+    YES → Way 2 bind_tools + LCEL
+
+Are you in prod and need guardrails + observability?
+    YES → Do you know LangGraph?
+        NO  → Way 3 Manual Loop (for now)
+        YES → Way 4 LangGraph Custom Graph ← recommended
+
+Are you in prod with multi-step, multi-agent, or HITL?
+    YES → Way 4 LangGraph Custom Graph ← only real option
+```
+
+---
+
+### One Line Answer
+
+> **For prod — always LangGraph Custom Graph.**
+> Works the same for LangChain `@tool` and MCP tools.
+> Gives you guardrails, observability, HITL, and checkpointing
+> without writing and maintaining the loop yourself.
+
+---
+
 ## Full Comparison Summary
 
 | Question | LangChain `@tool` | MCP Tool |
@@ -294,3 +964,4 @@ the LLM sees identical tool schemas either way.
 | Cacheable? | Yes | Yes |
 | Token cost difference? | Same | Same |
 | Best for | Single app, fast dev | Shared tools, multi-app, microservices |
+| Prod invocation | LangGraph Custom Graph | LangGraph Custom Graph |
