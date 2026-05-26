@@ -1090,68 +1090,20 @@ In practice:
 > **For your RAG pipeline** — LLM call is 500ms+.
 > MCP overhead of 5ms is less than 1% of total latency.
 > Performance is NOT a reason to choose one over the other.
-> Choose based on architecture need — single app vs shared tools.
+
 
 ---
 
-## SOA Analogy — Tool Calling is Like Dynamic vs Static Service Invocation
+## SOA Analogy — Static Stub vs Dynamic Invocation
 
-> If you have worked with SOA / Java web services, tool calling maps directly to concepts you already know.
+> Same trade-off you know from SOA / Java web services — directly applies here.
+
+### Mapping Table
 
 | SOA / Java | Tool Calling Equivalent |
 |---|---|
 | Static stub (compile-time bound) | LangChain `@tool` — defined in your code, fixed at deploy time |
-| Dynamic invocation interface (DII) — runtime discovery | MCP Tools — discovered from server at runtime via `load_mcp_tools()` |
-| WSDL contract | Tool schema (name, description, parameters) sent to LLM |
-| Service bus / ESB routing | AgentExecutor / LangGraph — routes LLM decision to correct tool |
-| Client calls service | LLM decides → executor calls tool |
-
-**Why the analogy holds:**
-- `@tool` = static stub — you know the tool at compile/deploy time, bound in code
-- MCP = dynamic invocation — tool registry discovered at runtime, decoupled from your app
-- Tool schema = WSDL — LLM reads it to know what to call and with what parameters
-- LangGraph = service orchestration layer — routes, retries, manages flow
-
----
-
-## Error Handling — What Happens When a Tool Fails
-
-| Way | Tool Fails — What Happens | Who Handles It |
-|---|---|---|
-| Way 1 — AgentExecutor | Built-in retry — retries automatically | Framework handles it |
-| Way 2 — bind_tools + LCEL | Exception thrown — nothing catches it | You handle in your code |
-| Way 3 — Manual loop | Exception breaks the loop — request fails | You handle in your code |
-| Way 4 — LangGraph | You add an error node in the graph | Most structured — you decide recovery |
-
-**LangGraph error node example:**
-```python
-def tool_node_with_error_handling(state: MessagesState):
-    try:
-        # execute tool
-        result = tools_map[tool_call["name"]].invoke(tool_call["args"])
-    except Exception as e:
-        # return error message back to LLM — LLM decides next step
-        return {"messages": [ToolMessage(
-            content=f"Tool failed: {str(e)} — please try a different approach",
-            tool_call_id=tool_call["id"]
-        )]}
-```
-
-**Why LangGraph error handling is best:**
-- Error returned to LLM as a message — LLM can recover gracefully
-- LLM sees the error and decides: retry, use different tool, or tell user
-- AgentExecutor retries blindly — LangGraph retries intelligently
-
----
-
-## SOA Analogy — Dynamic Invocation vs Static Stub
-
-> Tool calling in LangChain maps directly to SOA patterns you already know from Java/enterprise development.
-
-| SOA / Java | Tool Calling Equivalent |
-|---|---|
-| Static stub (compile-time bound) | LangChain `@tool` — defined in your code, fixed at deploy time |
-| Dynamic invocation interface (DII) — runtime discovery | MCP Tools — discovered from server at runtime via `load_mcp_tools()` |
+| Dynamic invocation interface (DII) | MCP Tools — discovered from server at runtime via `load_mcp_tools()` |
 | WSDL contract | Tool schema (name, description, parameters) sent to LLM |
 | Service bus / ESB routing | AgentExecutor / LangGraph — routes LLM decision to correct tool |
 | Client calls service | LLM decides → executor calls tool |
@@ -1159,19 +1111,32 @@ def tool_node_with_error_handling(state: MessagesState):
 | JAX-WS generated stub | LangChain `@tool` decorator — fixed interface known at compile time |
 | JAX-WS DII `Dispatch` | `load_mcp_tools()` — loads tool interface dynamically at runtime |
 
-**Analogy holds exactly:**
-- `@tool` = static stub — you know the tool at compile/deploy time, bound in code
-- MCP = dynamic invocation — tool registry discovered at runtime, decoupled from your app
-- Tool schema = WSDL — LLM reads it to know what to call and with what parameters
-- LangGraph = ESB / service orchestration — routes, retries, manages the flow
+---
+
+### Static Stub vs DII — Same Advantages Carry Over
+
+| SOA Advantage | Static Stub → LangChain `@tool` | DII → MCP Tools |
+|---|---|---|
+| Speed | Fast — compile-time bound, no discovery overhead | Slightly slower — runtime discovery + network call |
+| Simplicity | Simpler — interface visible in your code | More setup — server to deploy and maintain |
+| Debuggability | Easy — tool defined in your codebase, full stack trace | Harder — error may be on remote MCP server |
+| Coupling | Tightly coupled — tool change = app redeploy | Loosely coupled — tool server updated independently |
+| Reusability | Low — tied to one app | High — any app connects to same MCP server |
+| Runtime flexibility | None — tools fixed at deploy | High — tools discovered and changed without app redeploy |
+| Multi-app sharing | Requires copy-paste to each app | Single MCP server — all apps connect |
+| Failure impact | Tool failure = in-process exception | Tool failure = network error, server down |
+
+**Bottom line — same trade-off as SOA:**
+> Static stub = `@tool` — simple, fast, tightly coupled, single app
+> DII = MCP — flexible, loosely coupled, shared across apps, runtime discovery
 
 ---
 
-## Error Handling Per Invocation Way
+## Error Handling — What Happens When a Tool Fails
 
 | Way | What Happens When Tool Fails | Who Handles It |
 |---|---|---|
-| Way 1 — AgentExecutor | Built-in retry — retries the tool call automatically | AgentExecutor handles it |
+| Way 1 — AgentExecutor | Built-in retry — retries the tool call automatically | Framework handles it |
 | Way 2 — bind_tools + LCEL | Exception thrown — your code must catch it | You handle it |
 | Way 3 — Manual loop | Exception thrown inside loop — your code must catch it | You handle it |
 | Way 4 — LangGraph | Add error node in graph — most structured error handling | You define error node |
@@ -1181,7 +1146,7 @@ def tool_node_with_error_handling(state: MessagesState):
 from langgraph.graph import StateGraph, MessagesState, END
 from typing import Literal
 
-def should_call_tool(state: MessagesState) -> Literal["tools", "error", END]:
+def should_call_tool(state: MessagesState) -> Literal["tools", END]:
     last_message = state["messages"][-1]
     if last_message.tool_calls:
         return "tools"
@@ -1189,28 +1154,23 @@ def should_call_tool(state: MessagesState) -> Literal["tools", "error", END]:
 
 def tool_node_with_error(state: MessagesState):
     try:
-        # execute tool
+        # execute tool — local @tool or MCP remote call
         result = tools_map[state["messages"][-1].tool_calls[0]["name"]].invoke(
             state["messages"][-1].tool_calls[0]["args"]
         )
         return {"messages": [ToolMessage(content=str(result))]}
     except Exception as e:
-        # route to error handler instead of crashing
-        return {"messages": [ToolMessage(content=f"Tool failed: {str(e)}")]}
-
-def error_node(state: MessagesState):
-    # log to Langfuse, alert, fallback response
-    return {"messages": [AIMessage(content="Tool failed. Please try again.")]}
+        # return error to LLM — LLM decides: retry, different tool, or tell user
+        return {"messages": [ToolMessage(content=f"Tool failed: {str(e)} — try a different approach")]}
 
 graph_builder.add_node("tools", tool_node_with_error)
-graph_builder.add_node("error", error_node)
 graph_builder.add_conditional_edges("llm", should_call_tool)
-graph_builder.add_edge("error", END)
+graph_builder.add_edge("tools", "llm")  # LLM sees error and recovers
 ```
 
 > **Why LangGraph error handling is best:**
-> Error is a first-class node in the graph — you log it, alert on it, and return a graceful fallback.
-> In manual loop (Way 3) an unhandled exception crashes the entire pipeline.
+> Error returned to LLM as a message — LLM decides to retry, use a different tool, or tell the user.
+> AgentExecutor retries blindly. Manual loop crashes. LangGraph recovers intelligently.
 
 ---
 
@@ -1226,6 +1186,10 @@ graph_builder.add_edge("error", END)
 | Tool schema tokens? | Yes — per call | Yes — per call |
 | Cacheable? | Yes | Yes |
 | Token cost difference? | Same | Same |
-| Performance difference? | Faster by ~1–5ms per tool call | ~1–5ms slower (localhost) |
+| Performance difference? | Faster — ~0ms overhead | ~1–5ms slower (localhost) |
+| SOA equivalent | Static stub | Dynamic invocation (DII) |
+| Coupling | Tight — deploy with app | Loose — independent server |
+| Reusability | Single app | Shared across apps |
+| Error handling | Exception in your code | Error node in LangGraph |
 | Best for | Single app, fast dev | Shared tools, multi-app, microservices |
 | Prod invocation | LangGraph Custom Graph | LangGraph Custom Graph |
