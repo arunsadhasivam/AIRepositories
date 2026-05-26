@@ -431,25 +431,47 @@ Different ways exist because **not every situation needs the same level of contr
 
 ### LLM Vendor Compatibility — Which Way Works With Which LLM?
 
-| Way | OpenAI / Azure OpenAI | Anthropic Claude | Ollama (local) | Google Gemini | Notes |
-|---|---|---|---|---|---|
-| Way 1 — AgentExecutor | ✅ | ✅ | ⚠️ Partial | ✅ | Uses `create_openai_functions_agent` — works best with OpenAI-style function calling |
-| Way 2 — bind_tools + LCEL | ✅ | ✅ | ✅ | ✅ | Works with any LLM that supports `bind_tools()` |
-| Way 3 — Manual Loop | ✅ | ✅ | ✅ | ✅ | Works with any LLM — you control everything |
-| Way 4 — LangGraph | ✅ | ✅ | ✅ | ✅ | Works with any LLM that supports `bind_tools()` |
+**Simple Rule:**
+```
+All 4 ways work with ALL LLM providers
+        EXCEPT
+Way 1 AgentExecutor → OpenAI / Azure OpenAI only
+```
 
-**Ollama details:**
-- AgentExecutor with `create_openai_functions_agent` — **does not work reliably** with Ollama because Ollama does not fully support OpenAI function-calling format
-- `bind_tools()` + LCEL or LangGraph — **works with Ollama** as long as the model supports tool calling (e.g. `mistral`, `llama3.1`, `qwen2.5`)
-- Models like `nomic-embed-text` are embedding-only — **no tool calling**
+| Way | OpenAI / Azure OpenAI | Anthropic Claude | Ollama (local) | Google Gemini |
+|---|---|---|---|---|
+| Way 1 — AgentExecutor | ✅ | ❌ Not recommended | ❌ Does not work | ❌ Not recommended |
+| Way 2 — bind_tools + LCEL | ✅ | ✅ | ✅ | ✅ |
+| Way 3 — Manual Loop | ✅ | ✅ | ✅ | ✅ |
+| Way 4 — LangGraph | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+**Ollama — Extra Rule (not all models support tools):**
+
+```
+Ollama models WITH tool calling support   → Way 2, 3, 4 work ✅
+  mistral, llama3.1, llama3.2, qwen2.5, phi3
+
+Ollama models WITHOUT tool calling        → no tool calling at all ❌
+  nomic-embed-text  (embedding only — no chat, no tools)
+  mxbai-embed-large (embedding only — no chat, no tools)
+```
+
+> Rule: check `ollama show <model>` — if it lists `tools` capability → Ways 2, 3, 4 work.
+
+---
 
 **Anthropic Claude details:**
-- All 4 ways work with Claude via `langchain_anthropic.ChatAnthropic`
+- Ways 2, 3, 4 work via `langchain_anthropic.ChatAnthropic`
 - Claude has native tool use — works cleanly with `bind_tools()` and LangGraph
+- Way 1 AgentExecutor uses OpenAI function-calling format internally — **avoid with Claude**
+
+---
 
 **Key rule:**
-> If your LLM supports `bind_tools()` → Way 2, 3, 4 all work.
-> Way 1 AgentExecutor → safest with OpenAI / Azure OpenAI only.
+> `bind_tools()` supported by LLM → Way 2, 3, 4 all work — any provider.
+> Way 1 AgentExecutor → **OpenAI / Azure OpenAI only.**
 
 ---
 
@@ -951,6 +973,50 @@ Are you in prod with multi-step, multi-agent, or HITL?
 
 ---
 
+## Production Usage Split — LangChain `@tool` vs MCP Tools
+
+> Both are prod grade when used with LangGraph.
+> The split below reflects real-world adoption as of 2024–2025.
+
+```
+LangChain @tool (local)     ████████████████░░░░  70%
+MCP Tools                   ████░░░░░░░░░░░░░░░░  30%
+```
+
+### Why 70% Still Use LangChain `@tool`
+- Existed for years — most teams already built with it
+- Simpler setup — no separate server to deploy
+- Most tutorials, docs, and examples use `@tool`
+- Works perfectly for single-app use cases
+- LangGraph works with it out of the box
+
+### Why MCP is Growing Fast (30% → rising)
+- Anthropic pushed it as an open standard in late 2024
+- Claude Desktop, Cursor, VS Code Copilot all adopted MCP natively
+- Teams building **tool registries** shared across multiple AI apps
+- Companies want tools decoupled from the AI app itself
+
+### Honest Reality Check
+
+| | LangChain `@tool` | MCP Tools |
+|---|---|---|
+| Prod apps today | Majority — 70% | Minority — 30% but rising fast |
+| New greenfield projects 2025 | Still most common | Increasingly chosen |
+| Enterprise multi-app platforms | Less common | Growing preference |
+| Startups / single app | Dominant | Rare |
+| Tool shared across 5+ apps | Rare | Primary use case |
+
+### Bottom Line — Which to Pick
+
+| Your Situation | Use |
+|---|---|
+| Building one RAG app | LangChain `@tool` + LangGraph ✅ |
+| Building a platform — multiple AI apps share tools | MCP + LangGraph ✅ |
+| Your current RAG pipeline (single app) | LangChain `@tool` + LangGraph — right call today |
+| Long term as you add more agents | MCP + LangGraph — direction industry is moving |
+
+---
+
 ## Full Comparison Summary
 
 | Question | LangChain `@tool` | MCP Tool |
@@ -965,10 +1031,3 @@ Are you in prod with multi-step, multi-agent, or HITL?
 | Token cost difference? | Same | Same |
 | Best for | Single app, fast dev | Shared tools, multi-app, microservices |
 | Prod invocation | LangGraph Custom Graph | LangGraph Custom Graph |
-
-
-Ollama models WITH tool support    → Way 2, 3, 4 work
-  e.g. mistral, llama3.1, qwen2.5
-
-Ollama models WITHOUT tool support → no tool calling at all
-  e.g. nomic-embed-text (embedding only)
