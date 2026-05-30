@@ -10,6 +10,9 @@ from typing import List
 from rag.retriever.BaseRetriever import BaseRetriever
 from rag.retriever.Document import Document
 from rag.exception.RetrieverException import RetrieverException
+from langchain_core.retrievers import BaseRetriever as LangChainBaseRetriever
+from langchain_core.documents import Document as LangChainDocument
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 logger = logging.getLogger(__name__)
 
@@ -184,3 +187,32 @@ class SolrSparseRetriever(BaseRetriever):
     def close(self):
         """No persistent connection — Solr uses stateless HTTP."""
         logger.info("SolrSparseRetriever: No connection to close")
+
+    def as_langchain_retriever(self):
+        """
+        Wraps HybridRetriever into a LangChain compatible retriever.
+        Required for MultiQueryRetriever.from_llm() to accept it.
+        """
+        # Local reference to self (HybridRetriever) for use inside inner class
+        vector  = self
+        # Inner class that extends LangChain's BaseRetriever
+        class LangChainAdapter(LangChainBaseRetriever):
+            def _get_relevant_documents(
+                self, 
+                query: str, 
+                *, 
+                run_manager: CallbackManagerForRetrieverRun  # required by LangChain
+            ):
+                # Call HybridRetriever's retrieve method
+                docs = vector.retrieve(query)
+
+                # Convert your Document objects to LangChain Document objects
+                return [
+                    LangChainDocument(
+                        page_content=str(doc.content) if doc.content is not None else "",   # map content -> page_content
+                        metadata=doc.metadata if isinstance(doc.metadata, dict) else {}    # ensure dict     
+                       )
+                    for doc in docs
+                ]
+
+        return LangChainAdapter()  # return instance of adapter

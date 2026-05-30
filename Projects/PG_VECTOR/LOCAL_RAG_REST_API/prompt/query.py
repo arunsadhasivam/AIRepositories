@@ -19,7 +19,7 @@ from rag.guadrail.GuadRail import is_input_safe
 from rag.guadrail.GuadRail import is_output_safe
 from prompt.promptFactory import get_prompt
 from rag.kvcache.kvContext import getKVStableContext
-from prompt.router.GraphRouter import GraphBasedRetriever
+from prompt.router.graphRouter import GraphBasedRetriever, GraphRouter
 
 from agents.MathClassificationAgent import MathClassificationAgent
 import json
@@ -136,9 +136,7 @@ def query(query,search_type,user_role,pwd):
                 embedding_model=embedding_model,  # embedding model instance
                 search_type="similarity"
             )
-            
             response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
-            #response = configureAndProcessRetriever(query, vectorRetriever)
             logging.info("-----------------------PROMPT.QUERY END--------------------------------------")
 
             return response
@@ -162,28 +160,29 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     retriever = None
     hybridRetriever = None
     if search_type==DistanceMetric.HYBRID.value:
-        # Step 2: Create sparse (BM25/keyword) retriever
+        # Build the same hybrid retriever instance for judge evaluation while
+        # letting GraphRouter decide which retriever to use for actual search.
         sparseSolrRetriever = SolrSparseRetriever(
             host="localhost",
             port=SOLR_PORT,
             core=SOLR_CORE,
-            collection_id=None   # or pass specific collection if needed
+            collection_id=None
         )
-        # Step 3: Create config with weights
         config = RetrieverConfig()
         config.vector_weight = 0.7   # 70% semantic search
         config.sparse_weight = 0.3   # 30% keyword search
         config.top_k = TOP_K
-        # Step 4: Create HybridRetriever with both retrievers
         hybridRetriever = HybridRetriever(vectorRetriever, sparseSolrRetriever, config)
-            # Step 5: Use hybridRetriever as the LangChain retriever
-
-        #retriever = GraphBasedRetriever(query,vectorRetriever)    
-        retriever = MultiQueryRetriever.from_llm(
-            hybridRetriever.as_langchain_retriever(),  # wrap to LangChain compatible
-            llm,
-            prompt=QUERY_PROMPT
+        graph_router = GraphRouter(
+            llm=llm,
+            query_prompt=QUERY_PROMPT,
+            prompt=prompt,
+            solr_port=SOLR_PORT,
+            solr_core=SOLR_CORE,
+            top_k=TOP_K
         )
+        response = GraphBasedRetriever(query=query, search_type= search_type,vector_retriever=vectorRetriever,
+                                           llm=llm,query_prompt=QUERY_PROMPT,prompt=prompt)
     else:
         logging.info(':::::: COSINE SIMILARITY SEARCH :::::')
         retriever = MultiQueryRetriever.from_llm(
