@@ -181,7 +181,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
             solr_core=SOLR_CORE,
             top_k=TOP_K
         )
-        response = GraphBasedRetriever(query=query, search_type= search_type,vector_retriever=vectorRetriever,
+        retriever, hybridRetriever = GraphBasedRetriever(query=query, search_type= search_type,vector_retriever=vectorRetriever,
                                            llm=llm,query_prompt=QUERY_PROMPT,prompt=prompt)
     else:
         logging.info(':::::: COSINE SIMILARITY SEARCH :::::')
@@ -254,16 +254,16 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         retrieved_docs = retriever.invoke(query) #VECTORIZE internally (only operation need vector)
         # sort chunks deterministically — same docs always same order → stable prefix → KV cache hit
         # kvStable context requires more memory always 7gb vram
-        stable_context = getKVStableContext(retrieved_docs)
+        #stable_context = getKVStableContext(retrieved_docs)
         # join chunk content into single context string
-        #context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
         rag_chain = (
             {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
             | prompt
             | llm
             | StrOutputParser()
         )
-        response = rag_chain.invoke({"context": stable_context, "question": query})
+        response = rag_chain.invoke({"context": context, "question": query})
         # ── OUTPUT GUADTRAIL guadtrail handler ──
         retrieved_context_text = " ".join([doc.page_content for doc in retrieved_docs])
 

@@ -199,7 +199,7 @@ Hypothetical document:"""
         config.sparse_weight = 0.3
         config.top_k = self.top_k
         hybrid_retriever = HybridRetriever(state["vector_retriever"], sparse_retriever, config)
-        multi_query_retriex1ver = MultiQueryRetriever.from_llm(
+        multi_query_retriever = MultiQueryRetriever.from_llm(
             hybrid_retriever.as_langchain_retriever(),
             self.llm,
             prompt=self.query_prompt,
