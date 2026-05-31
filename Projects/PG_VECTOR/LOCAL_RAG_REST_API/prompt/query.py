@@ -213,9 +213,11 @@ def getRetreiverResponseWithoutJudge(retriever,query):
         response
     """
     try:
-        logging.info(':::::: RETRIEVER RESPONSE BEGIN :::::')
+        logging.info(':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE :::::')
         retrieved_docs = retriever.invoke(query)
-        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+        logging.info(f':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS{retrieved_docs} :::::')
+        #context = "\n\n".join([doc.page_content.split()[:500]  for doc in retrieved_docs])
+        context = "\n\n".join([doc.page_content  for doc in retrieved_docs])
         rag_chain = (
             prompt
             | llm

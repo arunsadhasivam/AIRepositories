@@ -133,7 +133,9 @@ def embed_task(self, file_path: str, user_role: str, pwd: str,
             return False
 
         # Load document and split into chunks using Docling
-        embedder = DocumentEmbedding.DocumentEmbedder()                    # Your existing service class
+        DOC_CHUNK_SIZE = int(os.getenv("DOC_CHUNK_SIZE", "3000"))
+        DOC_CHUNK_OVERLAP = int(os.getenv("DOC_CHUNK_OVERLAP", "100"))
+        embedder = DocumentEmbedding.DocumentEmbedder(chunk_size=DOC_CHUNK_SIZE, chunk_overlap=DOC_CHUNK_OVERLAP)                    # Your existing service class
         chunks = embedder.load_and_split_data(file_path)
 
         # Validate that chunks were created
