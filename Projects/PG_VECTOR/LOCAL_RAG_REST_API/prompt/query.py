@@ -191,15 +191,37 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
             prompt=QUERY_PROMPT
         )
          
-    response ,output_result,retrieved_docs = getRetrieverAndGuadRailResponse(retriever,query)
-    if output_result is not None and not is_output_safe(output_result, response):
-        return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
-    response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
-    logging.info(':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::')
+    # memory issues , i run with gpu
+    # response ,output_result,retrieved_docs = getRetrieverAndGuadRailResponse(retriever,query)
+    # if output_result is not None and not is_output_safe(output_result, response):
+    #     return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
+    # response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
+    response = getRetreiverResponseWithoutJudge(retriever,query)
+    logging.info(f':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::{response}')
 
     return response
 
 
+def getRetreiverResponseWithoutJudge(retriever,query):
+    """
+    Process the retriever response.
+    Args:
+        retriever: LangChain retriever instance
+        query: Search query string
+        
+    Returns:
+        response
+    """
+    logging.info(':::::: RETRIEVER RESPONSE BEGIN :::::')
+    retrieved_docs = retriever.invoke(query)
+    context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+    rag_chain = (
+        prompt
+        | llm
+        | StrOutputParser()
+    )
+    response = rag_chain.invoke({"context": context, "question": query})
+    return response,retrieved_docs     
     
 def getRetrieverAndGuadRailResponse(retriever,query):
     """
@@ -233,12 +255,16 @@ def getRetrieverAndGuadRailResponse(retriever,query):
     #langfuse.trace(name="math-prompt", input={"query": query})
     classification_response = classifier_chain.invoke(query)
     # Parse JSON response properly
+    requires_math = False  # default to false if parsing fails or field is missing
     try:
-        classification_result = json.loads(classification_response.strip())
-        requires_math = classification_result.get("REQUIRESMATH", False)
+        if is_valid_json(classification_response.strip()):
+            classification_result = json.loads(classification_response.strip())
+            requires_math = classification_result.get("REQUIRESMATH", False)
+            logging.warning(f"::::: JSON response missing 'REQUIRESMATH' field, defaulting to false: {classification_response}")
+        else:
+            requires_math = False
     except json.JSONDecodeError:
         # Fallback: check for boolean keywords
-        requires_math = 'true' in classification_response.lower()
         logging.warning(f"::::: Failed to parse JSON, using fallback: {classification_response}")
 
     output_result = None  # add this    
@@ -258,8 +284,8 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         # join chunk content into single context string
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
         rag_chain = (
-            {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
-            | prompt
+            #{"context": RunnablePassthrough(), "question": RunnablePassthrough()}
+            prompt
             | llm
             | StrOutputParser()
         )
@@ -271,6 +297,13 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         #output_result = output_guardrail(query, retrieved_context_text, response)
     logging.debug(f'::::: GUADRAIL RESPONSE:::::::::::::::')    
     return response,output_result,retrieved_docs
+
+def is_valid_json(text):
+    try:
+        json.loads(text)
+        return True
+    except json.JSONDecodeError:
+        return False
 
 
 def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs):

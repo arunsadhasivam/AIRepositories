@@ -106,7 +106,7 @@ class SolrSparseRetriever(BaseRetriever):
             logger.error(f"SolrSparseRetriever: Indexing failed: {str(e)}")
             raise RetrieverException(f"Solr indexing error: {str(e)}")
 
-    def retrieve(self, query: str, top_k: int = 10) -> List[Document]:
+    def retrieve(self, query: str, top_k: int = 3) -> List[Document]:
         """
         Retrieve documents using BM25 keyword search via Solr.
 
