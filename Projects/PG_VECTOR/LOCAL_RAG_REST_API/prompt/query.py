@@ -212,15 +212,19 @@ def getRetreiverResponseWithoutJudge(retriever,query):
     Returns:
         response
     """
-    logging.info(':::::: RETRIEVER RESPONSE BEGIN :::::')
-    retrieved_docs = retriever.invoke(query)
-    context = "\n\n".join([doc.page_content for doc in retrieved_docs])
-    rag_chain = (
-        prompt
-        | llm
-        | StrOutputParser()
-    )
-    response = rag_chain.invoke({"context": context, "question": query})
+    try:
+        logging.info(':::::: RETRIEVER RESPONSE BEGIN :::::')
+        retrieved_docs = retriever.invoke(query)
+        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+        rag_chain = (
+            prompt
+            | llm
+            | StrOutputParser()
+        )
+        response = rag_chain.invoke({"context": context, "question": query})
+    except Exception as e:
+        logging.error(f":::::: ERROR IN RETRIEVER RESPONSE :::::{str(e)}")
+        raise
     return response,retrieved_docs     
     
 def getRetrieverAndGuadRailResponse(retriever,query):
