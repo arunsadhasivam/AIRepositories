@@ -40,7 +40,7 @@ class DocumentEmbedder:
         PG_CONNECTION_STRING = f'postgresql+psycopg2://{user_role}:{pwd}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
         return PG_CONNECTION_STRING
     
-    def __init__(self, temp_folder=None, max_file_size=None, chunk_size=7500, chunk_overlap=100):
+    def __init__(self, temp_folder=None, max_file_size=None, chunk_size=3000, chunk_overlap=100):
         """
         Initialize DocumentEmbedder with configuration parameters.
         
