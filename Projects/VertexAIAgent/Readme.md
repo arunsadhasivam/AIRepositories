@@ -574,6 +574,24 @@ E.g:
 
 ```
    adk deploy cloud_run   --project=bigqueryagent-499022  --region=us-central1  --service_name=bigquery-vertex  bigquery-vertex
+
+for bash:
+
+         adk deploy cloud_run \
+           --project=bigqueryagent-499022 \
+           --region=us-central1 \
+           --service_name=bigquery-vertex \
+           bigquery-vertex
+
+for windows:
+
+             adk deploy cloud_run ^
+           --project=bigqueryagent-499022 ^
+           --region=us-central1 ^
+           --service_name=bigquery-vertex ^
+           bigquery-vertex
+
+
 ```
 It prints a service URL like `https://bq-agent-xxxxx-uc.a.run.app`.
 
