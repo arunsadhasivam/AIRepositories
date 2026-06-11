@@ -23,6 +23,7 @@
 11. [Framework Note — ADK vs LangChain](#11-framework-note--adk-vs-langchain)
 12. [UI vs CLI Reference](#12-ui-vs-cli-reference)
 13. [Project Cleanup / Deletion](#13-project-cleanup--deletion)
+14. [Troubleshooting Log](#14-troubleshooting-log-real-errors-hit-and-fixed)
 
 ---
 
@@ -166,6 +167,75 @@ gcloud services enable \
 gcloud auth application-default login
 ```
 
+### Local machine setup — gcloud CLI (needed once you run agent code locally)
+
+The **gcloud CLI** (Google Cloud SDK) is the command-line tool for GCP. It provides three commands used in this project: `gcloud` (all services), `bq` (BigQuery), and is also required to create local credentials (ADC) — without it, local Python code fails with `DefaultCredentialsError`.
+
+**1. Install on Windows (click by click):**
+1. Download **GoogleCloudSDKInstaller.exe** from https://cloud.google.com/sdk/docs/install
+2. Double-click the .exe → accept defaults on every screen (single user, default folder)
+3. On the FINAL screen keep these checked ✅:
+   - *Start Google Cloud SDK Shell*
+   - *Run `gcloud init`*
+4. Click Finish → a terminal opens automatically and `gcloud init` starts
+5. **Important:** any OTHER terminals already open will NOT see `gcloud` — open new ones
+
+**2. `gcloud init` prompts (Login #1 — authenticates the CLI tool):**
+- *"You must log in to continue. Would you like to log in (Y/n)?"* → **Y** → browser opens → sign in with the account that owns your GCP project → Allow
+- *"Pick cloud project to use:"* → type the number next to your project ID
+- Default region prompt → pick `us-central1` or press Enter to skip
+
+**3. Create ADC credentials (Login #2 — for YOUR PYTHON CODE; commonly missed):**
+```bash
+# Creates the credential file that google.auth.default() reads.
+# gcloud init alone does NOT do this. Skipping it causes:
+# DefaultCredentialsError: Your default credentials were not found
+gcloud auth application-default login
+
+# Set quota project so Vertex AI calls bill correctly (use YOUR project ID)
+gcloud auth application-default set-quota-project <your-project-id>
+```
+
+The ADC file lands at `C:\Users\<you>\AppData\Roaming\gcloud\application_default_credentials.json`.
+
+**4. Verify everything:**
+```bash
+# CLI installed and version
+gcloud --version
+
+# Which account + project the CLI is using
+gcloud config list
+
+# THE test that matters: can Python code find credentials?
+python -c "import google.auth; c, p = google.auth.default(); print('OK:', p)"
+```
+If the last command prints your project ID, local code will authenticate. Restart `adk web` after fixing credentials — they're loaded at import time, so a restart is required.
+
+**5. Windows install issues:**
+
+| Problem | Fix |
+|---|---|
+| `'gcloud' is not recognized` | Open a NEW terminal; or use the **"Google Cloud SDK Shell"** Start-menu shortcut; or add `C:\Users\<you>\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin` to PATH |
+| PowerShell: *"running scripts is disabled"* | Use Command Prompt (cmd) instead, or `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
+| Installer hangs / blocked | Antivirus interference — temporarily disable, or use the zip install: extract `google-cloud-cli-windows-x86_64.zip` to `C:\gcloud`, run `install.bat` |
+
+**6. gcloud command quick reference (the ones used in this project):**
+```bash
+gcloud auth login                              # login the CLI tool
+gcloud auth application-default login          # create ADC for code
+gcloud config set project <id>                 # switch active project
+gcloud config list                             # show active account/project
+gcloud services enable <api>                   # enable an API
+gcloud projects create / delete <id>           # project lifecycle
+gcloud run deploy / services delete            # Cloud Run
+gcloud artifacts repositories create           # Artifact Registry
+gcloud builds submit --tag <image>             # Cloud Build
+bq mk / bq load / bq query                     # BigQuery CLI (installed with the SDK)
+adk web / adk api_server / adk deploy          # ADK CLI (installed via pip, separate from SDK)
+```
+
+**ADC concept (one sentence):** the same `google.auth.default()` line works in three environments with zero code change — locally it finds the ADC file, on Cloud Run it gets the service account token from the metadata server, in CI it can use workload identity federation. That's the "no credentials in code" story.
+
 ---
 
 ## 5. Phase 1 — BigQuery Data Setup (COMPLETED)
@@ -273,8 +343,10 @@ The **Agent Development Kit (ADK)** is GCP's first-party, code-first framework f
 mkdir bq-agent && cd bq-agent
 python -m venv venv
 venv\Scripts\activate          # Windows
-pip install google-adk
+pip install "google-adk[gcp]"
 ```
+
+> ⚠️ **`google-adk` alone is NOT enough for the BigQuery toolset.** The BigQuery tools are lazy-loaded optional dependencies. Without the `[gcp]` extra, the agent fails at runtime with `ImportError: cannot import name 'dataplex_v1' from 'google.cloud'`. The `[gcp]` extras group (verified against package metadata) pulls in `google-cloud-bigquery`, `google-cloud-bigquery-storage`, and `google-cloud-dataplex`. Note: `[extensions]` does NOT include these. Quotes around the package name are required on Windows.
 
 ### Required project structure (ADK convention)
 ```
@@ -288,13 +360,36 @@ bq-agent/
 
 ### `requirements.txt`
 ```
-google-adk
+google-adk[gcp]
 ```
+
+### Naming rules — three independent names
+
+| Name | Your choice? | Rules |
+|---|---|---|
+| `Agent(name="...")` | Yes | Valid Python identifier: letters, digits, underscores only — `employee_data_agent` ✅, `my-agent` ❌, `my agent` ❌. Reserved word `user` not allowed. Internal ADK identifier — appears only in logs/traces, never as a cloud resource |
+| Folder / app name | Yes | Same identifier style (it's a Python package). **The folder name = the app name in API URLs** (`/apps/<folder>/...`) and in the Spring Boot config |
+| Cloud Run `--service_name` | Yes | Opposite convention: lowercase + **hyphens**, no underscores — `bq-agent` ✅, `bq_agent` ❌ |
+
+Nothing ties the three together except your code and deploy command. The underscore-vs-hyphen flip (Python uses `_`, cloud resource names use `-`) is the common gotcha.
 
 ### `my_bq_agent/__init__.py`
 ```python
 from . import agent
 ```
+
+**Why this line (Python vs Java imports):** Java's `import` is only name resolution for the compiler — it runs nothing. Python's `import` is **execution**: importing a file runs it top to bottom. The chain when you run `adk web`:
+
+```
+adk web scans the parent folder
+  → finds my_bq_agent/ with __init__.py        (it's a package)
+    → imports the package → __init__.py runs
+      → "from . import agent" → agent.py RUNS top to bottom
+        → root_agent = Agent(...) executes → agent exists
+          → ADK finds the variable root_agent → registered ✅
+```
+
+Without that line, `agent.py` never executes, `root_agent` is never created, and ADK reports *"No root_agent found."* The closest Java equivalent isn't an import — it's `Class.forName("...Driver")` for JDBC: the point is not to use a name but to **trigger initialization** (static block registers the driver ↔ top-level code creates `root_agent`).
 
 ### `my_bq_agent/.env`
 ```
@@ -302,6 +397,8 @@ GOOGLE_GENAI_USE_VERTEXAI=TRUE
 GOOGLE_CLOUD_PROJECT=arun-bq-agent-demo
 GOOGLE_CLOUD_LOCATION=us-central1
 ```
+
+**What `GOOGLE_CLOUD_LOCATION` is:** the region where Gemini inference runs — a choice, not a lookup. `us-central1` is the widest-availability Vertex AI region and matches every other region in this project (Artifact Registry, Cloud Run). It is independent of the BigQuery dataset location (`US` multi-region): BigQuery location = where the *data* lives; this setting = where *model inference* runs. Keeping both in the US avoids cross-region latency. Valid options: Console → Vertex AI → region dropdown.
 
 ### `my_bq_agent/agent.py`
 ```python
@@ -332,7 +429,7 @@ bigquery_toolset = BigQueryToolset(
 # The root agent — ADK looks for this exact variable name: root_agent
 root_agent = Agent(
     name="bq_data_agent",
-    model="gemini-2.0-flash",                 # Gemini served via Vertex AI
+    model="gemini-2.5-flash",                 # Gemini via Vertex AI. NOTE: gemini-2.0-flash was RETIRED June 1, 2026 (returns 404)
     description="Agent that answers questions about employee data in BigQuery.",
     instruction=(
         "You are a data analyst. Answer questions by querying BigQuery. "
@@ -343,17 +440,34 @@ root_agent = Agent(
 )
 ```
 
-### Test locally — built-in dev UI
+
+NOTE:
+=====
+ - enable Agent API then it works.
+
+
+ <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/956b9f22-969b-471a-a9df-664dc5bd52d4" />
+
+
+
+### Test locally — built-in dev UI (chat)
+
+**Prerequisites (one time):** gcloud SDK installed, `gcloud auth application-default login` done (see Phase 0 / Troubleshooting), `.env` present in the agent folder.
+
 ```bash
-# From the bq-agent/ folder (parent of my_bq_agent/)
+# From the bq-agent/ folder — the PARENT of my_bq_agent/, NOT inside it
 adk web
 ```
-Open **http://localhost:8000** — a chat UI where you can ask:
-- "What is the average salary in Engineering?"
-- "Who is the highest paid employee?"
-- "How many employees per department?"
+Open **http://localhost:8000**:
+1. Top-left **dropdown** → select the agent (the folder name)
+2. Type questions in the chat box:
+   - "What is the average salary in Engineering?"
+   - "Who is the highest paid employee?"
+   - "How many employees per department?"
+3. Click the response (or the **Events** tab) → **trace view** showing every internal step: model decision → which BigQuery tool was called → the exact SQL generated → raw result → final answer
+4. Test **session memory**: ask "and what about Sales?" after the Engineering question — the agent resolves "what about" from session history
 
-The UI shows a **visual trace of every reasoning step and tool call** — far better for a live demo than terminal logs. Study the trace: question → model decides tool → SQL executed → result → final answer.
+The trace view is the most valuable part — study it until each step makes sense. Running from the wrong folder (inside the agent package instead of its parent) is the most common startup mistake.
 
 ### Test locally — plain REST API
 ```bash
@@ -700,11 +814,28 @@ Notes:
 
 ---
 
+## 14. Troubleshooting Log (real errors hit and fixed)
+
+| Error | Root cause | Fix |
+|---|---|---|
+| `ImportError: cannot import name 'AgentExecutor' from 'langchain.agents'` | LangChain v1.0 removed the legacy agent APIs (`create_react_agent` → `create_agent`; legacy moved to `langchain-classic`) | Migrated to ADK entirely (see Section 11) |
+| `ImportError: Fail to load module. cannot import name 'dataplex_v1' from 'google.cloud'` | ADK lazy-loads BigQuery tools; their dependencies are NOT in the base `google-adk` install | `pip install "google-adk[gcp]"` — the `gcp` extras group includes `google-cloud-bigquery`, `google-cloud-bigquery-storage`, `google-cloud-dataplex`. Note `[extensions]` does NOT include them |
+| `DefaultCredentialsError: Your default credentials were not found` (`_CLOUD_SDK_MISSING_CREDENTIALS`) | `google.auth.default()` found no ADC file — `gcloud auth application-default login` was never run (it's a separate login from `gcloud init`) | Install gcloud SDK → `gcloud init` → `gcloud auth application-default login` → `set-quota-project` → restart `adk web` (credentials are loaded at import time, so a restart is required) |
+| `'gcloud' is not recognized` (Windows) | SDK not on PATH, or terminal opened before install | Open a NEW terminal; or use the "Google Cloud SDK Shell" Start-menu shortcut; or add `...\Google\Cloud SDK\google-cloud-sdk\bin` to PATH |
+| PowerShell: `running scripts is disabled on this system` | Execution policy blocks `gcloud.ps1` | Use Command Prompt (cmd) instead, or `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
+| `No root_agent found` | `__init__.py` missing or doesn't contain `from . import agent`, so agent.py never executes | Add the import line; see the import-chain explanation in Phase 2 |
+| `adk web` can't find the agent | Running from INSIDE the agent folder | Run from the PARENT folder of the agent package |
+| 404 on `publishers/google/models/gemini-2.0-flash` | **Model lifecycle:** gemini-2.0-flash was discontinued June 1, 2026 — shut-down models return 404 | Change to `model="gemini-2.5-flash"` (retirement no earlier than Oct 16, 2026). Production lesson: models have deprecation/shutdown dates — keep the model name in config/env (e.g. `MODEL_NAME` in `.env`), monitor deprecation notices, test the replacement before cutoff |
+
+**Debugging pattern worth internalizing:** every one of these errors was diagnosed by reading the traceback bottom-up — the last line names the real error, and the file/line chain above it shows exactly where in the import sequence it failed (e.g., `__init__.py` line 1 → `agent.py` line 9 → `google.auth.default()`).
+
+---
+
 ## Status Tracker
 
-- [x] Phase 0 — GCP project + APIs
+- [x] Phase 0 — GCP project + APIs + gcloud SDK + ADC
 - [x] Phase 1 — BigQuery dataset, table, test queries ✅ DONE
-- [ ] Phase 2 — ADK agent working locally (`adk web`)
+- [ ] Phase 2 — ADK agent working locally (`adk web`) — IN PROGRESS (deps + ADC fixed, chat test pending)
 - [ ] Phase 3 — `adk deploy cloud_run`
 - [ ] Phase 4 — Spring Boot client end-to-end
 - [ ] Phase 5 — Local DB fallback + demo rehearsal
