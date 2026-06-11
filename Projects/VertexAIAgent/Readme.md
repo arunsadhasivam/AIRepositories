@@ -601,17 +601,25 @@ gcloud projects add-iam-policy-binding bigqueryagent-1234 --member="serviceAccou
 
 - https://console.cloud.google.com/iam-admin/iam?project=bigqueryagent-1234 and select the service account give the permission for your
   login email
-  
+
+## service account settings
+
 <img width="1415" height="725" alt="image" src="https://github.com/user-attachments/assets/db524a2c-89e9-40e4-83aa-688371cdc236" />
 
 
 E.g:
 ====
 
+
+
 ```
    adk deploy cloud_run   --project=bigqueryagent-1234  --region=us-central1  --service_name=bigquery-vertex  .
 ```
 
+## important
+
+- . at the end current project location if not work try in command prompt check adk and gcloud both command works
+  
 ## for bash:
 
 ```
