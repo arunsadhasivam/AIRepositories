@@ -94,7 +94,7 @@ VERY VERY IMPORTANT:
 
 - without this remote build to cloud wont happen. if fails check the .env and application properties in cloud 
 
-**SCM_DO_BUILD_DURING_DEPLOYMENT** - Tells Azure trigger a build after deployment
+  **SCM_DO_BUILD_DURING_DEPLOYMENT** - Tells Azure trigger a build after deployment
 
-**ENABLE_ORYX_BUILD** - Tells Azure use Oryx to do that build — which runs pip install
+  **ENABLE_ORYX_BUILD** - Tells Azure use Oryx to do that build — which runs pip install
 
