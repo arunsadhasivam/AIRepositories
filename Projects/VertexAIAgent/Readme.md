@@ -516,21 +516,57 @@ adk deploy cloud_run \
 
 NOTE:
 ======
+# ADK Cloud Run Deployment — `--service_name` Guide
 
---service_name=bq-agent is the name given to the Cloud Run service that gets created/deployed.
-It's the identifier Google Cloud uses to refer to your deployed container — shows up in:
+## What is `--service_name`?
 
-Cloud Run console URL: https://console.cloud.google.com/run/detail/us-central1/bq-agent
-The HTTPS endpoint: https://bq-agent-<hash>-uc.a.run.app
-gcloud run services list output
+The `--service_name` flag sets the name of the **Cloud Run service** created during deployment.
 
-If you omit --service_name, ADK defaults to the agent folder name (my_bq_agent in your case).You said: any name i can give rightany name i can give right9:36 AMClaude responded: Yes, any lowercase name with hyphens.Yes, any lowercase name with hyphens. Just follow Cloud Run naming rules:
+```bash
+adk deploy cloud_run \
+  --project=arun-bq-agent-demo \
+  --region=us-central1 \
+  --service_name=bq-agent \
+  my_bq_agent
+```
 
-Lowercase letters, numbers, hyphens only
-Must start with a letter
-Max 49 characters
+It appears in:
+- **Cloud Run Console URL:** `https://console.cloud.google.com/run/detail/us-central1/bq-agent`
+- **Service HTTPS Endpoint:** `https://bq-agent-<hash>-uc.a.run.app`
+- **CLI listing:** `gcloud run services list`
 
-So --service_name=my-agent, --service_name=arun-demo, --service_name=bq-agent-v2 — all valid.
+> If `--service_name` is omitted, ADK defaults to the agent folder name (e.g., `my_bq_agent`).
+
+---
+
+## Naming Rules
+
+| Rule | Detail |
+|------|--------|
+| Characters allowed | Lowercase letters, numbers, hyphens (`-`) only |
+| Must start with | A letter |
+| Max length | 49 characters |
+| No spaces or underscores | ❌ Not allowed |
+
+---
+
+## Valid Examples
+
+```bash
+--service_name=bq-agent
+--service_name=my-agent
+--service_name=arun-demo
+--service_name=bq-agent-v2
+--service_name=bigquery-assistant-prod
+```
+
+## Invalid Examples
+
+```bash
+--service_name=My_Agent       # ❌ uppercase + underscore
+--service_name=1-bq-agent     # ❌ starts with a number
+--service_name=bq agent       # ❌ space not allowed
+```
 
 E.g:
 ====
