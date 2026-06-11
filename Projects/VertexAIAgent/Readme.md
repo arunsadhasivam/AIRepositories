@@ -569,38 +569,76 @@ It appears in:
 --service_name=bq agent       # ❌ space not allowed
 ```
 
+prerequisties permission:
+============================
+
+- check the service account by https://console.cloud.google.com/iam-admin/iam?project=bigqueryagent-1234
+- copy the service account name 
+
+
+## list service account 
+
+```
+gcloud projects describe bigqueryagent-1234 --format="value(projectNumber)"
+```
+
+
+## Grant role by command - build role:
+
+```
+gcloud projects add-iam-policy-binding bigqueryagent-1234 --member="serviceAccount:1234-compute@developer.gserviceaccount.com" --role="roles/cloudbuild.builds.builder"
+```
+
+## Grant storage role
+
+```
+gcloud projects add-iam-policy-binding bigqueryagent-1234 --member="serviceAccount:1234-compute@developer.gserviceaccount.com" --role="roles/storage.objectAdmin"
+
+```
+
+## Also in service account add build and deploy admin right
+
+
+- https://console.cloud.google.com/iam-admin/iam?project=bigqueryagent-1234 and select the service account give the permission for your
+  login email
+  
+<img width="1415" height="725" alt="image" src="https://github.com/user-attachments/assets/db524a2c-89e9-40e4-83aa-688371cdc236" />
+
+
 E.g:
 ====
 
 ```
-   adk deploy cloud_run   --project=bigqueryagent-499022  --region=us-central1  --service_name=bigquery-vertex  bigquery-vertex
+   adk deploy cloud_run   --project=bigqueryagent-1234  --region=us-central1  --service_name=bigquery-vertex  .
 ```
 
 ## for bash:
 
 ```
 adk deploy cloud_run \
-  --project=bigqueryagent-499022 \
+  --project=bigqueryagent-1234 \
   --region=us-central1 \
-  --service_name=bigquery-vertex \
-  bigquery-vertex
+  --service_name=bigquery-vertex .       
 
 ```
 
 ## for windows:
 
 - ^ for windows instead of \ multiline
+-  
  
 ```
 adk deploy cloud_run ^
-  --project=bigqueryagent-499022 ^
+  --project=bigqueryagent-1234 ^
   --region=us-central1 ^
-  --service_name=bigquery-vertex ^
-  bigquery-vertex
+  --service_name=bigquery-vertex   C:\ARUNWorkspace\BigQuery  
 
 
 
 ```
+
+<img width="3342" height="1780" alt="image" src="https://github.com/user-attachments/assets/fa65c42c-b811-48cc-b11f-6a7b7d46f3f1" />
+
 It prints a service URL like `https://bq-agent-xxxxx-uc.a.run.app`.
 
 ### What it does underneath (know this conceptually)
