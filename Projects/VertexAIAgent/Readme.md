@@ -648,7 +648,7 @@ adk deploy cloud_run ^
 
 
 ## above result confirms deployed
-- check the endpoint
+- above endpoint can be used by external applications use that endpoint in spring boot to invoke using vertex-AI
  
 It prints a service URL like `https://bq-agent-xxxxx-uc.a.run.app`.
 
