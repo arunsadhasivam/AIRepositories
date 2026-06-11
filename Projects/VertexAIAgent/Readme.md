@@ -514,6 +514,29 @@ adk deploy cloud_run \
   my_bq_agent
 ```
 
+NOTE:
+======
+
+--service_name=bq-agent is the name given to the Cloud Run service that gets created/deployed.
+It's the identifier Google Cloud uses to refer to your deployed container — shows up in:
+
+Cloud Run console URL: https://console.cloud.google.com/run/detail/us-central1/bq-agent
+The HTTPS endpoint: https://bq-agent-<hash>-uc.a.run.app
+gcloud run services list output
+
+If you omit --service_name, ADK defaults to the agent folder name (my_bq_agent in your case).You said: any name i can give rightany name i can give right9:36 AMClaude responded: Yes, any lowercase name with hyphens.Yes, any lowercase name with hyphens. Just follow Cloud Run naming rules:
+
+Lowercase letters, numbers, hyphens only
+Must start with a letter
+Max 49 characters
+
+So --service_name=my-agent, --service_name=arun-demo, --service_name=bq-agent-v2 — all valid.
+
+E.g:
+====
+
+         adk deploy cloud_run   --project=bigqueryagent-499022   --region=us-central1   --service_name=bigquery-vertex   bigquery-vertex
+
 It prints a service URL like `https://bq-agent-xxxxx-uc.a.run.app`.
 
 ### What it does underneath (know this conceptually)
