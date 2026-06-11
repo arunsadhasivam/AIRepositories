@@ -644,9 +644,12 @@ adk deploy cloud_run ^
 
 
 ```
+<img width="2820" height="1255" alt="image" src="https://github.com/user-attachments/assets/21ca9d02-1118-4248-9604-decb9792dd74" />
+<img width="2465" height="1437" alt="image" src="https://github.com/user-attachments/assets/5287ec91-24f3-428b-8d88-2346cb77bac7" />
 
-<img width="3342" height="1780" alt="image" src="https://github.com/user-attachments/assets/fa65c42c-b811-48cc-b11f-6a7b7d46f3f1" />
-
+## above result confirms deployed
+- check the endpoint
+ 
 It prints a service URL like `https://bq-agent-xxxxx-uc.a.run.app`.
 
 ### What it does underneath (know this conceptually)
