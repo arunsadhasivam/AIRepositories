@@ -644,8 +644,8 @@ adk deploy cloud_run ^
 
 
 ```
-<img width="2820" height="1255" alt="image" src="https://github.com/user-attachments/assets/21ca9d02-1118-4248-9604-decb9792dd74" />
-<img width="2465" height="1437" alt="image" src="https://github.com/user-attachments/assets/5287ec91-24f3-428b-8d88-2346cb77bac7" />
+ <img width="2465" height="1437" alt="image" src="https://github.com/user-attachments/assets/0602dbe9-d176-4862-9ca7-26554b017bcf" />
+
 
 ## above result confirms deployed
 - check the endpoint
