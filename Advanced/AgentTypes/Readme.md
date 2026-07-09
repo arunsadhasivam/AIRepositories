@@ -7,6 +7,5 @@
     - internally use search tool find age of b
     - syntehesis
 
-5) Deep Research Agent. - Research open ended complex investigation where you need
-                          external knowledge do hypothesis and then do research.
+5) Deep Research Agent. - 
                          
