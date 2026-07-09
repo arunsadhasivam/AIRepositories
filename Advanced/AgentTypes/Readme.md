@@ -7,5 +7,7 @@
     - internally use search tool find age of b
     - syntehesis
 
-5) Deep Research Agent. - 
+5) Deep Research Agent. - do hypothesis do complex investigation
+                           here it uses multiple agent like query decomposition to decompose query and PER to
+                           plan , execute and reflect.
                          
