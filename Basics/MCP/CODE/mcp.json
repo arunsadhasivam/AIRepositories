@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rag-mcp-server": {
+      "command": "python",
+      "args": ["-m", "rag_mcp_server"],
+      "env": {
+        "VECTOR_STORE_PATH": "./vector_store"
+      }
+    }
+  }
+}
