@@ -1,0 +1,9 @@
+{"trace_id":"trace-published","event":"tool_result","tool":"load_target_accounts","rows":["row-101","row-102"],"next_cursor":"2","truncated":true}
+{"trace_id":"trace-published","event":"tool_result","tool":"load_target_accounts","rows":["row-103","row-104"],"next_cursor":"4","truncated":true}
+{"trace_id":"trace-published","event":"tool_result","tool":"load_target_accounts","rows":["row-105","row-106"],"next_cursor":null,"truncated":false}
+{"trace_id":"trace-published","event":"agent_output","complete":true,"source_row_count":6,"company_bundle_count":6,"deliverable_count":24,"note":"Published the complete personalized campaign."}
+{"trace_id":"trace-published","event":"evaluation","passed":true,"detail":"every source row has the requested asset types"}
+{"trace_id":"trace-distractor","event":"tool_error","tool":"image_search","code":"transient_timeout","retryable":true}
+{"trace_id":"trace-retry","event":"tool_result","tool":"load_target_accounts","rows":["row-101","row-102"],"next_cursor":"2","truncated":true}
+{"trace_id":"trace-retry","event":"tool_result","tool":"load_target_accounts","rows":["row-103","row-104"],"next_cursor":"2","truncated":true}
+{"trace_id":"trace-retry","event":"worker_timeout","elapsed_seconds":90,"note":"No terminal campaign result was recorded."}

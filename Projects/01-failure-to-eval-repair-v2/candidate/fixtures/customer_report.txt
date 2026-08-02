@@ -1,0 +1,7 @@
+I selected the Northstar Brand Kit and our ABM campaign template for five
+companies. CharacterQuilt says everything is complete, but I see what looks
+like two different Acme campaigns and one of them does not look like the Brand
+Kit I selected.
+
+I also retried once and the run never finished. Can you determine what we can
+actually trust here and fix the class of failure rather than this one output?

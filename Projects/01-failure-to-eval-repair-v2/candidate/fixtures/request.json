@@ -1,0 +1,11 @@
+{
+  "prompt": "Create one personalized landing page and three LinkedIn ads for every company in the uploaded list. Use the selected Brand Kit and campaign template.",
+  "brand_kit": {
+    "id": "brand-kit-northstar",
+    "name": "Northstar Growth"
+  },
+  "template": {
+    "id": "template-abm-campaign",
+    "name": "ABM campaign template"
+  }
+}

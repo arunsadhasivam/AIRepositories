@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../RAG"
+		},
+		{
+			"path": "../../Arun/PythonEnv/PYTHON_CUDA_GPU_HOME"
+		},
+		{
+			"path": "../AgentADK"
+		},
+		{
+			"path": "../../Arun/PythonEnv/AGENTADK_HOME"
+		}
+	],
+	"settings": {}
+}

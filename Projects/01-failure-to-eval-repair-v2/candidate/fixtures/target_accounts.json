@@ -1,0 +1,46 @@
+[
+  {
+    "id": "row-101",
+    "company_id": "company-acme",
+    "company_name": "Acme Logistics",
+    "domain": "acme-logistics.example",
+    "segment": "transportation"
+  },
+  {
+    "id": "row-102",
+    "company_id": "company-beacon",
+    "company_name": "Beacon Health",
+    "domain": "beacon-health.example",
+    "segment": "healthcare"
+  },
+  {
+    "id": "row-103",
+    "company_id": "company-cedar",
+    "company_name": "Cedar Capital",
+    "domain": "cedar-capital.example",
+    "segment": "financial services"
+  },
+  {
+    "id": "row-104",
+    "company_id": "company-delta",
+    "company_name": "Delta Works",
+    "domain": "delta-works.example",
+    "segment": "construction"
+  },
+  {
+    "id": "row-105",
+    "company_id": "company-evergreen",
+    "company_name": "Evergreen Fitness",
+    "domain": "evergreen-fitness.example",
+    "segment": "fitness"
+  },
+  {
+    "id": "row-106",
+    "company_id": "company-acme",
+    "company_name": "ACME Logistics Holdings",
+    "domain": "acme-logistics.example",
+    "segment": "enterprise transportation",
+    "saved_brand_kit_id": "brand-kit-old-default",
+    "saved_template_id": "template-old-default"
+  }
+]
