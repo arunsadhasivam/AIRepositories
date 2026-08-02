@@ -1,35 +1,25 @@
-# CharacterQuilt Repair Lab
+# CharacterQuilt technical screen: repair an incomplete campaign
 
-This repo is a local stand-in for a campaign builder that loads uploaded target accounts from a paginated tool, generates campaign deliverables, and evaluates whether the generated campaign is complete.
+Read [TASK.md](TASK.md) — it has the whole assignment and the customer story.
 
-## What was wrong
+## Summary
 
-The starter implementation reported a campaign complete when:
-- every uploaded row had the required asset types,
-- but the evaluation did not verify whether those assets were actually built with the requested campaign `brand_kit_id` and `template_id`.
+This repo models a campaign builder that loads uploaded target accounts through a paginated lookup tool, generates deliverables for each account, and evaluates whether the resulting campaign is complete.
 
-That meant a plan could pass the supplied check even if one row was built with stale per-account defaults instead of the customer-selected kit/template.
+The starter implementation passed the visible check shipped with the repo, but the customer evidence indicates a campaign could still be reported complete even when one account used stale per-account defaults instead of the requested campaign `brand_kit_id` and `template_id`.
 
-## What I fixed
+## What was fixed
 
-- `src/repair_lab.py`
-  - strengthened the completeness evaluator so it checks:
-    - every uploaded source row is included,
-    - each row has all required asset types,
-    - every deliverable uses the requested `brand_kit_id` and `template_id`.
-  - removed the incorrect fallback behavior where an account’s saved kit/template could silently override the request.
+- Strengthened `src/repair_lab.py` so the evaluator now requires:
+  - every uploaded source row appears in the campaign plan,
+  - each source row includes all required asset types,
+  - every deliverable uses the requested `brand_kit_id` and `template_id`.
+- Removed the silent fallback where an account’s saved kit or template could override the requested campaign configuration.
+- Added test coverage for incomplete campaigns that otherwise looked valid by count.
 
-- `tests/test_visible.py`
-  - added coverage for:
-    - the published fixed campaign plan,
-    - a case where a saved account override would previously hide a bad plan,
-    - the new requested-kit/template validation logic.
+## Why this matters
 
-## Why this fix matters
-
-- It ties every output back to the uploaded input row.
-- It makes “complete” mean complete and correct, not just complete in count.
-- It prevents stale per-account configuration from bypassing the customer’s selected campaign settings.
+A green `make demo` / `make test` run on the starter code is not sufficient evidence alone. The bug is a logical mismatch between “reported complete” and “built correctly with the customer-selected campaign settings.” This fix makes completion mean complete and correct.
 
 ## How to run
 
@@ -37,3 +27,25 @@ That meant a plan could pass the supplied check even if one row was built with s
 cd candidate
 make demo
 make test
+```
+
+## Expected packet contents
+
+- repository with git history
+- raw agent transcript, including dead ends
+- `ROADMAP.md` committed before code/test edits
+- updated implementation and checks
+- `make demo` and `make test` output
+- `DECISIONS.md` and `SUBMISSION.md` with actual time spent
+
+## Files
+
+- `TASK.md` — the assignment.
+- `fixtures/request.json` — the customer's request.
+- `fixtures/target_accounts.json` — the uploaded account list.
+- `fixtures/customer_report.txt` — the customer’s note to support.
+- `fixtures/failure-traces.jsonl` — the recorded run trace.
+- `src/repair_lab.py` — campaign plan builder and evaluator.
+- `tests/test_visible.py` — visible test coverage.
+- `demo.py` — script the demo command runs.
+- `DECISIONS.md`, `SUBMISSION.md` — packet documentation.
