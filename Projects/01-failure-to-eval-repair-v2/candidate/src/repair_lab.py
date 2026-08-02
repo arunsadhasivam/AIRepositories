@@ -63,12 +63,6 @@ def _make_deliverables(
 ) -> list[dict[str, str]]:
     deliverables: list[dict[str, str]] = []
     for account in accounts:
-        effective_brand_kit = str(
-            account.get("saved_brand_kit_id", brand_kit_id)
-        )
-        effective_template = str(
-            account.get("saved_template_id", template_id)
-        )
         for asset_type in REQUIRED_ASSET_TYPES:
             deliverables.append(
                 {
@@ -76,8 +70,8 @@ def _make_deliverables(
                     "company_id": str(account["company_id"]),
                     "company_name": str(account["company_name"]),
                     "asset_type": asset_type,
-                    "brand_kit_id": effective_brand_kit,
-                    "template_id": effective_template,
+                    "brand_kit_id": brand_kit_id,
+                    "template_id": template_id,
                 }
             )
     return deliverables
@@ -106,6 +100,8 @@ def build_campaign_plan(
             brand_kit_id=brand_kit_id,
             template_id=template_id,
         ),
+        "brand_kit_id": brand_kit_id,
+        "template_id": template_id,
         "complete": True,
     }
 
@@ -132,6 +128,23 @@ def evaluate_campaign_coverage(
         }
         if observed_types != set(REQUIRED_ASSET_TYPES):
             return False, f"source row {row_id} has the wrong asset set"
+
+    expected_brand_kit = plan.get("brand_kit_id")
+    expected_template = plan.get("template_id")
+    if expected_brand_kit is None or expected_template is None:
+        return False, "campaign did not declare requested campaign settings"
+
+    for item in deliverables:
+        if str(item.get("brand_kit_id")) != str(expected_brand_kit):
+            return False, (
+                "campaign deliverable used the wrong brand kit: "
+                f"expected {expected_brand_kit}, got {item.get('brand_kit_id')}"
+            )
+        if str(item.get("template_id")) != str(expected_template):
+            return False, (
+                "campaign deliverable used the wrong template: "
+                f"expected {expected_template}, got {item.get('template_id')}"
+            )
 
     if plan.get("complete") is not True:
         return False, "campaign did not declare completion"
