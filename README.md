@@ -14,3 +14,6 @@ https://github.com/daveebbelaar/ai-cookbook/tree/main/knowledge/agentic-rag
 
 
 https://github.com/addyosmani/agent-skills
+
+
+https://github.com/hamzafarooq/claude-code-starter
