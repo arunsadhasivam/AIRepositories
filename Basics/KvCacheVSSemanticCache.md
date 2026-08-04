@@ -1,4 +1,3 @@
-
 # KV Cache vs Semantic Cache
 
 ## 1. KV Cache (Key-Value Cache)
@@ -90,7 +89,82 @@ else:                                 # cache HIT
 
 ---
 
-## 3. Side-by-side comparison
+## 3. Layered caching — exact-match, normalized/sorted, and semantic cache
+
+Exact-match cache, normalized/sorted deterministic cache, and semantic cache are not mutually exclusive — in production, they are typically **layered together**, checked in order of cost.
+
+**Order of checks:**
+
+```
+New query arrives
+   ↓
+1. Check EXACT-MATCH cache (e.g., Redis key = raw query string)
+   → HIT? return instantly (fastest, no embedding needed)
+   → MISS? go to step 2
+   ↓
+2. Check NORMALIZED/SORTED cache (lowercase, strip stopwords, sort tokens -> use as key)
+   → HIT? return instantly (still no embedding needed)
+   → MISS? go to step 3
+   ↓
+3. Check SEMANTIC cache (embed query, cosine similarity search)
+   → HIT? return cached answer (still cheaper than an LLM call)
+   → MISS? go to step 4
+   ↓
+4. Call the LLM (most expensive, last resort)
+   → store result in exact-match cache, normalized cache, AND semantic cache for next time
+```
+
+**Why exact-match is checked first:**
+- Embedding + vector similarity search has real cost (compute + latency, roughly 100-300ms).
+- If many users ask the exact same wording repeatedly (common for FAQs), exact-match cache resolves it in single-digit milliseconds with zero embedding cost.
+- Semantic cache is reserved as the fallback — for catching paraphrased/reworded queries that an exact-match cache would otherwise miss.
+
+**Interview line:** "Exact-match and semantic cache are layered, not either/or. Exact-match is checked first since it's cheap and fast; semantic cache is the fallback for semantically equivalent but differently worded queries. Only if both miss does it fall through to an actual LLM call."
+
+### 3.1 Normalized / sorted deterministic cache
+
+A middle layer between exact-match and semantic cache: normalize the query (lowercase, remove stopwords/punctuation, sort remaining tokens alphabetically), then use that normalized string as an exact-match key. Catches reordered phrasing cheaply, without needing embeddings.
+
+**Example:**
+
+```
+Query A: "What is capital of France"
+Query B: "What is France capital"
+
+Normalize both:
+  -> lowercase
+  -> remove stopwords ("is", "of")
+  -> sort remaining tokens alphabetically
+
+Query A tokens: ["capital", "france"]  (sorted)
+Query B tokens: ["capital", "france"]  (sorted)
+
+Normalized key for both: "capital_france"   -> SAME KEY -> cache HIT, no embedding needed
+```
+
+**What it CANNOT catch (still needs semantic cache):**
+
+```
+"What is capital of France"  vs  "Tell me France's capital city"
+
+Normalized tokens A: ["capital", "france"]
+Normalized tokens B: ["capital", "citys", "france", "tell"]   -> different vocabulary, NO overlap match
+```
+Different words, not just different order — normalized/sorted cache misses this. Only semantic cache (embeddings) catches true paraphrases with different vocabulary.
+
+**Comparison of all three techniques:**
+
+| Technique | "capital of France" vs "France capital" | "capital of France" vs "tell me France's capital city" | Cost |
+|---|---|---|---|
+| Raw exact-match | No match (different string) | No match | Cheapest |
+| Normalized/sorted cache | **Match** (same sorted tokens) | No match (different vocabulary) | Cheap (no embedding) |
+| Semantic cache | Match | Match | Higher (embedding + similarity search) |
+
+**Interview line:** "A normalized/sorted deterministic cache is a lightweight middle layer — it catches queries using the same words in different order, cheaply, without embeddings. But it can't catch true paraphrases with different vocabulary — that's still semantic cache's job. So the full layering becomes: exact-match -> normalized/sorted cache -> semantic cache -> LLM."
+
+---
+
+## 4. Side-by-side comparison
 
 | | KV Cache | Semantic Cache |
 |---|---|---|
