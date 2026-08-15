@@ -17,3 +17,7 @@ https://github.com/addyosmani/agent-skills
 
 
 https://github.com/hamzafarooq/claude-code-starter
+
+AI:
+===
+https://github.com/arunsadhasivam/SystemDesign/edit/master/README.md
