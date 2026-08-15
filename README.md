@@ -21,4 +21,4 @@ https://github.com/hamzafarooq/claude-code-starter
 System Design:
 ===============
 
-https://github.com/arunsadhasivam/SystemDesign/master/README.md
+https://github.com/arunsadhasivam/SystemDesign/blob/master/README.md
