@@ -18,6 +18,11 @@ https://github.com/addyosmani/agent-skills
 
 https://github.com/hamzafarooq/claude-code-starter
 
+SKILLS:
+=======
+
+https://agentskills.io/home
+
 System Design:
 ===============
 
