@@ -50,6 +50,70 @@
 </details>
 
 <details>
+<summary><h2>Time Series</h2></summary>
+
+- ARIMA
+- SARIMA
+- Prophet
+- Exponential Smoothing (Holt-Winters)
+- LSTM/GRU for forecasting
+- Moving Average / Weighted Moving Average
+
+</details>
+
+<details>
+<summary><h2>NLP-specific</h2></summary>
+
+- TF-IDF
+- Word2Vec
+- GloVe
+- FastText
+- Named Entity Recognition (NER) models
+- Topic Modeling (LDA — text version)
+- POS Tagging models
+
+</details>
+
+<details>
+<summary><h2>Recommendation Systems</h2></summary>
+
+- Collaborative Filtering
+- Matrix Factorization (SVD-based)
+- Content-Based Filtering
+- Neural Collaborative Filtering
+- Hybrid Recommender Systems
+
+</details>
+
+<details>
+<summary><h2>Ensemble / Classical ML</h2></summary>
+
+**Bagging-based**
+- Random Forest
+- Bagging (Bootstrap Aggregating)
+- Extra Trees (Extremely Randomized Trees)
+
+**Boosting-based**
+- AdaBoost
+- Gradient Boosting (GBM)
+- XGBoost
+- LightGBM
+- CatBoost
+
+**Stacking-based**
+- Stacked Generalization (Stacking)
+- Blending
+
+**Base Learners (commonly used in EDA/baseline modeling)**
+- Decision Tree
+- Linear Regression / Logistic Regression
+- K-Nearest Neighbors (KNN)
+- Support Vector Machine (SVM)
+- Naive Bayes
+
+</details>
+
+<details>
 <summary><h2>Deep Learning</h2></summary>
 
 **Foundational Architectures**
