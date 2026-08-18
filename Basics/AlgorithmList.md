@@ -241,3 +241,133 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 20 | Bias-Variance Tradeoff Analysis | Balance underfitting vs. overfitting | [Watch](https://www.youtube.com/results?search_query=Bias-Variance%20Tradeoff%20Analysis%20explained) |
 
 </details>
+
+
+<details>
+<summary><h2>9. Feature Engineering / Preprocessing</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | StandardScaler (Z-score scaling) | Rescale features to mean 0, std 1 so no feature dominates due to scale | [Watch](https://www.youtube.com/results?search_query=StandardScaler%20%28Z-score%20scaling%29%20explained) |
+| 2 | MinMax Scaling | Rescale features to a fixed range, typically 0 to 1 | [Watch](https://www.youtube.com/results?search_query=MinMax%20Scaling%20explained) |
+| 3 | Robust Scaling | Scale using median/IQR, resistant to outliers | [Watch](https://www.youtube.com/results?search_query=Robust%20Scaling%20explained) |
+| 4 | One-Hot Encoding | Convert categorical values into binary columns for ML models | [Watch](https://www.youtube.com/results?search_query=One-Hot%20Encoding%20explained) |
+| 5 | Label Encoding | Convert categories into integer codes | [Watch](https://www.youtube.com/results?search_query=Label%20Encoding%20explained) |
+| 6 | Target Encoding | Encode categories using the mean of the target variable | [Watch](https://www.youtube.com/results?search_query=Target%20Encoding%20explained) |
+| 7 | Binning/Discretization | Convert continuous values into discrete buckets | [Watch](https://www.youtube.com/results?search_query=Binning/Discretization%20explained) |
+| 8 | Log/Box-Cox Transform | Transform skewed data to be closer to normal distribution | [Watch](https://www.youtube.com/results?search_query=Log/Box-Cox%20Transform%20explained) |
+| 9 | Polynomial Features | Generate interaction/higher-order terms to capture non-linearity | [Watch](https://www.youtube.com/results?search_query=Polynomial%20Features%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>10. Hyperparameter Tuning</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Grid Search | Exhaustively try every combination of parameters in a defined grid | [Watch](https://www.youtube.com/results?search_query=Grid%20Search%20explained) |
+| 2 | Random Search | Randomly sample parameter combinations, often faster than grid search | [Watch](https://www.youtube.com/results?search_query=Random%20Search%20explained) |
+| 3 | Bayesian Optimization (Optuna, Hyperopt) | Use past trial results to intelligently pick the next parameters to try | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Optimization%20%28Optuna%2C%20Hyperopt%29%20explained) |
+| 4 | Hyperband / Successive Halving | Allocate more resources to promising configurations early | [Watch](https://www.youtube.com/results?search_query=Hyperband%20/%20Successive%20Halving%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>11. Model Evaluation Metrics</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Accuracy | Fraction of correct predictions out of total predictions | [Watch](https://www.youtube.com/results?search_query=Accuracy%20explained) |
+| 2 | Precision | Of predicted positives, how many were actually positive | [Watch](https://www.youtube.com/results?search_query=Precision%20explained) |
+| 3 | Recall (Sensitivity) | Of actual positives, how many were correctly predicted | [Watch](https://www.youtube.com/results?search_query=Recall%20%28Sensitivity%29%20explained) |
+| 4 | F1 Score | Harmonic mean of precision and recall | [Watch](https://www.youtube.com/results?search_query=F1%20Score%20explained) |
+| 5 | ROC-AUC | Measures ability to distinguish classes across all thresholds | [Watch](https://www.youtube.com/results?search_query=ROC-AUC%20explained) |
+| 6 | Confusion Matrix | Table showing true/false positives and negatives | [Watch](https://www.youtube.com/results?search_query=Confusion%20Matrix%20explained) |
+| 7 | RMSE (Root Mean Squared Error) | Measures average prediction error magnitude, penalizes large errors | [Watch](https://www.youtube.com/results?search_query=RMSE%20%28Root%20Mean%20Squared%20Error%29%20explained) |
+| 8 | MAE (Mean Absolute Error) | Measures average absolute prediction error | [Watch](https://www.youtube.com/results?search_query=MAE%20%28Mean%20Absolute%20Error%29%20explained) |
+| 9 | R² Score | Measures how much variance in target is explained by the model | [Watch](https://www.youtube.com/results?search_query=R%C2%B2%20Score%20explained) |
+| 10 | Log Loss | Penalizes confident wrong probability predictions in classification | [Watch](https://www.youtube.com/results?search_query=Log%20Loss%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>12. Explainability (XAI)</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | SHAP | Explain individual predictions by attributing contribution to each feature | [Watch](https://www.youtube.com/results?search_query=SHAP%20explained) |
+| 2 | LIME | Approximate a complex model locally with an interpretable one to explain a prediction | [Watch](https://www.youtube.com/results?search_query=LIME%20explained) |
+| 3 | Grad-CAM | Highlight image regions a CNN used to make its prediction | [Watch](https://www.youtube.com/results?search_query=Grad-CAM%20explained) |
+| 4 | Integrated Gradients | Attribute a deep model's prediction to input features via gradient path integration | [Watch](https://www.youtube.com/results?search_query=Integrated%20Gradients%20explained) |
+| 5 | Permutation Feature Importance | Measure feature importance by shuffling it and seeing performance drop | [Watch](https://www.youtube.com/results?search_query=Permutation%20Feature%20Importance%20explained) |
+| 6 | Partial Dependence Plot (PDP) | Show how a feature affects predictions on average, holding others fixed | [Watch](https://www.youtube.com/results?search_query=Partial%20Dependence%20Plot%20%28PDP%29%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>13. Transfer Learning / Fine-Tuning</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Transfer Learning (feature extraction) | Reuse a pretrained model's learned features for a new, related task | [Watch](https://www.youtube.com/results?search_query=Transfer%20Learning%20%28feature%20extraction%29%20explained) |
+| 2 | Fine-Tuning | Continue training a pretrained model's weights on new task-specific data | [Watch](https://www.youtube.com/results?search_query=Fine-Tuning%20explained) |
+| 3 | Domain Adaptation | Adapt a model trained on one data distribution to perform well on another | [Watch](https://www.youtube.com/results?search_query=Domain%20Adaptation%20explained) |
+| 4 | LoRA (Low-Rank Adaptation) | Fine-tune large models efficiently by training small low-rank weight updates | [Watch](https://www.youtube.com/results?search_query=LoRA%20%28Low-Rank%20Adaptation%29%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>14. Self-Supervised / Contrastive Learning</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | SimCLR | Learn representations by contrasting augmented views of the same image | [Watch](https://www.youtube.com/results?search_query=SimCLR%20explained) |
+| 2 | MoCo (Momentum Contrast) | Contrastive learning using a momentum-updated memory queue of negatives | [Watch](https://www.youtube.com/results?search_query=MoCo%20%28Momentum%20Contrast%29%20explained) |
+| 3 | BYOL | Learn representations without negative samples using two networks that predict each other | [Watch](https://www.youtube.com/results?search_query=BYOL%20explained) |
+| 4 | Masked Autoencoders (MAE) | Learn representations by reconstructing randomly masked parts of input | [Watch](https://www.youtube.com/results?search_query=Masked%20Autoencoders%20%28MAE%29%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>15. Association Rule Mining</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Apriori | Find frequent itemsets and generate association rules (e.g., market basket analysis) | [Watch](https://www.youtube.com/results?search_query=Apriori%20explained) |
+| 2 | FP-Growth | Faster frequent itemset mining without candidate generation, using a tree structure | [Watch](https://www.youtube.com/results?search_query=FP-Growth%20explained) |
+| 3 | Eclat | Mine frequent itemsets using a vertical data format and set intersections | [Watch](https://www.youtube.com/results?search_query=Eclat%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>16. Bayesian Methods</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Bayesian Networks | Model probabilistic dependencies between variables using a directed graph | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Networks%20explained) |
+| 2 | Gaussian Processes | Model a distribution over functions for probabilistic regression | [Watch](https://www.youtube.com/results?search_query=Gaussian%20Processes%20explained) |
+| 3 | Naive Bayes (Bayesian use) | Classify using Bayes' theorem with a simplifying independence assumption | [Watch](https://www.youtube.com/results?search_query=Naive%20Bayes%20%28Bayesian%20use%29%20explained) |
+| 4 | Markov Chain Monte Carlo (MCMC) | Sample from complex probability distributions to estimate posteriors | [Watch](https://www.youtube.com/results?search_query=Markov%20Chain%20Monte%20Carlo%20%28MCMC%29%20explained) |
+| 5 | Bayesian Linear Regression | Regression that outputs a distribution over predictions, not just a point estimate | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Linear%20Regression%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>17. AutoML</h2></summary>
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Neural Architecture Search (NAS) | Automatically search for the best neural network architecture | [Watch](https://www.youtube.com/results?search_query=Neural%20Architecture%20Search%20%28NAS%29%20explained) |
+| 2 | Auto-sklearn | Automatically select and tune classical ML models/pipelines | [Watch](https://www.youtube.com/results?search_query=Auto-sklearn%20explained) |
+| 3 | TPOT | Use genetic programming to automatically build ML pipelines | [Watch](https://www.youtube.com/results?search_query=TPOT%20explained) |
+| 4 | Google AutoML / H2O AutoML | Automate model selection, tuning, and training end-to-end | [Watch](https://www.youtube.com/results?search_query=Google%20AutoML%20/%20H2O%20AutoML%20explained) |
+
+</details>
