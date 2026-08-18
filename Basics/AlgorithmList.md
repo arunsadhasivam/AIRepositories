@@ -79,6 +79,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>2. Ensemble / Classical ML</h2></summary>
 
+**Why here:** These are the simplest models that actually learn patterns. You must understand a single Decision Tree before understanding why Random Forest (many trees) or Boosting (sequential correction) improves it.
+
+**Unlocks:** A working baseline model and the core idea of "learning from data" before adding neural complexity.
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Decision Tree | Split data on feature thresholds to predict a label/value | [Watch](https://www.youtube.com/results?search_query=Decision%20Tree%20explained) |
@@ -104,7 +108,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>3. Deep Learning</h2></summary>
 
-**Why here:** Classical ML can't automatically learn features from raw pixels, audio, or long text sequences — you'd have to hand-engineer them. Deep Learning solves this by learning features directly from raw data, but it needs everything above (clean data, evaluation, regularization) to avoid massively overfitting on its huge parameter count.
+**Why here:** Classical ML can't automatically learn features from raw pixels, audio, or long text sequences — you'd have to hand-engineer them. Deep Learning solves this by learning features directly from raw data, but it needs everything before it (clean data, evaluation, regularization) to avoid massively overfitting on its huge parameter count.
 
 **Unlocks:** The ability to learn features directly from raw, unstructured data.
 
@@ -162,7 +166,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>4. Computer Vision</h2></summary>
 
-**Why here:** These are DL architectures specialized for images — you need to understand CNNs before understanding detection (YOLO) or segmentation (U-Net) built on top of them.
+**Why here:** These are DL architectures specialized for images — you need to understand CNNs (from Deep Learning) before understanding detection (YOLO) or segmentation (U-Net) built on top of them.
 
 **Unlocks:** Image-specific tasks: classification, detection, segmentation, generation.
 
@@ -301,6 +305,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>9. Feature Engineering / Preprocessing</h2></summary>
 
+**Why here:** Raw data from EDA still isn't model-ready — categories need encoding, scales need normalizing. Models fail or perform poorly without this.
+
+**Unlocks:** Clean, numeric, scaled input any algorithm can consume.
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | StandardScaler (Z-score scaling) | Rescale features to mean 0, std 1 so no feature dominates due to scale | [Watch](https://www.youtube.com/results?search_query=StandardScaler%20%28Z-score%20scaling%29%20explained) |
@@ -378,7 +386,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>13. Transfer Learning / Fine-Tuning</h2></summary>
 
-**Why here:** Requires a pretrained deep model to already exist (Deep Learning, CV, NLP) before you can reuse or adapt it.
+**Why here:** Requires a pretrained deep model to already exist (from Deep Learning, CV, NLP) before you can reuse or adapt it.
 
 **Unlocks:** Faster, cheaper model development by reusing existing knowledge.
 
@@ -412,9 +420,9 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 <details>
 <summary><h2>15. Association Rule Mining</h2></summary>
 
-**Why here:** Pattern-mining rounds out classical ML alongside Bayesian methods — still shallow/interpretable models, the last stop before neural networks.
+**Why here:** Pattern-mining rounds out classical ML — still a shallow, interpretable technique, one of the last stops before neural networks.
 
-**Unlocks:** Full classical ML toolkit. This limitation on complex data is exactly why Deep Learning is needed next.
+**Unlocks:** Full classical ML toolkit. This limitation on complex data (images, text, sequences) is exactly why Deep Learning is needed next.
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -430,7 +438,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Why here:** These round out classical ML with probabilistic reasoning — still shallow/interpretable models, the last stop before neural networks.
 
-**Unlocks:** Full classical ML toolkit. At this point classical models plateau on complex data (images, text, sequences) — this limitation is why you need Deep Learning next.
+**Unlocks:** Full classical ML toolkit. At this point classical models plateau on complex data — this limitation is why you need Deep Learning next.
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
