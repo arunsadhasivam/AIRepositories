@@ -37,6 +37,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** You now understand what the data actually looks like.
 
+**Reference:**
+- Book: "Python for Data Analysis" by Wes McKinney
+- Site: https://www.kaggle.com/learn/data-cleaning
+- Site: https://seaborn.pydata.org/tutorial.html
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Histogram | Visualize the distribution shape of a single variable | [Watch](https://www.youtube.com/results?search_query=Histogram%20explained) |
@@ -88,6 +93,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Clean, numeric, scaled input any algorithm can consume.
 
+**Reference:**
+- Book: "Feature Engineering for Machine Learning" by Alice Zheng & Amanda Casari
+- Site: https://scikit-learn.org/stable/modules/preprocessing.html
+- Site: https://www.kaggle.com/learn/feature-engineering
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | StandardScaler (Z-score scaling) | Rescale features to mean 0, std 1 so no feature dominates due to scale | [Watch](https://www.youtube.com/results?search_query=StandardScaler%20%28Z-score%20scaling%29%20explained) |
@@ -109,6 +119,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** These are the simplest models that actually learn patterns. You must understand a single Decision Tree before understanding why Random Forest (many trees) or Boosting (sequential correction) improves it.
 
 **Unlocks:** A working baseline model and the core idea of "learning from data" before adding neural complexity.
+
+**Reference:**
+- Book: "The Elements of Statistical Learning" by Hastie, Tibshirani, Friedman
+- Book: "Hands-On Machine Learning" by Aurelien Geron
+- Site: https://scikit-learn.org/stable/user_guide.html
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -142,6 +157,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** A way to judge every model you build from here on.
 
+**Reference:**
+- Book: "Evaluating Machine Learning Models" by Alice Zheng
+- Site: https://scikit-learn.org/stable/modules/model_evaluation.html
+- Site: https://developers.google.com/machine-learning/crash-course/classification/metrics
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Accuracy | Fraction of correct predictions out of total predictions | [Watch](https://www.youtube.com/results?search_query=Accuracy%20explained) |
@@ -164,6 +184,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** A model can score well on training data and still fail in the real world. This stage teaches you to detect and prevent that trap — critical before models get more complex (deep learning overfits far more easily).
 
 **Unlocks:** The discipline needed before trusting any larger model.
+
+**Reference:**
+- Book: "Deep Learning" by Goodfellow, Bengio, Courville — Chapter 5 & 7
+- Site: https://www.deeplearningbook.org/
+- Site: https://developers.google.com/machine-learning/crash-course/overfitting
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -198,6 +223,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** A properly optimized classical model — the ceiling of "shallow" ML.
 
+**Reference:**
+- Site: https://scikit-learn.org/stable/modules/grid_search.html
+- Site: https://optuna.org/
+- Site: https://www.jeremyjordan.me/hyperparameter-tuning/
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Grid Search | Exhaustively try every combination of parameters in a defined grid | [Watch](https://www.youtube.com/results?search_query=Grid%20Search%20explained) |
@@ -214,6 +244,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** These round out classical ML with probabilistic reasoning — still shallow/interpretable models, the last stop before neural networks.
 
 **Unlocks:** Full classical ML toolkit. At this point classical models plateau on complex data — this limitation is why you need Deep Learning next.
+
+**Reference:**
+- Book: "Pattern Recognition and Machine Learning" by Christopher Bishop
+- Book: "Bayesian Reasoning and Machine Learning" by David Barber
+- Site: https://www.cs.ubc.ca/~murphyk/MLbook/
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -233,6 +268,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Full classical ML toolkit. This limitation on complex data (images, text, sequences) is exactly why Deep Learning is needed next.
 
+**Reference:**
+- Book: "Data Mining: Concepts and Techniques" by Han, Kamber, Pei
+- Site: https://www.kaggle.com/learn/intro-to-data-mining (search: market basket analysis)
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Apriori | Find frequent itemsets and generate association rules (e.g., market basket analysis) | [Watch](https://www.youtube.com/results?search_query=Apriori%20explained) |
@@ -248,6 +287,12 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** Classical ML can't automatically learn features from raw pixels, audio, or long text sequences — you'd have to hand-engineer them. Deep Learning solves this by learning features directly from raw data, but it needs everything before it (clean data, evaluation, regularization) to avoid massively overfitting on its huge parameter count.
 
 **Unlocks:** The ability to learn features directly from raw, unstructured data.
+
+**Reference:**
+- Book: "Deep Learning" by Goodfellow, Bengio, Courville
+- Site: https://www.deeplearningbook.org/
+- Site: https://cs231n.stanford.edu/ (Stanford CS231n)
+- Site: https://d2l.ai/ (Dive into Deep Learning)
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -313,6 +358,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Image-specific tasks: classification, detection, segmentation, generation.
 
+**Reference:**
+- Book: "Computer Vision: Algorithms and Applications" by Richard Szeliski
+- Site: https://cs231n.stanford.edu/
+- Site: https://pyimagesearch.com/
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | CNN Classifiers (AlexNet/VGG/ResNet/EfficientNet) | Assign a label to an entire image | [Watch](https://www.youtube.com/results?search_query=CNN%20Classifiers%20%28AlexNet/VGG/ResNet/EfficientNet%29%20explained) |
@@ -370,6 +420,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Text-specific tasks: embeddings, entity recognition, topic modeling.
 
+**Reference:**
+- Book: "Speech and Language Processing" by Jurafsky & Martin
+- Site: https://web.stanford.edu/~jurafsky/slp3/
+- Site: https://huggingface.co/learn/nlp-course
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | TF-IDF | Weigh words by importance across a document collection | [Watch](https://www.youtube.com/results?search_query=TF-IDF%20explained) |
@@ -390,6 +445,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** The ability to forecast sequences with trend and seasonality.
 
+**Reference:**
+- Book: "Forecasting: Principles and Practice" by Hyndman & Athanasopoulos
+- Site: https://otexts.com/fpp3/
+- Site: https://facebook.github.io/prophet/
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | ARIMA | Forecast based on autoregression, differencing, and moving average | [Watch](https://www.youtube.com/results?search_query=ARIMA%20explained) |
@@ -409,6 +469,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Personalized recommendations combining classical and neural approaches.
 
+**Reference:**
+- Book: "Recommender Systems: The Textbook" by Charu Aggarwal
+- Site: https://developers.google.com/machine-learning/recommendation
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Collaborative Filtering | Recommend based on similar users'/items' behavior | [Watch](https://www.youtube.com/results?search_query=Collaborative%20Filtering%20explained) |
@@ -426,6 +490,11 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** You can only explain a model once it's complex enough to need explaining — Grad-CAM specifically requires a trained CNN to visualize.
 
 **Unlocks:** The ability to interpret and trust complex model decisions.
+
+**Reference:**
+- Book: "Interpretable Machine Learning" by Christoph Molnar (free online)
+- Site: https://christophm.github.io/interpretable-ml-book/
+- Site: https://shap.readthedocs.io/
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
@@ -446,6 +515,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** Faster, cheaper model development by reusing existing knowledge.
 
+**Reference:**
+- Site: https://huggingface.co/docs/transformers/training
+- Site: https://cs231n.github.io/transfer-learning/
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | Transfer Learning (feature extraction) | Reuse a pretrained model's learned features for a new, related task | [Watch](https://www.youtube.com/results?search_query=Transfer%20Learning%20%28feature%20extraction%29%20explained) |
@@ -463,6 +536,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 **Unlocks:** The ability to pretrain models without labeled data.
 
+**Reference:**
+- Site: https://lilianweng.github.io/posts/2019-11-10-self-supervised/
+- Site: https://ai.meta.com/blog/self-supervised-learning-the-dark-matter-of-intelligence/
+
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
 | 1 | SimCLR | Learn representations by contrasting augmented views of the same image | [Watch](https://www.youtube.com/results?search_query=SimCLR%20explained) |
@@ -479,6 +556,10 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 **Why here:** AutoML automates everything above — model selection, tuning, architecture search. It only makes sense once you understand what's being automated.
 
 **Unlocks:** Automated pipelines that replace manual trial-and-error across every stage above.
+
+**Reference:**
+- Book: "Automated Machine Learning" by Hutter, Kotthoff, Vanschoren (free online)
+- Site: https://www.automl.org/book/
 
 | S.No | Algorithm | Description | YouTube |
 |---|---|---|---|
