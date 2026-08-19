@@ -68,10 +68,15 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 27 | Hierarchical Clustering | Build nested clusters shown as a dendrogram | [Watch](https://www.youtube.com/results?search_query=Hierarchical%20Clustering%20explained) |
 | 28 | DBSCAN (clustering use) | Cluster by density, handles irregular shapes | [Watch](https://www.youtube.com/results?search_query=DBSCAN%20%28clustering%20use%29%20explained) |
 | 29 | Gaussian Mixture Model (GMM) | Soft/probabilistic clustering | [Watch](https://www.youtube.com/results?search_query=Gaussian%20Mixture%20Model%20%28GMM%29%20explained) |
-| 30 | Feature Importance (tree-based) | Rank features by predictive contribution | [Watch](https://www.youtube.com/results?search_query=Feature%20Importance%20%28tree-based%29%20explained) |
-| 31 | Mutual Information | Measure dependency between a feature and the target | [Watch](https://www.youtube.com/results?search_query=Mutual%20Information%20explained) |
-| 32 | Variance Threshold | Drop low-variance, uninformative features | [Watch](https://www.youtube.com/results?search_query=Variance%20Threshold%20explained) |
-| 33 | ANOVA F-test | Test if a feature's mean differs significantly across groups | [Watch](https://www.youtube.com/results?search_query=ANOVA%20F-test%20explained) |
+| 30 | Spectral Clustering | Cluster using graph connectivity/eigenvalues, handles non-convex shapes | [Watch](https://www.youtube.com/results?search_query=Spectral%20Clustering%20explained) |
+| 31 | Mean Shift Clustering | Cluster by shifting points toward areas of higher density | [Watch](https://www.youtube.com/results?search_query=Mean%20Shift%20Clustering%20explained) |
+| 32 | Affinity Propagation | Cluster by passing messages between points to find exemplars, no need to preset cluster count | [Watch](https://www.youtube.com/results?search_query=Affinity%20Propagation%20explained) |
+| 33 | OPTICS | Density-based clustering that handles varying density better than DBSCAN | [Watch](https://www.youtube.com/results?search_query=OPTICS%20explained) |
+| 34 | Self-Organizing Maps (SOM) | Neural network that maps high-dimensional data onto a low-dimensional grid, preserving topology | [Watch](https://www.youtube.com/results?search_query=Self-Organizing%20Maps%20%28SOM%29%20explained) |
+| 35 | Feature Importance (tree-based) | Rank features by predictive contribution | [Watch](https://www.youtube.com/results?search_query=Feature%20Importance%20%28tree-based%29%20explained) |
+| 36 | Mutual Information | Measure dependency between a feature and the target | [Watch](https://www.youtube.com/results?search_query=Mutual%20Information%20explained) |
+| 37 | Variance Threshold | Drop low-variance, uninformative features | [Watch](https://www.youtube.com/results?search_query=Variance%20Threshold%20explained) |
+| 38 | ANOVA F-test | Test if a feature's mean differs significantly across groups | [Watch](https://www.youtube.com/results?search_query=ANOVA%20F-test%20explained) |
 
 </details>
 
@@ -113,16 +118,19 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 4 | K-Nearest Neighbors (KNN) | Classify/predict based on the closest training examples | [Watch](https://www.youtube.com/results?search_query=K-Nearest%20Neighbors%20%28KNN%29%20explained) |
 | 5 | Support Vector Machine (SVM) | Find the maximum-margin boundary between classes | [Watch](https://www.youtube.com/results?search_query=Support%20Vector%20Machine%20%28SVM%29%20explained) |
 | 6 | Naive Bayes | Classify using Bayes' theorem assuming feature independence | [Watch](https://www.youtube.com/results?search_query=Naive%20Bayes%20explained) |
-| 7 | Random Forest | Average many decision trees (bagging) to reduce variance | [Watch](https://www.youtube.com/results?search_query=Random%20Forest%20explained) |
-| 8 | Bagging | Train models on random data subsets and average results | [Watch](https://www.youtube.com/results?search_query=Bagging%20explained) |
-| 9 | Extra Trees | Like Random Forest but extra randomness in splits, faster | [Watch](https://www.youtube.com/results?search_query=Extra%20Trees%20explained) |
-| 10 | AdaBoost | Sequentially boost weak learners by reweighting misclassified points | [Watch](https://www.youtube.com/results?search_query=AdaBoost%20explained) |
-| 11 | Gradient Boosting (GBM) | Sequentially fit models to the residual errors | [Watch](https://www.youtube.com/results?search_query=Gradient%20Boosting%20%28GBM%29%20explained) |
-| 12 | XGBoost | Regularized, optimized gradient boosting for speed and accuracy | [Watch](https://www.youtube.com/results?search_query=XGBoost%20explained) |
-| 13 | LightGBM | Leaf-wise gradient boosting, very fast on large datasets | [Watch](https://www.youtube.com/results?search_query=LightGBM%20explained) |
-| 14 | CatBoost | Gradient boosting optimized for categorical features | [Watch](https://www.youtube.com/results?search_query=CatBoost%20explained) |
-| 15 | Stacking | Combine multiple models' predictions using a meta-model | [Watch](https://www.youtube.com/results?search_query=Stacking%20explained) |
-| 16 | Blending | Like stacking but meta-model trained on a held-out validation set | [Watch](https://www.youtube.com/results?search_query=Blending%20explained) |
+| 7 | Polynomial Regression | Fit a curved (non-linear) relationship by adding polynomial terms to linear regression | [Watch](https://www.youtube.com/results?search_query=Polynomial%20Regression%20explained) |
+| 8 | Quadratic Discriminant Analysis (QDA) | Classify assuming each class has its own Gaussian distribution with different covariance | [Watch](https://www.youtube.com/results?search_query=Quadratic%20Discriminant%20Analysis%20%28QDA%29%20explained) |
+| 9 | Linear Discriminant Analysis (classifier use) | Classify by projecting data onto a line that best separates classes | [Watch](https://www.youtube.com/results?search_query=Linear%20Discriminant%20Analysis%20%28classifier%20use%29%20explained) |
+| 10 | Random Forest | Average many decision trees (bagging) to reduce variance | [Watch](https://www.youtube.com/results?search_query=Random%20Forest%20explained) |
+| 11 | Bagging | Train models on random data subsets and average results | [Watch](https://www.youtube.com/results?search_query=Bagging%20explained) |
+| 12 | Extra Trees | Like Random Forest but extra randomness in splits, faster | [Watch](https://www.youtube.com/results?search_query=Extra%20Trees%20explained) |
+| 13 | AdaBoost | Sequentially boost weak learners by reweighting misclassified points | [Watch](https://www.youtube.com/results?search_query=AdaBoost%20explained) |
+| 14 | Gradient Boosting (GBM) | Sequentially fit models to the residual errors | [Watch](https://www.youtube.com/results?search_query=Gradient%20Boosting%20%28GBM%29%20explained) |
+| 15 | XGBoost | Regularized, optimized gradient boosting for speed and accuracy | [Watch](https://www.youtube.com/results?search_query=XGBoost%20explained) |
+| 16 | LightGBM | Leaf-wise gradient boosting, very fast on large datasets | [Watch](https://www.youtube.com/results?search_query=LightGBM%20explained) |
+| 17 | CatBoost | Gradient boosting optimized for categorical features | [Watch](https://www.youtube.com/results?search_query=CatBoost%20explained) |
+| 18 | Stacking | Combine multiple models' predictions using a meta-model | [Watch](https://www.youtube.com/results?search_query=Stacking%20explained) |
+| 19 | Blending | Like stacking but meta-model trained on a held-out validation set | [Watch](https://www.youtube.com/results?search_query=Blending%20explained) |
 
 </details>
 
@@ -288,6 +296,12 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 43 | RMSProp | Adapt learning rate per parameter using recent gradient magnitude | [Watch](https://www.youtube.com/results?search_query=RMSProp%20explained) |
 | 44 | Adam | Combines momentum and adaptive learning rates for fast convergence | [Watch](https://www.youtube.com/results?search_query=Adam%20explained) |
 | 45 | AdamW | Adam with decoupled weight decay for better generalization | [Watch](https://www.youtube.com/results?search_query=AdamW%20explained) |
+| 46 | Restricted Boltzmann Machine (RBM) | Learn a probability distribution over inputs using a two-layer stochastic network | [Watch](https://www.youtube.com/results?search_query=Restricted%20Boltzmann%20Machine%20%28RBM%29%20explained) |
+| 47 | Deep Belief Network (DBN) | Stack multiple RBMs to learn hierarchical feature representations | [Watch](https://www.youtube.com/results?search_query=Deep%20Belief%20Network%20%28DBN%29%20explained) |
+| 48 | Hopfield Network | Recurrent network that stores patterns as stable states for associative memory recall | [Watch](https://www.youtube.com/results?search_query=Hopfield%20Network%20explained) |
+| 49 | Siamese Networks | Compare two inputs using twin networks with shared weights, useful for similarity/verification | [Watch](https://www.youtube.com/results?search_query=Siamese%20Networks%20explained) |
+| 50 | Capsule Networks | Preserve spatial hierarchies between features using vector-based capsules instead of scalar neurons | [Watch](https://www.youtube.com/results?search_query=Capsule%20Networks%20explained) |
+| 51 | Highway Networks | Use gated skip connections to let deep networks train more easily, precursor to ResNet | [Watch](https://www.youtube.com/results?search_query=Highway%20Networks%20explained) |
 
 </details>
 
@@ -337,6 +351,14 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 34 | SORT | Simple, fast multi-object tracking using Kalman filter + IOU | [Watch](https://www.youtube.com/results?search_query=SORT%20explained) |
 | 35 | DeepSORT | SORT enhanced with a deep appearance embedding for tracking | [Watch](https://www.youtube.com/results?search_query=DeepSORT%20explained) |
 | 36 | Kalman Filter | Predict/track object position under uncertainty over time | [Watch](https://www.youtube.com/results?search_query=Kalman%20Filter%20explained) |
+| 37 | Neural Style Transfer | Blend the content of one image with the artistic style of another using CNN features | [Watch](https://www.youtube.com/results?search_query=Neural%20Style%20Transfer%20explained) |
+| 38 | Image Captioning (CNN+RNN/Transformer) | Generate a natural language description of an image's content | [Watch](https://www.youtube.com/results?search_query=Image%20Captioning%20%28CNN%2BRNN/Transformer%29%20explained) |
+| 39 | Depth Estimation (MiDaS) | Predict per-pixel depth from a single 2D image | [Watch](https://www.youtube.com/results?search_query=Depth%20Estimation%20%28MiDaS%29%20explained) |
+| 40 | PointNet | Directly process 3D point cloud data for classification/segmentation | [Watch](https://www.youtube.com/results?search_query=PointNet%20explained) |
+| 41 | 3D CNN / SlowFast | Recognize actions in video by learning spatio-temporal features | [Watch](https://www.youtube.com/results?search_query=3D%20CNN%20/%20SlowFast%20explained) |
+| 42 | Swin Transformer | Vision transformer using shifted windows for efficient hierarchical feature extraction | [Watch](https://www.youtube.com/results?search_query=Swin%20Transformer%20explained) |
+| 43 | ConvNeXt | Modernized pure-CNN architecture that matches transformer-level accuracy | [Watch](https://www.youtube.com/results?search_query=ConvNeXt%20explained) |
+| 44 | Image Inpainting | Fill in missing or removed regions of an image realistically | [Watch](https://www.youtube.com/results?search_query=Image%20Inpainting%20explained) |
 
 </details>
 
