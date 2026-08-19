@@ -9,22 +9,22 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 | Stage | Category | Why It Comes at This Point |
 |---|---|---|
-| 1 | EDA | Can't build any model without knowing data shape, missing values, outliers first |
+| 1 | Exploratory Data Analysis (EDA) | Can't build any model without knowing data shape, missing values, outliers first |
 | 2 | Feature Engineering / Preprocessing | Raw data from EDA isn't model-ready — needs encoding/scaling before any algorithm can use it |
-| 3 | Classical ML / Ensemble | Simplest models that actually learn patterns; foundation before adding complexity |
+| 3 | Ensemble / Classical ML | Simplest models that actually learn patterns; foundation before adding complexity |
 | 4 | Model Evaluation Metrics | Need a way to judge if a model is actually good, not just built |
 | 5 | Generalization / Avoiding Overfitting | A model can look good on training data and fail in reality — must catch this before trusting bigger models |
 | 6 | Hyperparameter Tuning | Optimize a model only after you can validate it's trustworthy |
-| 7 | Bayesian Methods / Association Rule Mining | Rounds out classical ML; its limits on images/text/sequences are exactly why Deep Learning is needed next |
-| 8 | Deep Learning (Perceptron → MLP → CNN → RNN/LSTM → Transformer) | Classical ML can't auto-learn features from raw pixels/text/audio; DL learns features directly, but needs steps 1-7 to avoid massive overfitting |
-| 9 | Computer Vision | Specialized DL architectures built on CNNs from step 8 (detection, segmentation, GANs) |
-| 10 | NLP-specific | Transformers from step 8 applied specifically to text |
-| 11 | Time Series | LSTM-based forecasting depends on RNN/LSTM fundamentals from step 8 |
-| 12 | Recommendation Systems | Neural Collaborative Filtering needs neural network fundamentals from step 8 |
-| 13 | Explainability (XAI) | Can only explain a model once it's complex enough to need explaining (e.g. Grad-CAM needs a trained CNN) |
-| 14 | Transfer Learning / Fine-Tuning | Requires a pretrained deep model (steps 8-10) to already exist before reusing/adapting it |
-| 15 | Self-Supervised / Contrastive Learning | Advanced pretraining strategy; needs supervised DL understood first to see why label-free learning differs |
-| 16 | Reinforcement Learning | Uses neural networks internally (step 8) but adds a different, reward-based learning paradigm |
+| 7 | Bayesian Methods | Probabilistic reasoning rounds out classical ML — still shallow/interpretable, near the ceiling of classical ML |
+| 8 | Association Rule Mining | Pattern-mining is the last classical/interpretable technique — its limits on images/text/sequences are exactly why Deep Learning is needed next |
+| 9 | Deep Learning (Perceptron → MLP → CNN → RNN/LSTM → Transformer → RL) | Classical ML can't auto-learn features from raw pixels/text/audio; DL learns features directly, but needs steps 1-8 to avoid massive overfitting |
+| 10 | Computer Vision | Specialized DL architectures built on CNNs from step 9 (detection, segmentation, GANs) |
+| 11 | NLP-specific | Transformers from step 9 applied specifically to text |
+| 12 | Time Series | LSTM-based forecasting depends on RNN/LSTM fundamentals from step 9 |
+| 13 | Recommendation Systems | Neural Collaborative Filtering needs neural network fundamentals from step 9 |
+| 14 | Explainability (XAI) | Can only explain a model once it's complex enough to need explaining (e.g. Grad-CAM needs a trained CNN from step 10) |
+| 15 | Transfer Learning / Fine-Tuning | Requires a pretrained deep model (steps 9-11) to already exist before reusing/adapting it |
+| 16 | Self-Supervised / Contrastive Learning | Advanced pretraining strategy; needs supervised DL understood first to see why label-free learning differs |
 | 17 | AutoML | Automates everything above — only makes sense once you understand what's being automated |
 
 ---
@@ -77,7 +77,29 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>2. Ensemble / Classical ML</h2></summary>
+<summary><h2>2. Feature Engineering / Preprocessing</h2></summary>
+
+**Why here:** Raw data from EDA still isn't model-ready — categories need encoding, scales need normalizing. Models fail or perform poorly without this.
+
+**Unlocks:** Clean, numeric, scaled input any algorithm can consume.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | StandardScaler (Z-score scaling) | Rescale features to mean 0, std 1 so no feature dominates due to scale | [Watch](https://www.youtube.com/results?search_query=StandardScaler%20%28Z-score%20scaling%29%20explained) |
+| 2 | MinMax Scaling | Rescale features to a fixed range, typically 0 to 1 | [Watch](https://www.youtube.com/results?search_query=MinMax%20Scaling%20explained) |
+| 3 | Robust Scaling | Scale using median/IQR, resistant to outliers | [Watch](https://www.youtube.com/results?search_query=Robust%20Scaling%20explained) |
+| 4 | One-Hot Encoding | Convert categorical values into binary columns for ML models | [Watch](https://www.youtube.com/results?search_query=One-Hot%20Encoding%20explained) |
+| 5 | Label Encoding | Convert categories into integer codes | [Watch](https://www.youtube.com/results?search_query=Label%20Encoding%20explained) |
+| 6 | Target Encoding | Encode categories using the mean of the target variable | [Watch](https://www.youtube.com/results?search_query=Target%20Encoding%20explained) |
+| 7 | Binning/Discretization | Convert continuous values into discrete buckets | [Watch](https://www.youtube.com/results?search_query=Binning/Discretization%20explained) |
+| 8 | Log/Box-Cox Transform | Transform skewed data to be closer to normal distribution | [Watch](https://www.youtube.com/results?search_query=Log/Box-Cox%20Transform%20explained) |
+| 9 | Polynomial Features | Generate interaction/higher-order terms to capture non-linearity | [Watch](https://www.youtube.com/results?search_query=Polynomial%20Features%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>3. Ensemble / Classical ML</h2></summary>
 
 **Why here:** These are the simplest models that actually learn patterns. You must understand a single Decision Tree before understanding why Random Forest (many trees) or Boosting (sequential correction) improves it.
 
@@ -106,7 +128,114 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>3. Deep Learning</h2></summary>
+<summary><h2>4. Model Evaluation Metrics</h2></summary>
+
+**Why here:** Once you have a model, you need to know if it's actually good. Without this, you can't tell a good model from a lucky/bad one.
+
+**Unlocks:** A way to judge every model you build from here on.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Accuracy | Fraction of correct predictions out of total predictions | [Watch](https://www.youtube.com/results?search_query=Accuracy%20explained) |
+| 2 | Precision | Of predicted positives, how many were actually positive | [Watch](https://www.youtube.com/results?search_query=Precision%20explained) |
+| 3 | Recall (Sensitivity) | Of actual positives, how many were correctly predicted | [Watch](https://www.youtube.com/results?search_query=Recall%20%28Sensitivity%29%20explained) |
+| 4 | F1 Score | Harmonic mean of precision and recall | [Watch](https://www.youtube.com/results?search_query=F1%20Score%20explained) |
+| 5 | ROC-AUC | Measures ability to distinguish classes across all thresholds | [Watch](https://www.youtube.com/results?search_query=ROC-AUC%20explained) |
+| 6 | Confusion Matrix | Table showing true/false positives and negatives | [Watch](https://www.youtube.com/results?search_query=Confusion%20Matrix%20explained) |
+| 7 | RMSE (Root Mean Squared Error) | Measures average prediction error magnitude, penalizes large errors | [Watch](https://www.youtube.com/results?search_query=RMSE%20%28Root%20Mean%20Squared%20Error%29%20explained) |
+| 8 | MAE (Mean Absolute Error) | Measures average absolute prediction error | [Watch](https://www.youtube.com/results?search_query=MAE%20%28Mean%20Absolute%20Error%29%20explained) |
+| 9 | R² Score | Measures how much variance in target is explained by the model | [Watch](https://www.youtube.com/results?search_query=R%C2%B2%20Score%20explained) |
+| 10 | Log Loss | Penalizes confident wrong probability predictions in classification | [Watch](https://www.youtube.com/results?search_query=Log%20Loss%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>5. Generalization / Avoiding Overfitting</h2></summary>
+
+**Why here:** A model can score well on training data and still fail in the real world. This stage teaches you to detect and prevent that trap — critical before models get more complex (deep learning overfits far more easily).
+
+**Unlocks:** The discipline needed before trusting any larger model.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Train/Validation/Test Split | Hold out data to measure real-world performance | [Watch](https://www.youtube.com/results?search_query=Train/Validation/Test%20Split%20explained) |
+| 2 | Cross-Validation (K-Fold, Stratified, LOO) | Validate robustly across multiple splits | [Watch](https://www.youtube.com/results?search_query=Cross-Validation%20%28K-Fold%2C%20Stratified%2C%20LOO%29%20explained) |
+| 3 | Data Augmentation | Synthetically expand training data variety | [Watch](https://www.youtube.com/results?search_query=Data%20Augmentation%20explained) |
+| 4 | SMOTE / Under/Oversampling | Rebalance classes to avoid biased learning | [Watch](https://www.youtube.com/results?search_query=SMOTE%20/%20Under/Oversampling%20explained) |
+| 5 | L1 Regularization (Lasso) | Shrink and zero-out less useful feature weights | [Watch](https://www.youtube.com/results?search_query=L1%20Regularization%20%28Lasso%29%20explained) |
+| 6 | L2 Regularization (Ridge) | Shrink weights smoothly to reduce overfitting | [Watch](https://www.youtube.com/results?search_query=L2%20Regularization%20%28Ridge%29%20explained) |
+| 7 | ElasticNet | Combine L1 + L2 regularization | [Watch](https://www.youtube.com/results?search_query=ElasticNet%20explained) |
+| 8 | Pruning (Decision Trees) | Cut back tree branches to reduce overfitting | [Watch](https://www.youtube.com/results?search_query=Pruning%20%28Decision%20Trees%29%20explained) |
+| 9 | Max Depth / Min Samples Leaf | Constrain tree size to limit memorization | [Watch](https://www.youtube.com/results?search_query=Max%20Depth%20/%20Min%20Samples%20Leaf%20explained) |
+| 10 | Dropout (generalization use) | Randomly drop neurons to prevent co-adaptation | [Watch](https://www.youtube.com/results?search_query=Dropout%20%28generalization%20use%29%20explained) |
+| 11 | Batch Normalization (generalization use) | Stabilizes training, mild regularizing effect | [Watch](https://www.youtube.com/results?search_query=Batch%20Normalization%20%28generalization%20use%29%20explained) |
+| 12 | Early Stopping | Stop training when validation performance stops improving | [Watch](https://www.youtube.com/results?search_query=Early%20Stopping%20explained) |
+| 13 | Weight Decay | Penalize large weights during optimization | [Watch](https://www.youtube.com/results?search_query=Weight%20Decay%20explained) |
+| 14 | Label Smoothing | Soften target labels to reduce overconfidence | [Watch](https://www.youtube.com/results?search_query=Label%20Smoothing%20explained) |
+| 15 | Gradient Clipping | Cap gradients to prevent unstable training | [Watch](https://www.youtube.com/results?search_query=Gradient%20Clipping%20explained) |
+| 16 | Noise Injection | Add noise to inputs/weights to improve robustness | [Watch](https://www.youtube.com/results?search_query=Noise%20Injection%20explained) |
+| 17 | Bagging (generalization use) | Reduce variance by averaging diverse models | [Watch](https://www.youtube.com/results?search_query=Bagging%20%28generalization%20use%29%20explained) |
+| 18 | Boosting (generalization caution) | Reduces bias but needs early stopping to avoid overfitting | [Watch](https://www.youtube.com/results?search_query=Boosting%20%28generalization%20caution%29%20explained) |
+| 19 | Learning Curves | Plot train vs. validation loss to diagnose over/underfitting | [Watch](https://www.youtube.com/results?search_query=Learning%20Curves%20explained) |
+| 20 | Bias-Variance Tradeoff Analysis | Balance underfitting vs. overfitting | [Watch](https://www.youtube.com/results?search_query=Bias-Variance%20Tradeoff%20Analysis%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>6. Hyperparameter Tuning</h2></summary>
+
+**Why here:** Now that you can build and validate a model, you optimize it. Doing this before generalization would mean tuning a model you don't even know is trustworthy.
+
+**Unlocks:** A properly optimized classical model — the ceiling of "shallow" ML.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Grid Search | Exhaustively try every combination of parameters in a defined grid | [Watch](https://www.youtube.com/results?search_query=Grid%20Search%20explained) |
+| 2 | Random Search | Randomly sample parameter combinations, often faster than grid search | [Watch](https://www.youtube.com/results?search_query=Random%20Search%20explained) |
+| 3 | Bayesian Optimization (Optuna, Hyperopt) | Use past trial results to intelligently pick the next parameters to try | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Optimization%20%28Optuna%2C%20Hyperopt%29%20explained) |
+| 4 | Hyperband / Successive Halving | Allocate more resources to promising configurations early | [Watch](https://www.youtube.com/results?search_query=Hyperband%20/%20Successive%20Halving%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>7. Bayesian Methods</h2></summary>
+
+**Why here:** These round out classical ML with probabilistic reasoning — still shallow/interpretable models, the last stop before neural networks.
+
+**Unlocks:** Full classical ML toolkit. At this point classical models plateau on complex data — this limitation is why you need Deep Learning next.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Bayesian Networks | Model probabilistic dependencies between variables using a directed graph | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Networks%20explained) |
+| 2 | Gaussian Processes | Model a distribution over functions for probabilistic regression | [Watch](https://www.youtube.com/results?search_query=Gaussian%20Processes%20explained) |
+| 3 | Naive Bayes (Bayesian use) | Classify using Bayes' theorem with a simplifying independence assumption | [Watch](https://www.youtube.com/results?search_query=Naive%20Bayes%20%28Bayesian%20use%29%20explained) |
+| 4 | Markov Chain Monte Carlo (MCMC) | Sample from complex probability distributions to estimate posteriors | [Watch](https://www.youtube.com/results?search_query=Markov%20Chain%20Monte%20Carlo%20%28MCMC%29%20explained) |
+| 5 | Bayesian Linear Regression | Regression that outputs a distribution over predictions, not just a point estimate | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Linear%20Regression%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>8. Association Rule Mining</h2></summary>
+
+**Why here:** Pattern-mining rounds out classical ML — still a shallow, interpretable technique, one of the last stops before neural networks.
+
+**Unlocks:** Full classical ML toolkit. This limitation on complex data (images, text, sequences) is exactly why Deep Learning is needed next.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | Apriori | Find frequent itemsets and generate association rules (e.g., market basket analysis) | [Watch](https://www.youtube.com/results?search_query=Apriori%20explained) |
+| 2 | FP-Growth | Faster frequent itemset mining without candidate generation, using a tree structure | [Watch](https://www.youtube.com/results?search_query=FP-Growth%20explained) |
+| 3 | Eclat | Mine frequent itemsets using a vertical data format and set intersections | [Watch](https://www.youtube.com/results?search_query=Eclat%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>9. Deep Learning</h2></summary>
 
 **Why here:** Classical ML can't automatically learn features from raw pixels, audio, or long text sequences — you'd have to hand-engineer them. Deep Learning solves this by learning features directly from raw data, but it needs everything before it (clean data, evaluation, regularization) to avoid massively overfitting on its huge parameter count.
 
@@ -164,7 +293,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>4. Computer Vision</h2></summary>
+<summary><h2>10. Computer Vision</h2></summary>
 
 **Why here:** These are DL architectures specialized for images — you need to understand CNNs (from Deep Learning) before understanding detection (YOLO) or segmentation (U-Net) built on top of them.
 
@@ -213,26 +342,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>5. Time Series</h2></summary>
-
-**Why here:** Statistical forecasting (ARIMA) can be learned early, but LSTM-based forecasting depends on understanding RNN/LSTM from Deep Learning.
-
-**Unlocks:** The ability to forecast sequences with trend and seasonality.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | ARIMA | Forecast based on autoregression, differencing, and moving average | [Watch](https://www.youtube.com/results?search_query=ARIMA%20explained) |
-| 2 | SARIMA | ARIMA extended to handle seasonality | [Watch](https://www.youtube.com/results?search_query=SARIMA%20explained) |
-| 3 | Prophet | Forecasting model handling trend, seasonality, and holidays automatically | [Watch](https://www.youtube.com/results?search_query=Prophet%20explained) |
-| 4 | Exponential Smoothing (Holt-Winters) | Weight recent observations more for forecasting | [Watch](https://www.youtube.com/results?search_query=Exponential%20Smoothing%20%28Holt-Winters%29%20explained) |
-| 5 | LSTM/GRU for Forecasting | Capture long-range temporal patterns for prediction | [Watch](https://www.youtube.com/results?search_query=LSTM/GRU%20for%20Forecasting%20explained) |
-| 6 | Moving Average | Smooth a series to reveal underlying trend | [Watch](https://www.youtube.com/results?search_query=Moving%20Average%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>6. NLP-specific</h2></summary>
+<summary><h2>11. NLP-specific</h2></summary>
 
 **Why here:** Transformers (from Deep Learning) are the backbone; this stage applies them specifically to text.
 
@@ -252,7 +362,26 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>7. Recommendation Systems</h2></summary>
+<summary><h2>12. Time Series</h2></summary>
+
+**Why here:** Statistical forecasting (ARIMA) can be learned early, but LSTM-based forecasting depends on understanding RNN/LSTM from Deep Learning.
+
+**Unlocks:** The ability to forecast sequences with trend and seasonality.
+
+| S.No | Algorithm | Description | YouTube |
+|---|---|---|---|
+| 1 | ARIMA | Forecast based on autoregression, differencing, and moving average | [Watch](https://www.youtube.com/results?search_query=ARIMA%20explained) |
+| 2 | SARIMA | ARIMA extended to handle seasonality | [Watch](https://www.youtube.com/results?search_query=SARIMA%20explained) |
+| 3 | Prophet | Forecasting model handling trend, seasonality, and holidays automatically | [Watch](https://www.youtube.com/results?search_query=Prophet%20explained) |
+| 4 | Exponential Smoothing (Holt-Winters) | Weight recent observations more for forecasting | [Watch](https://www.youtube.com/results?search_query=Exponential%20Smoothing%20%28Holt-Winters%29%20explained) |
+| 5 | LSTM/GRU for Forecasting | Capture long-range temporal patterns for prediction | [Watch](https://www.youtube.com/results?search_query=LSTM/GRU%20for%20Forecasting%20explained) |
+| 6 | Moving Average | Smooth a series to reveal underlying trend | [Watch](https://www.youtube.com/results?search_query=Moving%20Average%20explained) |
+
+</details>
+
+
+<details>
+<summary><h2>13. Recommendation Systems</h2></summary>
 
 **Why here:** Basic collaborative filtering is classical, but Neural Collaborative Filtering needs neural network fundamentals from Deep Learning.
 
@@ -270,102 +399,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>8. Generalization / Avoiding Overfitting</h2></summary>
-
-**Why here:** A model can score well on training data and still fail in the real world. This stage teaches you to detect and prevent that trap — critical before models get more complex (deep learning overfits far more easily).
-
-**Unlocks:** The discipline needed before trusting any larger model.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | Train/Validation/Test Split | Hold out data to measure real-world performance | [Watch](https://www.youtube.com/results?search_query=Train/Validation/Test%20Split%20explained) |
-| 2 | Cross-Validation (K-Fold, Stratified, LOO) | Validate robustly across multiple splits | [Watch](https://www.youtube.com/results?search_query=Cross-Validation%20%28K-Fold%2C%20Stratified%2C%20LOO%29%20explained) |
-| 3 | Data Augmentation | Synthetically expand training data variety | [Watch](https://www.youtube.com/results?search_query=Data%20Augmentation%20explained) |
-| 4 | SMOTE / Under/Oversampling | Rebalance classes to avoid biased learning | [Watch](https://www.youtube.com/results?search_query=SMOTE%20/%20Under/Oversampling%20explained) |
-| 5 | L1 Regularization (Lasso) | Shrink and zero-out less useful feature weights | [Watch](https://www.youtube.com/results?search_query=L1%20Regularization%20%28Lasso%29%20explained) |
-| 6 | L2 Regularization (Ridge) | Shrink weights smoothly to reduce overfitting | [Watch](https://www.youtube.com/results?search_query=L2%20Regularization%20%28Ridge%29%20explained) |
-| 7 | ElasticNet | Combine L1 + L2 regularization | [Watch](https://www.youtube.com/results?search_query=ElasticNet%20explained) |
-| 8 | Pruning (Decision Trees) | Cut back tree branches to reduce overfitting | [Watch](https://www.youtube.com/results?search_query=Pruning%20%28Decision%20Trees%29%20explained) |
-| 9 | Max Depth / Min Samples Leaf | Constrain tree size to limit memorization | [Watch](https://www.youtube.com/results?search_query=Max%20Depth%20/%20Min%20Samples%20Leaf%20explained) |
-| 10 | Dropout (generalization use) | Randomly drop neurons to prevent co-adaptation | [Watch](https://www.youtube.com/results?search_query=Dropout%20%28generalization%20use%29%20explained) |
-| 11 | Batch Normalization (generalization use) | Stabilizes training, mild regularizing effect | [Watch](https://www.youtube.com/results?search_query=Batch%20Normalization%20%28generalization%20use%29%20explained) |
-| 12 | Early Stopping | Stop training when validation performance stops improving | [Watch](https://www.youtube.com/results?search_query=Early%20Stopping%20explained) |
-| 13 | Weight Decay | Penalize large weights during optimization | [Watch](https://www.youtube.com/results?search_query=Weight%20Decay%20explained) |
-| 14 | Label Smoothing | Soften target labels to reduce overconfidence | [Watch](https://www.youtube.com/results?search_query=Label%20Smoothing%20explained) |
-| 15 | Gradient Clipping | Cap gradients to prevent unstable training | [Watch](https://www.youtube.com/results?search_query=Gradient%20Clipping%20explained) |
-| 16 | Noise Injection | Add noise to inputs/weights to improve robustness | [Watch](https://www.youtube.com/results?search_query=Noise%20Injection%20explained) |
-| 17 | Bagging (generalization use) | Reduce variance by averaging diverse models | [Watch](https://www.youtube.com/results?search_query=Bagging%20%28generalization%20use%29%20explained) |
-| 18 | Boosting (generalization caution) | Reduces bias but needs early stopping to avoid overfitting | [Watch](https://www.youtube.com/results?search_query=Boosting%20%28generalization%20caution%29%20explained) |
-| 19 | Learning Curves | Plot train vs. validation loss to diagnose over/underfitting | [Watch](https://www.youtube.com/results?search_query=Learning%20Curves%20explained) |
-| 20 | Bias-Variance Tradeoff Analysis | Balance underfitting vs. overfitting | [Watch](https://www.youtube.com/results?search_query=Bias-Variance%20Tradeoff%20Analysis%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>9. Feature Engineering / Preprocessing</h2></summary>
-
-**Why here:** Raw data from EDA still isn't model-ready — categories need encoding, scales need normalizing. Models fail or perform poorly without this.
-
-**Unlocks:** Clean, numeric, scaled input any algorithm can consume.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | StandardScaler (Z-score scaling) | Rescale features to mean 0, std 1 so no feature dominates due to scale | [Watch](https://www.youtube.com/results?search_query=StandardScaler%20%28Z-score%20scaling%29%20explained) |
-| 2 | MinMax Scaling | Rescale features to a fixed range, typically 0 to 1 | [Watch](https://www.youtube.com/results?search_query=MinMax%20Scaling%20explained) |
-| 3 | Robust Scaling | Scale using median/IQR, resistant to outliers | [Watch](https://www.youtube.com/results?search_query=Robust%20Scaling%20explained) |
-| 4 | One-Hot Encoding | Convert categorical values into binary columns for ML models | [Watch](https://www.youtube.com/results?search_query=One-Hot%20Encoding%20explained) |
-| 5 | Label Encoding | Convert categories into integer codes | [Watch](https://www.youtube.com/results?search_query=Label%20Encoding%20explained) |
-| 6 | Target Encoding | Encode categories using the mean of the target variable | [Watch](https://www.youtube.com/results?search_query=Target%20Encoding%20explained) |
-| 7 | Binning/Discretization | Convert continuous values into discrete buckets | [Watch](https://www.youtube.com/results?search_query=Binning/Discretization%20explained) |
-| 8 | Log/Box-Cox Transform | Transform skewed data to be closer to normal distribution | [Watch](https://www.youtube.com/results?search_query=Log/Box-Cox%20Transform%20explained) |
-| 9 | Polynomial Features | Generate interaction/higher-order terms to capture non-linearity | [Watch](https://www.youtube.com/results?search_query=Polynomial%20Features%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>10. Hyperparameter Tuning</h2></summary>
-
-**Why here:** Now that you can build and validate a model, you optimize it. Doing this before generalization would mean tuning a model you don't even know is trustworthy.
-
-**Unlocks:** A properly optimized classical model — the ceiling of "shallow" ML.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | Grid Search | Exhaustively try every combination of parameters in a defined grid | [Watch](https://www.youtube.com/results?search_query=Grid%20Search%20explained) |
-| 2 | Random Search | Randomly sample parameter combinations, often faster than grid search | [Watch](https://www.youtube.com/results?search_query=Random%20Search%20explained) |
-| 3 | Bayesian Optimization (Optuna, Hyperopt) | Use past trial results to intelligently pick the next parameters to try | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Optimization%20%28Optuna%2C%20Hyperopt%29%20explained) |
-| 4 | Hyperband / Successive Halving | Allocate more resources to promising configurations early | [Watch](https://www.youtube.com/results?search_query=Hyperband%20/%20Successive%20Halving%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>11. Model Evaluation Metrics</h2></summary>
-
-**Why here:** Once you have a model, you need to know if it's actually good. Without this, you can't tell a good model from a lucky/bad one.
-
-**Unlocks:** A way to judge every model you build from here on.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | Accuracy | Fraction of correct predictions out of total predictions | [Watch](https://www.youtube.com/results?search_query=Accuracy%20explained) |
-| 2 | Precision | Of predicted positives, how many were actually positive | [Watch](https://www.youtube.com/results?search_query=Precision%20explained) |
-| 3 | Recall (Sensitivity) | Of actual positives, how many were correctly predicted | [Watch](https://www.youtube.com/results?search_query=Recall%20%28Sensitivity%29%20explained) |
-| 4 | F1 Score | Harmonic mean of precision and recall | [Watch](https://www.youtube.com/results?search_query=F1%20Score%20explained) |
-| 5 | ROC-AUC | Measures ability to distinguish classes across all thresholds | [Watch](https://www.youtube.com/results?search_query=ROC-AUC%20explained) |
-| 6 | Confusion Matrix | Table showing true/false positives and negatives | [Watch](https://www.youtube.com/results?search_query=Confusion%20Matrix%20explained) |
-| 7 | RMSE (Root Mean Squared Error) | Measures average prediction error magnitude, penalizes large errors | [Watch](https://www.youtube.com/results?search_query=RMSE%20%28Root%20Mean%20Squared%20Error%29%20explained) |
-| 8 | MAE (Mean Absolute Error) | Measures average absolute prediction error | [Watch](https://www.youtube.com/results?search_query=MAE%20%28Mean%20Absolute%20Error%29%20explained) |
-| 9 | R² Score | Measures how much variance in target is explained by the model | [Watch](https://www.youtube.com/results?search_query=R%C2%B2%20Score%20explained) |
-| 10 | Log Loss | Penalizes confident wrong probability predictions in classification | [Watch](https://www.youtube.com/results?search_query=Log%20Loss%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>12. Explainability (XAI)</h2></summary>
+<summary><h2>14. Explainability (XAI)</h2></summary>
 
 **Why here:** You can only explain a model once it's complex enough to need explaining — Grad-CAM specifically requires a trained CNN to visualize.
 
@@ -384,7 +418,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>13. Transfer Learning / Fine-Tuning</h2></summary>
+<summary><h2>15. Transfer Learning / Fine-Tuning</h2></summary>
 
 **Why here:** Requires a pretrained deep model to already exist (from Deep Learning, CV, NLP) before you can reuse or adapt it.
 
@@ -401,7 +435,7 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 
 
 <details>
-<summary><h2>14. Self-Supervised / Contrastive Learning</h2></summary>
+<summary><h2>16. Self-Supervised / Contrastive Learning</h2></summary>
 
 **Why here:** This is an advanced pretraining strategy for deep models — you need to fully understand supervised DL first to appreciate why learning without labels is different/harder.
 
@@ -413,40 +447,6 @@ Each row: S.No | Algorithm | Description | YouTube (search link). Numbering rese
 | 2 | MoCo (Momentum Contrast) | Contrastive learning using a momentum-updated memory queue of negatives | [Watch](https://www.youtube.com/results?search_query=MoCo%20%28Momentum%20Contrast%29%20explained) |
 | 3 | BYOL | Learn representations without negative samples using two networks that predict each other | [Watch](https://www.youtube.com/results?search_query=BYOL%20explained) |
 | 4 | Masked Autoencoders (MAE) | Learn representations by reconstructing randomly masked parts of input | [Watch](https://www.youtube.com/results?search_query=Masked%20Autoencoders%20%28MAE%29%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>15. Association Rule Mining</h2></summary>
-
-**Why here:** Pattern-mining rounds out classical ML — still a shallow, interpretable technique, one of the last stops before neural networks.
-
-**Unlocks:** Full classical ML toolkit. This limitation on complex data (images, text, sequences) is exactly why Deep Learning is needed next.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | Apriori | Find frequent itemsets and generate association rules (e.g., market basket analysis) | [Watch](https://www.youtube.com/results?search_query=Apriori%20explained) |
-| 2 | FP-Growth | Faster frequent itemset mining without candidate generation, using a tree structure | [Watch](https://www.youtube.com/results?search_query=FP-Growth%20explained) |
-| 3 | Eclat | Mine frequent itemsets using a vertical data format and set intersections | [Watch](https://www.youtube.com/results?search_query=Eclat%20explained) |
-
-</details>
-
-
-<details>
-<summary><h2>16. Bayesian Methods</h2></summary>
-
-**Why here:** These round out classical ML with probabilistic reasoning — still shallow/interpretable models, the last stop before neural networks.
-
-**Unlocks:** Full classical ML toolkit. At this point classical models plateau on complex data — this limitation is why you need Deep Learning next.
-
-| S.No | Algorithm | Description | YouTube |
-|---|---|---|---|
-| 1 | Bayesian Networks | Model probabilistic dependencies between variables using a directed graph | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Networks%20explained) |
-| 2 | Gaussian Processes | Model a distribution over functions for probabilistic regression | [Watch](https://www.youtube.com/results?search_query=Gaussian%20Processes%20explained) |
-| 3 | Naive Bayes (Bayesian use) | Classify using Bayes' theorem with a simplifying independence assumption | [Watch](https://www.youtube.com/results?search_query=Naive%20Bayes%20%28Bayesian%20use%29%20explained) |
-| 4 | Markov Chain Monte Carlo (MCMC) | Sample from complex probability distributions to estimate posteriors | [Watch](https://www.youtube.com/results?search_query=Markov%20Chain%20Monte%20Carlo%20%28MCMC%29%20explained) |
-| 5 | Bayesian Linear Regression | Regression that outputs a distribution over predictions, not just a point estimate | [Watch](https://www.youtube.com/results?search_query=Bayesian%20Linear%20Regression%20explained) |
 
 </details>
 
