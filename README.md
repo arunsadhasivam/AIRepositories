@@ -31,3 +31,10 @@ https://github.com/arunsadhasivam/SystemDesign/blob/master/README.md
 https://github.com/arunsadhasivam/MLAlgorithms/blob/main/README.md
 
 https://www.kaggle.com/code/nezukokamaado/eda-practice
+
+
+Math:
+======
+
+https://www.linkedin.com/safety/go/?url=https%3A%2F%2Fhusseinmahdi%2Exyz%2Fwriting%2Fmath-behind-nn-2-2%2F&urlhash=37MT&mt=qNTqOZvnGK1coUTJ9Sv0a3cLXZuSXFx8ipQBA5Ci7rEM5eyLsgTAGU1ZSdf5DkOn4IWzux4vy1VJu00sxDv-aYJAeg6g-zN31vvXHCwLplggG37gBosXcZmG&isSdui=true
+
