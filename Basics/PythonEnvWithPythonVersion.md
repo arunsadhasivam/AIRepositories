@@ -23,4 +23,4 @@ NOTE:
  - so if multiple version explicitly say pip3.11 or plan to install in python set in path just say
 
        pip install -r requirements.txt
- - also aware the python 3.11 only available in the venv PYTHON_CUDA_GPU_HOME
+ - also aware the python 3.11 only available in the venv PYTHON_CUDA_GPU_HOME other venv uses system path set python version.
