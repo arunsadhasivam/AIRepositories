@@ -28,5 +28,5 @@ NOTE:
  - whereas if venv PYTHON_CUDA_GPU_HOME has default 3.10(windows system environment path variable) and 3.11 .you need to explicitly
    say pip3.11 or pip3.10,   if you have both installed in venv  . if not specify explicitly ,it will install in python 3.10 path.
    
- - Aware if not use pip3.11 for your project which uses venv PYTHON_CUDA_GPU_HOME  wont have modules installed for 3.11 it will install on
+ - Aware if not use pip3.11 where project venv(PYTHON_CUDA_GPU_HOME) uses python 3.11 wont have modules installed for 3.11 it will install on
    default pip3.10 python version.
