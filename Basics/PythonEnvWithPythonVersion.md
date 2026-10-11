@@ -10,7 +10,7 @@ python3.11 -m venv PYTHON_CUDA_GPU_HOME
 
   C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts>activate
   
-  ## go to venv supported with  python 3.11
+  ## go to venv supported with  python 3.11 - important
   
   (PYTHON_CUDA_GPU_HOME)>pip3.11 install -r requirements.txt
 
@@ -18,13 +18,15 @@ python3.11 -m venv PYTHON_CUDA_GPU_HOME
 NOTE:
 =====
 
- - if system path has python older version if not specifically say pip3.11 it default install
-   all packages to default older python version.
- - so if multiple version explicitly say pip3.11 or plan to install in python set in path just say
+ - if system env path has python older version(python 3.10) if not specifically say pip3.11 it default install on python 3.10
+  
+ - so if your venv has multiple version explicitly say pip3.11 or python version 3.10 in system path env variable.
 
-       pip install -r requirements.txt
- - also aware the python 3.11 only available in the venv PYTHON_CUDA_GPU_HOME other venv uses system path set python version.
-   e.g if you python 3.10 for other venv it uses python 3.10 only. 
+       - pip install -r requirements.txt # will install on python 3.10
+       - pip3.11 install -r requirements.txt # will install on python 3.11
 
- - whereas venv PYTHON_CUDA_GPU_HOME has default 3.10(windows system environment path variable) and 3.11 so need to explicitly
-   say pip3.11 or pip3.10,   if you have both installed in venv.
+ - whereas if venv PYTHON_CUDA_GPU_HOME has default 3.10(windows system environment path variable) and 3.11 .you need to explicitly
+   say pip3.11 or pip3.10,   if you have both installed in venv  . if not specify explicitly ,it will install in python 3.10 path.
+   
+ - Aware if not use pip3.11 for your project which uses venv PYTHON_CUDA_GPU_HOME  wont have modules installed for 3.11 it will install on
+   default pip3.10 python version.
