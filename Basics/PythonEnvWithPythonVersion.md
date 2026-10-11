@@ -24,3 +24,6 @@ NOTE:
 
        pip install -r requirements.txt
  - also aware the python 3.11 only available in the venv PYTHON_CUDA_GPU_HOME other venv uses system path set python version.
+   e.g if you python 3.10 for other venv it uses python 3.10 only. whereas venv PYTHON_CUDA_GPU_HOME has
+   default 3.10 and 3.11 so need to explicitly say pip3.11 or pip3.10(default in system path environment variable of windows)
+   if you have both installed in venv.
