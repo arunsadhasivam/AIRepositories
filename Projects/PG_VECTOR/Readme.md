@@ -119,6 +119,22 @@ Step 1: main project:
 ```    
 
 
+ORDER:
+======
+
+1) ollama
+2) redis
+3) SOLR
+4) celery
+5) RAGUI
+6) in VSS run the LOCAL_RAG_REST_API
+
+**so that you can track the result in vss ( vector search call) else mistake multiple instance created vss LOCAL_RAG_REST_API wont get the 
+trigger**
+
+<img width="1010" height="245" alt="image" src="https://github.com/user-attachments/assets/d752d75c-97e4-4c56-b988-45721072a577" />
+
+
 LOCAL_RAG:
 ==========
 
