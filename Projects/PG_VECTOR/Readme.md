@@ -97,6 +97,16 @@ Step 1: main project:
 =====================
 
 
+ - Start in vscode, easy to debug
+```
+  C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts>activate
+  (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python app.py
+```
+
+- start in terminal since just UI
+
+```
+
     C:\Arun\PythonEnv\PYTHON_CUDA_GPU_HOME\Scripts>activate
   
     (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG>streamlit run RAGUI.py
@@ -106,7 +116,7 @@ Step 1: main project:
     Local URL: http://localhost:8501
     Network URL: http://10.0.0.218:8501
 
-    (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python app.py
+```    
 
 
 LOCAL_RAG:
