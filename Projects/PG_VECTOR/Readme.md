@@ -106,7 +106,7 @@ Step 1: main project:
     Local URL: http://localhost:8501
     Network URL: http://10.0.0.218:8501
 
-
+    (PYTHON_CUDA_GPU_HOME) C:\WorkSpace\LOCAL_RAG_REST_API>python app.py
 
 
 LOCAL_RAG:
@@ -141,6 +141,7 @@ Running logs:
 
 rest api
 =========
+<img width="2520" height="1152" alt="image" src="https://github.com/user-attachments/assets/5c2cc0a2-70a3-41da-8ef0-24cfa19eb2bf" />
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7e50e647-73cf-4d38-88d9-e9350f7d311f" />
 <img width="3815" height="2122" alt="image" src="https://github.com/user-attachments/assets/d2c586d9-85c6-4df8-ac19-b4f2ea5c6222" />
