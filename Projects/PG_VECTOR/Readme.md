@@ -187,7 +187,15 @@ Normal User - update RAG knowledge store:
 =========================================
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/dd2129d6-3aa1-449b-8251-de91e328fdc9" />
 
+
+
+<img width="3782" height="1337" alt="image" src="https://github.com/user-attachments/assets/720f1394-d91a-4161-a245-3c82aa49d0e2" />
+<img width="1987" height="1410" alt="image" src="https://github.com/user-attachments/assets/b7926ee0-5af7-44d4-9768-cc245b0f99fb" />
+<img width="3665" height="1867" alt="image" src="https://github.com/user-attachments/assets/f427c391-4054-4820-aac6-986d5ffe96f6" />
+
+
 Retrieve result from cache:
 ============================
+
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/18a981f0-391b-474f-821d-fb3c5049abb8" />
