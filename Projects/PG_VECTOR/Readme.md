@@ -134,6 +134,10 @@ trigger**
 
 <img width="1176" height="466" alt="image" src="https://github.com/user-attachments/assets/87b8bd3c-aec0-445c-a012-79a8882c8d01" />
 
+Different Retriever Results:
+===============================
+
+https://github.com/arunsadhasivam/AIRepositories/blob/master/Projects/PG_VECTOR/RetrieverResult.md
 
 LOCAL_RAG:
 ==========
