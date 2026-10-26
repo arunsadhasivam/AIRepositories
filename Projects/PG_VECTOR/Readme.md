@@ -127,7 +127,7 @@ ORDER:
 3) SOLR
 4) celery
 5) RAGUI
-6) in VSS run the LOCAL_RAG_REST_API
+6) in VSS run the LOCAL_RAG_REST_API (rest.bat)
 
 **so that you can track the result in vss ( vector search call) else mistake multiple instance created vss LOCAL_RAG_REST_API wont get the 
 trigger**
