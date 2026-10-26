@@ -24,15 +24,14 @@ class GraphState(TypedDict):
 class GraphRouter:
     ICD_PATTERN = re.compile(r'\b[A-Z]\d{2}(\.\d{1,4})?\b')
     DRUG_SUFFIXES = (
-        "mg", "mcg", "dosage", "tablet", "capsule", "injection",
-        "syrup", "antibiotic", "vaccine", "insulin"
+       "java", "spring", "hibernate", "webservices",
+        "API", "development", "AEM", "snaplogic"
     )
 
     CLASSIFIER_PROMPT = PromptTemplate.from_template(
-        """You are a medical query classifier for a pediatric clinical RAG system.
+        """You are a resume query keyword searcher.
 Classify the query below into exactly one of these two categories:
-- diagnostic: query describes symptoms, signs, or conditions to identify a disease
-- vague: query is ambiguous, general, or unclear in clinical intent
+- vague: query is ambiguous, general, or unclear in reusme intent
 
 Query: {query}
 
@@ -40,9 +39,9 @@ Respond with only one word: diagnostic or vague"""
     )
 
     HYDE_PROMPT = PromptTemplate.from_template(
-        """You are a clinical knowledge assistant.
-Write a short hypothetical clinical document that would answer the following vague query.
-Be factual and use pediatric clinical language.
+        """You are a resume search assistant.
+Write a short resume  document that would answer the following vague query.
+Be factual and use technical language.
 
 Query: {query}
 
@@ -79,11 +78,11 @@ Hypothetical document:"""
             "hybrid_retriever": None,   # add this
         }
         final_state = self.rag_graph.invoke(initial_state)
-        logging.info(f":::::: FINAL RESPONSE AFTER LANGGRAPH ROUTING ::::::{final_state}")
+        logging.info(":::::: FINAL RESPONSE AFTER LANGGRAPH ROUTING ::::::")
         #return final_state["response"]
         return final_state["response"], final_state["hybrid_retriever"]  # return tuple
 
-    def build_rag_graph(self) -> StateGraph:
+    def complex_build_rag_graph(self) -> StateGraph:
         graph = StateGraph(GraphState)
         graph.add_node("rule_based_classifier", self.rule_based_classifier)
         graph.add_node("llm_classifier", self.llm_classifier)
@@ -114,6 +113,15 @@ Hypothetical document:"""
         graph.add_edge("vague_retrieval", END)
         return graph.compile()
 
+    def build_rag_graph(self) -> StateGraph:
+        graph = StateGraph(GraphState)  # create the graph using the state definition
+        graph.add_node("rule_based_classifier", self.rule_based_classifier)  # register the rule node
+        graph.add_node("diagnostic_retrieval", self.diagnostic_retrieval)  # register the hybrid retrieval node that sets response
+        graph.set_entry_point("rule_based_classifier")  # start at the rule node
+        graph.add_edge("rule_based_classifier", "diagnostic_retrieval")  # always go to hybrid retrieval, no branching
+        graph.add_edge("diagnostic_retrieval", END)  # finish after retrieval
+        return graph.compile()  # compile into a runnable graph
+
     def rule_based_classifier(self, state: GraphState) -> GraphState:
         query = state["query"].strip()
         words = query.split()
@@ -124,7 +132,7 @@ Hypothetical document:"""
             logging.info(":::::: RULE CLASSIFIER ? solr (ICD code detected) ::::::")
             return {**state, "query_type": "solr"}
         if any(suffix in query.lower() for suffix in self.DRUG_SUFFIXES):
-            logging.info(":::::: RULE CLASSIFIER ? solr (drug keyword detected) ::::::")
+            logging.info(":::::: RULE CLASSIFIER ? solr (resume keyword detected) ::::::")
             return {**state, "query_type": "solr"}
         logging.info(":::::: RULE CLASSIFIER ? passing to LLM classifier ::::::")
         return {**state, "query_type": "llm_classify"}
