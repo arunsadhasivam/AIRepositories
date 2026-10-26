@@ -132,7 +132,7 @@ ORDER:
 **so that you can track the result in vss ( vector search call) else mistake multiple instance created vss LOCAL_RAG_REST_API wont get the 
 trigger**
 
-<img width="1010" height="245" alt="image" src="https://github.com/user-attachments/assets/d752d75c-97e4-4c56-b988-45721072a577" />
+<img width="1176" height="466" alt="image" src="https://github.com/user-attachments/assets/87b8bd3c-aec0-445c-a012-79a8882c8d01" />
 
 
 LOCAL_RAG:
