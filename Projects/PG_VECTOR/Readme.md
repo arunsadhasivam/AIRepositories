@@ -179,6 +179,8 @@ rest api
 cosine retriever:
 =================
 
+<img width="2742" height="960" alt="image" src="https://github.com/user-attachments/assets/94758e9b-a98e-415e-ae94-68c711c5cb13" />
+
 
 hybrid:
 =======
