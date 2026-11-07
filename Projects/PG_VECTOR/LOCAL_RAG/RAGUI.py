@@ -144,7 +144,7 @@ class RAGUI:
                 "Search Strategy",
                 options=[s.value for s in SearchType]
             )
-            logging.info(f"::::: RAGUI CONTROLLER:{search_type}")
+            logging.info(f"::::: UI LAYER >:searchQuery:::{search_type}")
             # Query input
             query = st.text_input("Enter your query")
             #st.button("Search") 
@@ -166,7 +166,7 @@ class RAGUI:
                   # Convert datetime, Decimal, etc. to strings so display and logging never fail
                   safe_response = json.loads(json.dumps(response, default=str))
                   # Log only the first 200 characters of the result
-                  logging.info("::::: RAGUI CONTROLLER :QUERY SUCCESS: %s", json.dumps(safe_response)[:200])
+                  logging.info("::::: UI LAYER >:QUERY SUCCESS: %s", json.dumps(safe_response)[:200])
                   # If it is a list or dict, show it as JSON
                   if isinstance(safe_response, (list, dict)):
                     # Render the structure as an expandable JSON view
@@ -176,7 +176,7 @@ class RAGUI:
                     # Render the text as is
                     st.write(safe_response)
             except Exception as e:
-                logging.info(f"::::: RAGUI CONTROLLER  :QUERY ERROR: {str(e)}")
+                logging.info(f"::::: UI LAYER >:QUERY ERROR: {str(e)}")
                 st.text(f"Error in processing Query From Vector DB_ERROR:{str(e)} ")      
 
 

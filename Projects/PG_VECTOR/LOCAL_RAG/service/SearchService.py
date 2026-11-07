@@ -1,5 +1,6 @@
 # Service Layer
 import requests
+import time
 import logging
 from cache.RedisRagCache import RedisRagCache
 class SearchService:
@@ -10,7 +11,7 @@ class SearchService:
         self.cache = cache
 
     def route_embed(self,file_path,user,pwd):
-        logging.info(f'::::: SEARCHSERVICE:route_embed:BEGIN:file_path:{file_path} ,user={user}')
+        logging.info(f'::::: SERVICE LAYER >:route_embed:BEGIN:file_path:{file_path} ,user={user}')
         endPointQUery  = 'http://127.0.0.1:8080/embed'
         with open(file_path, 'rb') as file:
             file = {"file": (file_path, file)}
@@ -22,7 +23,7 @@ class SearchService:
         return response
 
     def searchQuery(self,query,search_type,user_role,pwd):
-        logging.info(f'::::: SEARCHSERVICE:searchQuery::::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
+        logging.info(f'::::: SERVICE LAYER >:searchQuery::::{query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
        
         if query:
             querykey = query+'_'+search_type
@@ -31,14 +32,18 @@ class SearchService:
                 result = cached["result"]
                 logging.info(f"::::: RETURNED FROM REDIScache:::::::::::::::::::{result}")
                 return result
-        
+            start_time = time.perf_counter()
+            logging.info(f":::::::::::::::::::: DB LAYER CALL > VECTOR DB SEARCH BEGIN ::::::::::::::::::::")
             endPointQUery  = 'http://127.0.0.1:8080/query?query='+query
             result = requests.post(endPointQUery,headers={"Content-Type": "application/json"},json={'query':query,'search_type':search_type,'user_role':user_role,'pwd':pwd})
             try:
                 response = result.json().get('message')
             except Exception as e:
                 return "No Result Found"
-            
+    
+            end_time = time.perf_counter()
+            time_taken = end_time - start_time
+            logging.info(f":::::::::::::::::::: DB LAYER CALL > VECTOR DB SEARCH END > INFERENCE TIME TAKEN: {time_taken}::::::::::::::::::::")
             if response:
                 logging.info(f'::::: Controller:response:::{response}')
                 self.cache.set(querykey, None, response)  # or store embedding+result later

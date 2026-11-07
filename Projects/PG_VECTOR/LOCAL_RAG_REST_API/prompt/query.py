@@ -88,7 +88,7 @@ def getPgVectorStore(user_role,pwd):
         pg_vector_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={user_role} password={pwd}"
         pg_vector_admin_dsn = f"host={DB_HOST} port={DB_PORT} dbname={DB_NAME} user={DB_SUPERUSER} password={DB_SUPERUSER_PWD}"
 
-        logging.info(f":::::: PG_VECTOR CONNECTION:::::{pg_vector_dsn}")
+        logging.info(f":::::: PG_VECTOR_DB_CONNECTION LAYER > CONNECTION:::::{pg_vector_dsn}")
         #db = get_vector_db(user_role,pwd)
         pgVectorStore = PgVectorStore(
                 connection_string=pg_vector_dsn,
@@ -103,7 +103,7 @@ def getPgVectorStore(user_role,pwd):
 
 # Main function to handle the query process
 def query(query,search_type,user_role,pwd):
-    logging.info("-----------------------PROMPT.QUERY BEGIN--------------------------------------")
+    logging.info("-----------------------VECTOR DB LAYER > :QUERY BEGIN--------------------------------------")
     """
     handle query and process input prompt using retriever (based on configured hybrid or cosine or other).
     Args:
@@ -128,7 +128,7 @@ def query(query,search_type,user_role,pwd):
             MathClassificationAgent.init()
             math_executor = MathClassificationAgent.create_math_agent(llm)
             # Set up the retriever to generate multiple queries using the language model and the query prompt
-            logging.info(f'::::: Query EXECUTION :{query} , search_type:{search_type},user_role={user_role},pwd={pwd}')
+            logging.info(f'::::: VECTOR DB LAYER > :Query EXECUTION :{query} , search_type:{search_type},user_role={user_role},pwd={pwd}')
             embedding_model = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
             #Step 1: vector store
             pgVectorStore = getPgVectorStore(user_role,pwd)
@@ -139,7 +139,7 @@ def query(query,search_type,user_role,pwd):
                 search_kwargs={"k": 5} 
             )
             response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
-            logging.info("-----------------------PROMPT.QUERY END--------------------------------------")
+            logging.info("-----------------------VECTOR DB LAYER > :QUERY END--------------------------------------")
 
             return response
     except Exception as e:
@@ -186,7 +186,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
         retriever, hybridRetriever = GraphBasedRetriever(query=query, search_type= search_type,vector_retriever=vectorRetriever,
                                            llm=llm,query_prompt=QUERY_PROMPT,prompt=prompt)
     else:
-        logging.info(':::::: COSINE SIMILARITY SEARCH :::::')
+        logging.info(':::::: RETRIEVER LAYER > :COSINE SIMILARITY SEARCH :::::')
         retriever = MultiQueryRetriever.from_llm(
             vectorRetriever.as_langchain_retriever(),
             llm,
@@ -199,7 +199,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     #     return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
     # response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
     response = getRetreiverResponseWithoutJudge(retriever,query)
-    logging.info(f':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
+    logging.info(f':::::: RETRIEVER LAYER > :RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
 
     return response
 
@@ -215,9 +215,9 @@ def getRetreiverResponseWithoutJudge(retriever,query):
         response
     """
     try:
-        logging.info(':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE :::::')
+        logging.info(':::::: RETRIEVER LAYER > :RESPONSE BEGIN WITHOUT JUDGE :::::')
         retrieved_docs = retriever.invoke(query)
-        logging.info(f':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS :::::{len(retrieved_docs)}')
+        logging.info(f':::::: RETRIEVER LAYER > RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS :::::{len(retrieved_docs)}')
         limited_docs = retrieved_docs[:5]
         #context = "\n\n".join([doc.page_content.split()[:500]  for doc in retrieved_docs])
         #context = "\n\n".join([doc.page_content[:3]  for doc in retrieved_docs])
@@ -229,7 +229,7 @@ def getRetreiverResponseWithoutJudge(retriever,query):
         )
         response = rag_chain.invoke({"context": context, "question": query})
     except Exception as e:
-        logging.error(f":::::: ERROR IN RETRIEVER RESPONSE :::::{str(e)}")
+        logging.error(f":::::: RETRIEVER LAYER > :ERROR IN RETRIEVER RESPONSE :::::{str(e)}")
         raise
     return response,retrieved_docs     
     
@@ -243,7 +243,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
     Returns:
         tuple: (response, output_result)
     """
-    logging.info(':::::: GUARD RAIL BEGIN :::::')
+    logging.info(':::::: GUARDRAIL LAYER > :GUARDRAIL RAIL BEGIN :::::')
     #prompt = langfuse.get_prompt("math_prompt")
     #math_prompt_template = langfuse.get_prompt("math_prompt",  label="latest")
     #logging.info(f'::::: MATH TEMPLATE :::::::math_prompt_template:{math_prompt_template}')
@@ -270,7 +270,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
         if is_valid_json(classification_response.strip()):
             classification_result = json.loads(classification_response.strip())
             requires_math = classification_result.get("REQUIRESMATH", False)
-            logging.warning(f"::::: JSON response missing 'REQUIRESMATH' field, defaulting to false: {classification_response}")
+            logging.warning(f"::::: GUARDRAIL LAYER > :JSON response missing 'REQUIRESMATH' field, defaulting to false: {classification_response}")
         else:
             requires_math = False
     except json.JSONDecodeError:
@@ -279,11 +279,11 @@ def getRetrieverAndGuadRailResponse(retriever,query):
 
     output_result = None  # add this    
     if requires_math:
-        logging.debug(':::::  LOCAL PYTHON MATH FUNCTION:::::::::::')
+        logging.debug('::::: TOOL CALL LAYER >:LOCAL PYTHON MATH FUNCTION:::::::::::')
         response = MathClassificationAgent.math(query)
         retrieved_docs = []  # add this
     else:
-        logging.debug('::::: OLLAMA RAG GENERATION:::::::::::::::')    
+        logging.debug('::::: TOOL CALL LAYER > :OLLAMA RAG GENERATION:::::::::::::::')    
         #chunk order stabilization - Deterministic Chunk Ordering for KV Cache Prefix Stability
         # similar to sort A-z alphabets in array based on alphabet value (a-0 ,z -26)
         # Same chunk content → same hash → same sort position → every time, guaranteed.
@@ -305,7 +305,7 @@ def getRetrieverAndGuadRailResponse(retriever,query):
 
         # as guadrail takes time - gpu VRAM usage didn't recover within timeout commented.
         #output_result = output_guardrail(query, retrieved_context_text, response)
-    logging.debug(f'::::: GUADRAIL RESPONSE:::::::::::::::')    
+    logging.debug(f'::::: GUARDRAIL LAYER > :GUADRAIL RESPONSE:::::::::::::::')    
     return response,output_result,retrieved_docs
 
 def is_valid_json(text):
@@ -319,7 +319,7 @@ def is_valid_json(text):
 def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs):
     # Step 2 — Retrieve docs separately for judge context
     try:
-        logging.info(':::::: JUDGE RESPONSE BEGIN :::::')
+        logging.info(':::::: JUDGE LAYER >:JUDGE RESPONSE BEGIN :::::')
         #docs = retriever.invoke(query)
         # Step 3 — Run judge pipeline
         judge_result = run_judge_pipeline(
@@ -331,16 +331,16 @@ def getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs
         )
         # Step 4 — Act on judge result
         if judge_result["status"] == "blocked":
-            logging.warning(f"::::: JUDGE BLOCKED RESPONSE: {judge_result['reason']}")
+            logging.warning(f"::::: JUDGE LAYER > :JUDGE BLOCKED RESPONSE: {judge_result['reason']}")
             response = "I could not generate a reliable answer for this query."
         elif judge_result["status"] == "low_confidence":
-            logging.warning(f"::::: JUDGE LOW CONFIDENCE: {judge_result['scores']}")
+            logging.warning(f"::::: JUDGE LAYER > :JUDGE LOW CONFIDENCE: {judge_result['scores']}")
             response = judge_result["answer"]   # return answer but logged as low confidence
         else:
-            logging.debug(f"::::: JUDGE PASSED: {judge_result['scores']}")
+            logging.debug(f"::::: JUDGE LAYER >:JUDGE PASSED: {judge_result['scores']}")
             response = judge_result["answer"]   # use judge-approved answer
         
-        logging.warning(f"::::: JUDGE ACCEPTED RESPONSE: {response}")
+        logging.warning(f"::::: JUDGE LAYER > :JUDGE ACCEPTED RESPONSE: {response}")
         return response
     except Exception as e:
         logging.error(f"::::: Error processing query: {str(e)}", exc_info=True)  # ← add exc_info=True
