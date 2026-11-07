@@ -59,7 +59,8 @@ TOP_K = os.getenv('TOP_K',default=5)
 #langfuse = Langfuse()
 
 ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
-llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
+context_window = os.getenv('CONTEXT_WINDOW', 8192)
+llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url,num_ctx=8192, temperature=0.2)
 # Get the prompt templates
 QUERY_PROMPT, prompt = get_prompt()
 answer_prompt = get_prompt_response()
@@ -204,34 +205,79 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     return response
 
 
-def getRetreiverResponseWithoutJudge(retriever,query):
+# Define the retriever function
+def getRetreiverResponseWithoutJudge(retriever, query):
     """
     Process the retriever response.
     Args:
         retriever: LangChain retriever instance
         query: Search query string
-        
+
     Returns:
-        response
+        response (str), docs_out (list of JSON-safe dicts)
     """
+    # Wrap everything so errors are logged before being re-raised
     try:
-        logging.info(':::::: RETRIEVER LAYER > :RESPONSE BEGIN WITHOUT JUDGE :::::')
+        # Log the start of the retrieval
+        logging.info(':::::: RETRIEVER LAYER > RESPONSE BEGIN WITHOUT JUDGE :::::')
+
+        # Fetch the matching documents from the vector store
         retrieved_docs = retriever.invoke(query)
-        logging.info(f':::::: RETRIEVER LAYER > RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS :::::{len(retrieved_docs)}')
+
+        # Log how many documents were retrieved
+        logging.info(':::::: RETRIEVER LAYER > RETRIEVED_DOCS COUNT: %s', len(retrieved_docs))
+
+        # Return early with a clear message when nothing was found, so the LLM is not called with an empty context
+        if not retrieved_docs:
+            # Log the empty result
+            logging.warning(':::::: RETRIEVER LAYER > NO DOCUMENTS FOUND')
+            # Return a friendly message and an empty docs list
+            return "No relevant documents found.", []
+
+        # Keep only the top 5 documents
         limited_docs = retrieved_docs[:5]
-        #context = "\n\n".join([doc.page_content.split()[:500]  for doc in retrieved_docs])
-        #context = "\n\n".join([doc.page_content[:3]  for doc in retrieved_docs])
-        context = "\n\n".join([" ".join(doc.page_content.split()[:5]) for doc in limited_docs])
+
+        # Build the context: up to 300 words from each document (was 5 words, which caused the junk output)
+        context = "\n\n".join(
+            # Take the first 300 words of the document and join them back into text
+            " ".join(doc.page_content.split()[:300])
+            # Loop over the top 5 documents
+            for doc in limited_docs
+        )
+
+        # Log the context size so you can confirm the model gets enough text
+        logging.info(':::::: RETRIEVER LAYER > CONTEXT WORDS: %s', len(context.split()))
+
+        # Build the chain: prompt -> model -> plain string output
         rag_chain = (
+            # Fill the prompt with context and question
             answer_prompt
+            # Send the filled prompt to the Ollama model
             | llm
+            # Convert the model output to a string
             | StrOutputParser()
         )
+
+        # Run the chain with the context and the user question
         response = rag_chain.invoke({"context": context, "question": query})
+
+        # Convert each Document to a plain dict so jsonify and st.json never fail
+        docs_out = [
+            # Keep the text and the metadata of each document
+            {"content": doc.page_content, "metadata": doc.metadata}
+            # Loop over all retrieved documents
+            for doc in retrieved_docs
+        ]
+
+    # Catch any error from retrieval or generation
     except Exception as e:
-        logging.error(f":::::: RETRIEVER LAYER > :ERROR IN RETRIEVER RESPONSE :::::{str(e)}")
+        # Log the full stack trace
+        logging.exception(':::::: RETRIEVER LAYER > ERROR IN RETRIEVER RESPONSE ::::: %s', e)
+        # Re-raise so the caller can handle it
         raise
-    return response,retrieved_docs     
+
+    # Return the answer and the JSON-safe documents
+    return response, docs_out
     
 def getRetrieverAndGuadRailResponse(retriever,query):
     """
