@@ -175,6 +175,19 @@ rest api
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/7e50e647-73cf-4d38-88d9-e9350f7d311f" />
 <img width="3815" height="2122" alt="image" src="https://github.com/user-attachments/assets/d2c586d9-85c6-4df8-ac19-b4f2ea5c6222" />
+
+cosine retriever:
+=================
+
+<img width="2742" height="960" alt="image" src="https://github.com/user-attachments/assets/94758e9b-a98e-415e-ae94-68c711c5cb13" />
+
+
+hybrid:
+=======
+
+<img width="3665" height="1852" alt="image" src="https://github.com/user-attachments/assets/270ec24f-5b89-4915-b0c1-9973ebc39b26" />
+<img width="3775" height="2032" alt="image" src="https://github.com/user-attachments/assets/977b953c-e315-498a-b5f5-09ef49e23192" />
+
  
 RLS:
 =====
