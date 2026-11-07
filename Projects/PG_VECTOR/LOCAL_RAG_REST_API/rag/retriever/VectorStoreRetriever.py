@@ -61,7 +61,7 @@ class VectorStoreRetriever(BaseRetriever):
         self.vector_store = vector_store
         self.embedding_model = embedding_model
         self.search_type = search_type
-        self.search_kwargs = search_kwargs or {}
+        self.search_kwargs = search_kwargs or {"k": 5} 
         
         logger.info(f"Initialized VectorStoreRetriever with {search_type} search")
     

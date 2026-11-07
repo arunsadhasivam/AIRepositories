@@ -17,7 +17,7 @@ from rag.guadrail.GuadRail import input_guardrail
 from rag.guadrail.GuadRail import output_guardrail
 from rag.guadrail.GuadRail import is_input_safe
 from rag.guadrail.GuadRail import is_output_safe
-from prompt.promptFactory import get_prompt
+from prompt.promptFactory import get_prompt,get_prompt_response
 from rag.kvcache.kvContext import getKVStableContext
 from prompt.router.graphRouter import GraphBasedRetriever, GraphRouter
 
@@ -62,6 +62,7 @@ ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
 llm = ChatOllama(model=LLM_MODEL,base_url=ollama_base_url)
 # Get the prompt templates
 QUERY_PROMPT, prompt = get_prompt()
+answer_prompt = get_prompt_response()
 MULTIQUERY_MAX_QUERY_GEN_LIMIT=os.getenv('MULTIQUERY_MAX_QUERY_GEN_LIMIT',2)
 
 
@@ -134,7 +135,8 @@ def query(query,search_type,user_role,pwd):
             vectorRetriever = VectorStoreRetriever(
                 vector_store=pgVectorStore,              # your existing Chroma/pgvector db
                 embedding_model=embedding_model,  # embedding model instance
-                search_type="similarity"
+                search_type="similarity",
+                search_kwargs={"k": 5} 
             )
             response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
             logging.info("-----------------------PROMPT.QUERY END--------------------------------------")
@@ -197,7 +199,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     #     return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
     # response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
     response = getRetreiverResponseWithoutJudge(retriever,query)
-    logging.info(f':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::{response}')
+    logging.info(f':::::: FINAL RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
 
     return response
 
@@ -215,12 +217,13 @@ def getRetreiverResponseWithoutJudge(retriever,query):
     try:
         logging.info(':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE :::::')
         retrieved_docs = retriever.invoke(query)
-        logging.info(f':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS :::::')
+        logging.info(f':::::: RETRIEVER RESPONSE BEGIN WITHOUT JUDGE RETRIEVED_DOCS :::::{len(retrieved_docs)}')
+        limited_docs = retrieved_docs[:5]
         #context = "\n\n".join([doc.page_content.split()[:500]  for doc in retrieved_docs])
         #context = "\n\n".join([doc.page_content[:3]  for doc in retrieved_docs])
-        context = "\n\n".join([" ".join(doc.page_content.split()[:500]) for doc in retrieved_docs])
+        context = "\n\n".join([" ".join(doc.page_content.split()[:5]) for doc in limited_docs])
         rag_chain = (
-            prompt
+            answer_prompt
             | llm
             | StrOutputParser()
         )

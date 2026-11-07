@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import json
 load_dotenv()
 # if not os.environ.get("PHOENIX_WORKING_DIR"):
 #     os.environ["PHOENIX_WORKING_DIR"] = os.getenv('PHOENIX_TMP_DIR')
@@ -86,11 +87,14 @@ def route_query():
     logging.info(f'::::: REST API : route_query::::{search_query} , search_type:{search_type},user_role={user_role},pwd={pwd}' )
 
     response = query(search_query,search_type,user_role,pwd)
-    #logging.info(f'::::: APP:response:::'+response )
-     
-
+  
     if response:
-        return jsonify({"message": response}), 200
+        safe_response = json.loads(json.dumps(response, default=str))
+        if isinstance(safe_response, list): 
+          logging.info('::::: APP:response:::%s', len(safe_response))
+        else:
+            logging.info('::::: APP:response::: RESPONSE IS NOT A LIST', safe_response[0:5])
+        return jsonify({"message": safe_response}), 200
 
     return jsonify({"error": "Something went wrong"}), 400
 

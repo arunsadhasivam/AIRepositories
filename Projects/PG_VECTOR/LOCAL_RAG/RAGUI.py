@@ -148,15 +148,36 @@ class RAGUI:
             # Query input
             query = st.text_input("Enter your query")
             #st.button("Search") 
+            response = None
             try :
                 if query and st.button("Search"):
                   user_role = 'app_admin' if self.isAdmin(st.session_state.username) else 'app_user'
                   response =   self.controller.searchQuery(query,search_type,user_role,st.session_state.password)
-                  logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS:{response}")
-                  st.write(response)
+                   # If it is an HTTP Response object, try to parse its JSON body
+                  if hasattr(response, "json"):
+                    try:
+                        # Parse the body into a list or dict
+                        response = response.json()
+                        # If the body is not valid JSON, fall back to plain text
+                    except ValueError:
+                        # if no context match response
+                        response = response.text
+
+                  # Convert datetime, Decimal, etc. to strings so display and logging never fail
+                  safe_response = json.loads(json.dumps(response, default=str))
+                  # Log only the first 200 characters of the result
+                  logging.info("::::: RAGUI CONTROLLER :QUERY SUCCESS: %s", json.dumps(safe_response)[:200])
+                  # If it is a list or dict, show it as JSON
+                  if isinstance(safe_response, (list, dict)):
+                    # Render the structure as an expandable JSON view
+                    st.write(safe_response)
+                    # Otherwise it is plain text
+                  else:
+                    # Render the text as is
+                    st.write(safe_response)
             except Exception as e:
-                logging.info(f"::::: RAGUI CONTROLLER  :QUERY SUCESS: {str(e)}")
-                st.text(f"Error in processing Query From Vector DB:help ")      
+                logging.info(f"::::: RAGUI CONTROLLER  :QUERY ERROR: {str(e)}")
+                st.text(f"Error in processing Query From Vector DB_ERROR:{str(e)} ")      
 
 
         

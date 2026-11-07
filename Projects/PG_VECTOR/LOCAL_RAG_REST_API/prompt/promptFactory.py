@@ -27,4 +27,14 @@ def get_prompt():
     
     return QUERY_PROMPT, prompt
 
+def get_prompt_response():    
+    template = """Answer the question based ONLY on the following context:
+    {context}
+    Question: {question}
+    .Output only the answer.
+    """
+   
+    prompt = ChatPromptTemplate.from_template(template)
+    
+    return prompt
 
