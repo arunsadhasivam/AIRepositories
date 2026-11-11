@@ -1,0 +1,1 @@
+start cmd /k RAGUI_Log.bat

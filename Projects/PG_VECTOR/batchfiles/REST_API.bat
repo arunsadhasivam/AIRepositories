@@ -1,1 +1,1 @@
-start cmd /k rest.bat
+start cmd /k REST_LOG.bat
