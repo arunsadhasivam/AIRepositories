@@ -142,7 +142,7 @@ trigger**
 NOTE:
 ------
 
- - the *log.bat helps to log in text file as well as you can see command level log in RAG_UI.bat and REST_API.bat
+- log*.bat used for logging to text file adn *.bat for commandline result view.
 
 Different Retriever Results:
 ===============================
