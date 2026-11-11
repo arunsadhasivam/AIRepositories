@@ -134,6 +134,9 @@ trigger**
 
 <img width="1176" height="466" alt="image" src="https://github.com/user-attachments/assets/87b8bd3c-aec0-445c-a012-79a8882c8d01" />
 
+<img width="1742" height="363" alt="image" src="https://github.com/user-attachments/assets/a9f5cd40-d4c8-4388-bce5-7ccb0758eaca" />
+
+
 Different Retriever Results:
 ===============================
 
