@@ -139,6 +139,11 @@ trigger**
 <img width="2150" height="630" alt="image" src="https://github.com/user-attachments/assets/0ee3d5a8-f400-4036-96dc-a51851809062" />
 
 
+NOTE:
+------
+
+ - the *log.bat helps to log in text file as well as you can see command level log in RAG_UI.bat and REST_API.bat
+
 Different Retriever Results:
 ===============================
 
