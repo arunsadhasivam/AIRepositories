@@ -23,6 +23,8 @@ SKILLS:
 
 https://agentskills.io/home
 
+https://docs.nvidia.com/skills/skillevaluator
+
 System Design:
 ===============
 
