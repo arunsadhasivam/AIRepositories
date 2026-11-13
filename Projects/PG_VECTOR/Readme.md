@@ -82,7 +82,7 @@ Step5: Make sure you have not more than VRAM GPU laptop have:
 ===========================================================================
 
 - laptop have 6.9GB available out of (8GB) , so you can use only models in ollama less than 6.9gb
-- make sure your .env has parameter OLLAMA_GPU_LAYERS=-1  i.e use gpu if available else cpu.
+- ollama default run on GPU so make sure it run on GPU .
 
 
 **ollama used 3.2GB**
