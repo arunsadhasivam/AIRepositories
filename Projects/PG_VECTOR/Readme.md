@@ -77,6 +77,29 @@ Step 4:SOLR:
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/012ecbf8-eb4a-4657-bb30-d482c0332b0e" />
 
 
+
+Step5: Make sure you have not more than VRAM memory models:
+============================================================
+
+**ollama used 3.2GB**
+
+
+<img width="1617" height="232" alt="image" src="https://github.com/user-attachments/assets/56a882c5-9cda-4808-9784-7704c3813f9f" />
+
+<img width="2812" height="1362" alt="image" src="https://github.com/user-attachments/assets/5f6780f0-188f-40fa-8993-2c98d72226b2" />
+
+**CUDA RTX ADA USAGE**
+
+ 1) C:\Users\aruns>nvidia-smi
+
+<img width="1967" height="955" alt="image" src="https://github.com/user-attachments/assets/12bf1baf-46ac-4245-b1cf-55646d86f6de" />
+
+2) C:\Users\aruns>nvidia-smi -q -d memory
+
+<img width="1705" height="925" alt="image" src="https://github.com/user-attachments/assets/d9ebbde8-ec04-4e81-9b1c-08814198fa00" />
+
+ 
+
 </div>
 </p>
 </details>
