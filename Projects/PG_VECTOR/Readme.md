@@ -81,8 +81,9 @@ Step 4:SOLR:
 Step5: Make sure you have not more than VRAM GPU laptop have:
 ===========================================================================
 
-- laptop have 6.9GB available out of (8GB) , so you can use only models in ollama less than 6.9gb  and make sure your
-  ollama run on GPU.
+- laptop have 6.9GB available out of (8GB) , so you can use only models in ollama less than 6.9gb and
+  very important make sure **ollama run on GPU**. check whether GPU is in use.
+ 
 
 
 **ollama used 3.2GB**
