@@ -12,3 +12,6 @@ Hybrid Retriever Result:
 
 <img width="3665" height="1852" alt="image" src="https://github.com/user-attachments/assets/270ec24f-5b89-4915-b0c1-9973ebc39b26" />
 <img width="3775" height="2032" alt="image" src="https://github.com/user-attachments/assets/977b953c-e315-498a-b5f5-09ef49e23192" />
+
+<img width="2672" height="1250" alt="image" src="https://github.com/user-attachments/assets/5f719392-5a83-4395-a94e-6a4660fb9c84" />
+
