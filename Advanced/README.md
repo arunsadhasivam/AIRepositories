@@ -1,5 +1,7 @@
 # Production RAG Pipeline — 4-Layer Safety Model
 
+https://github.com/rohitg00/ai-engineering-from-scratch
+
 > **Core idea:** AI agents are powerful but dangerous without guardrails.
 > These 4 layers are what separates a demo from a production system.
 >
