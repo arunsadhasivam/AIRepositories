@@ -18,12 +18,18 @@ https://github.com/addyosmani/agent-skills
 
 https://github.com/hamzafarooq/claude-code-starter
 
+
+https://github.com/rohitg00/ai-engineering-from-scratch
+
 SKILLS:
 =======
 
 https://agentskills.io/home
 
 https://docs.nvidia.com/skills/skillevaluator
+
+
+
 
 System Design:
 ===============
