@@ -19,9 +19,11 @@ https://github.com/addyosmani/agent-skills
 https://github.com/hamzafarooq/claude-code-starter
 
 Good Learning Materials:
-========================
+=========================================
 
 https://github.com/rohitg00/ai-engineering-from-scratch
+
+https://github.com/calmrocks/ai-engineer-notebooks
 
 SKILLS:
 =======
