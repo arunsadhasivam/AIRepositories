@@ -27,3 +27,11 @@ C:\LANGFUSE\langfuse>docker compose up -d
  ✔ Container langfuse-langfuse-web-1     Started                                                                   7.2s
  ✔ Container langfuse-langfuse-worker-1  Started                                                                   7.0s
 ```
+
+
+C:\WorkSpace\RAG\langfuse\.env.dev-redis-cluster.example
+
+DIRECT_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse"
+DATABASE_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse"
+REDIS_PORT=6380
+
