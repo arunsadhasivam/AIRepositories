@@ -1,4 +1,5 @@
-pip config list -v
+
+## pip config list -v
 
 ```
 PYTHON_CUDA_GPU_HOME) C:\WorkSpace\RAG\LOCAL_RAG_REST_API>pip config list -v
