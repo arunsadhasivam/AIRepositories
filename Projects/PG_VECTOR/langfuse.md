@@ -110,3 +110,14 @@ Result:
 =======
 
 <img width="3775" height="525" alt="image" src="https://github.com/user-attachments/assets/a6bf2692-b1f1-4d09-ad7e-cc6b667f33f5" />
+
+
+Change the db:
+================
+
+```
+C:\WorkSpace\RAG\langfuse\.env.dev-redis-cluster.example
+DIRECT_URL="postgresql+psycopg2://admin:admin@localhost:5432/
+DATABASE_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse"
+
+```
