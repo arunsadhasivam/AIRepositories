@@ -150,4 +150,4 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
 
 CREATE DATABASE langfuse;
 ```
-<img width="3790" height="597" alt="image" src="https://github.com/user-attachments/assets/bb09a303-f069-444a-a729-ace4dbb9e558" />
+<img width="3777" height="552" alt="image" src="https://github.com/user-attachments/assets/ba54c91f-34c8-4a9c-bdb8-eb4997e3b3e6" />
