@@ -152,3 +152,5 @@ CREATE DATABASE langfuse;
 ```
 
 <img width="3792" height="630" alt="image" src="https://github.com/user-attachments/assets/c3343f77-adfd-478d-a456-dbdc97a2f81f" />
+
+<img width="3605" height="2005" alt="image" src="https://github.com/user-attachments/assets/a0a4256a-76aa-4323-9687-bbf6974c66e3" />
