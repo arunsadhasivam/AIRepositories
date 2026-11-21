@@ -116,8 +116,38 @@ Change the db:
 ================
 
 ```
+using postgresql+psycopg2 not in docker one installed manually for vector db Rag
+
 C:\WorkSpace\RAG\langfuse\.env.dev-redis-cluster.example
-DIRECT_URL="postgresql+psycopg2://admin:admin@localhost:5432/
+DIRECT_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse
 DATABASE_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse"
 
+REDIS_PORT=6380
+change the redisport , since docker has cluster.
+
+REDIS_CLUSTER_ENABLED="true"
+REDIS_CLUSTER_NODES="127.0.0.1:6370,127.0.0.1:6371,127.0.0.1:6372,127.0.0.1:6373,127.0.0.1:6374,127.0.0.1:6375"
+
+
+in docker-compose.yml
+======================
+
+redis:
+    image: docker.io/redis:7
+    restart: always
+    # CHANGEME: row below to secure redis password
+    command: >
+      --requirepass ${REDIS_AUTH:-myredissecret}
+      --maxmemory-policy noeviction
+    ports:
+      - 127.0.0.1:6380:6380
+
+docker one will be like , original one pointing to new docker instance installation
+since installing as manuall gives option to open sql editor.
+
+DIRECT_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+
+CREATE DATABASE langfuse;
 ```
+<img width="3790" height="597" alt="image" src="https://github.com/user-attachments/assets/bb09a303-f069-444a-a729-ace4dbb9e558" />
