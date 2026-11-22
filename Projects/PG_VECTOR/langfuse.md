@@ -75,3 +75,13 @@ LANGFUSE SETUP WORKING:
 
 
 <img width="3792" height="2037" alt="image" src="https://github.com/user-attachments/assets/83f532fa-15b7-430a-b958-367e41a1fdee" />
+
+Langfuse:
+=========
+
+![Uploading image.png…]() 
+
+ 
+<img width="3827" height="2105" alt="image" src="https://github.com/user-attachments/assets/c06084ea-bb3f-4932-aa0e-1c6ab9fcac63" />
+
+<img width="3722" height="2132" alt="image" src="https://github.com/user-attachments/assets/fcf9d0b5-16b1-4aba-8e5e-f6eb74243d5b" />
