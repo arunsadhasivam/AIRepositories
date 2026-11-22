@@ -264,6 +264,5 @@ Langfuse
 
 https://github.com/arunsadhasivam/AIRepositories/blob/master/Projects/PG_VECTOR/langfuse.md
 
-<img width="2535" height="900" alt="image" src="https://github.com/user-attachments/assets/ae82faf2-5867-4371-966e-7f943b39696d" />
+<img width="3740" height="1817" alt="image" src="https://github.com/user-attachments/assets/ae2b3381-e445-41b7-8021-6a58e43c17db" />
 
-<img width="3722" height="2132" alt="image" src="https://github.com/user-attachments/assets/b5e72224-482d-4835-982f-c62f79575b9b" />
