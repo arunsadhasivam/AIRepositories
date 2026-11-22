@@ -53,103 +53,6 @@ go to langfuse project and remove service.
 C:\WorkSpace\RAG\langfuse\docker-compose.yml
 
 
-```
-  # redis:
-  #   image: docker.io/redis:7
-  #   restart: always
-  #   # CHANGEME: row below to secure redis password
-  #   command: >
-  #     --requirepass ${REDIS_AUTH:-myredissecret}
-  #     --maxmemory-policy noeviction
-  #   ports:
-  #     - 127.0.0.1:6379:6379
-  #   volumes:
-  #     - langfuse_redis_data:/data
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 3s
-  #     timeout: 10s
-  #     retries: 10
- # postgres:
-  #   image: docker.io/postgres:${POSTGRES_VERSION:-17}
-  #   restart: always
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
-  #     interval: 3s
-  #     timeout: 3s
-  #     retries: 10
-  #   environment:
-  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres} # CHANGEME
-  #     POSTGRES_DB: ${POSTGRES_DB:-postgres}
-  #     TZ: UTC
-  #     PGTZ: UTC
-  #   ports:
-  #     - 127.0.0.1:5432:5432
-  #   volumes:
-  #     - langfuse_postgres_data:/var/lib/postgresql/data
-
-
-remove dependency:
-
-langfuse-worker:
-    image: docker.langfuse.com/langfuse/langfuse-worker:${LANGFUSE_IMAGE_TAG:-4}
-    restart: always
-    depends_on: &langfuse-depends-on
-      postgres:
-     #   condition: service_healthy
-      minio:
-        condition: service_healthy
-      #redis:
-      #  condition: service_healthy
-      clickhouse:
-
-```
-
-Result:
-=======
-
-<img width="3775" height="525" alt="image" src="https://github.com/user-attachments/assets/a6bf2692-b1f1-4d09-ad7e-cc6b667f33f5" />
-
-
-Change the db:
-================
-
-```
-using postgresql+psycopg2 not in docker one installed manually for vector db Rag
-
-C:\WorkSpace\RAG\langfuse\.env.dev-redis-cluster.example
-DIRECT_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse
-DATABASE_URL="postgresql+psycopg2://admin:admin@localhost:5432/langfuse"
-
-REDIS_PORT=6380
-change the redisport , since docker has cluster.
-
-REDIS_CLUSTER_ENABLED="true"
-REDIS_CLUSTER_NODES="127.0.0.1:6370,127.0.0.1:6371,127.0.0.1:6372,127.0.0.1:6373,127.0.0.1:6374,127.0.0.1:6375"
-
-
-in docker-compose.yml
-======================
-
-redis:
-    image: docker.io/redis:7
-    restart: always
-    # CHANGEME: row below to secure redis password
-    command: >
-      --requirepass ${REDIS_AUTH:-myredissecret}
-      --maxmemory-policy noeviction
-    ports:
-      - 127.0.0.1:6380:6380
-
-docker one will be like , original one pointing to new docker instance installation
-since installing as manuall gives option to open sql editor.
-
-DIRECT_URL="postgresql://postgres:postgres@localhost:5432/postgres"
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
-
-CREATE DATABASE langfuse;
-```
 
 <img width="3792" height="630" alt="image" src="https://github.com/user-attachments/assets/c3343f77-adfd-478d-a456-dbdc97a2f81f" />
 
@@ -159,6 +62,9 @@ CREATE DATABASE langfuse;
 
 <img width="3835" height="2132" alt="image" src="https://github.com/user-attachments/assets/e385886a-9aa5-48c3-8dc0-4c02772daa12" />
 
+
+LANGFUSE SETUP WORKING:
+=======================
 
 - works after changing the below
 - https://github.com/arunsadhasivam/AIRepositories/new/master/Projects/PG_VECTOR/langfuse/Readme.md
