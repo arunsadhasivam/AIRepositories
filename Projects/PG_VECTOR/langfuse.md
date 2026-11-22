@@ -69,4 +69,9 @@ LANGFUSE SETUP WORKING:
 - works after changing the below
 - follow this docker-compose.yml https://github.com/arunsadhasivam/AIRepositories/new/master/Projects/PG_VECTOR/langfuse/Readme.md
 
+- make sure the langfuse docker compose up shows the log as **"Ready to accept connections tcp"**
+
+<img width="2535" height="1942" alt="image" src="https://github.com/user-attachments/assets/dbca8594-24cb-464a-a6b4-ce46e186dfbe" />
+
+
 <img width="3792" height="2037" alt="image" src="https://github.com/user-attachments/assets/83f532fa-15b7-430a-b958-367e41a1fdee" />
