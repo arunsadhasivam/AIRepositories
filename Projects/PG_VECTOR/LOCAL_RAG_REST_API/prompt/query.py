@@ -26,21 +26,8 @@ import json
 import logging
 logging.basicConfig(level=logging.INFO)
 
-# import phoenix as px
-# from phoenix.client import Client
-# client = Client()
-#from langfuse.callback import CallbackHandler
-#from langfuse import Langfuse
-# initialize langfuse handler once
-# langfuse_handler = CallbackHandler(
-#     secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
-#     public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
-#     host=os.getenv("LANGFUSE_BASE_URL")
-# )
-
-# print("::::: LANGFUSE SK::::::", os.getenv("LANGFUSE_SECRET_KEY"))
-# print("::::: LANGFUSE PK:::::", os.getenv("LANGFUSE_PUBLIC_KEY"))
-# print("::::: LANGFUSE HOST:::::", os.getenv("LANGFUSE_BASE_URL"))
+from langfusetrace.LangfuseTracer import LangfuseTracer 
+LANGFUSE_TRACER = LangfuseTracer()
 
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral:7b-instruct-q2_K')
 GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
@@ -56,7 +43,6 @@ SOLR_PORT = os.getenv('SOLR_PORT',default=8983)
 SOLR_CORE = os.getenv('SOLR_CORE',default='rag_core')
 
 TOP_K = os.getenv('TOP_K',default=5)
-#langfuse = Langfuse()
 
 ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
 context_window = os.getenv('CONTEXT_WINDOW', 8192)
@@ -66,23 +52,6 @@ QUERY_PROMPT, prompt = get_prompt()
 answer_prompt = get_prompt_response()
 MULTIQUERY_MAX_QUERY_GEN_LIMIT=os.getenv('MULTIQUERY_MAX_QUERY_GEN_LIMIT',2)
 
-
-def verify_langfuse():
-    check = langfuse.auth_check()
-    logging.info(f"::::: Langfuse auth check: {check}")
-    return check
-#verify_langfuse()
-
-def get_langfuse_prompt(name: str) -> PromptTemplate:
-    # pull prompt from Langfuse UI
-    prompt = langfuse.get_prompt(name)
-    # compile with variable
-    template = prompt.compile(query="{{query}}")
-    # convert to LangChain PromptTemplate
-    return PromptTemplate(
-        input_variables=["query"],
-        template=prompt.prompt  # raw template string
-    )
 
 
 def getPgVectorStore(user_role,pwd):
@@ -141,6 +110,7 @@ def query(query,search_type,user_role,pwd):
             )
             response =  configureAndProcessRetriever(query, search_type,  vectorRetriever)
             logging.info("-----------------------VECTOR DB LAYER > :QUERY END--------------------------------------")
+            LANGFUSE_TRACER.trace(name="query-complete", model=LLM_MODEL, input={"query": query, "search_type": search_type}, output={"response": str(response)}) 
 
             return response
     except Exception as e:
@@ -186,6 +156,8 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
         )
         retriever, hybridRetriever = GraphBasedRetriever(query=query, search_type= search_type,vector_retriever=vectorRetriever,
                                            llm=llm,query_prompt=QUERY_PROMPT,prompt=prompt)
+        LANGFUSE_TRACER.trace(name="retriever-setup", model=LLM_MODEL, input={"query": query, "search_type": search_type}, output={"retriever": str(retriever), "hybridRetriever": str(hybridRetriever)}) 
+
     else:
         logging.info(':::::: RETRIEVER LAYER > :COSINE SIMILARITY SEARCH :::::')
         retriever = MultiQueryRetriever.from_llm(
@@ -201,6 +173,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     # response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
     response = getRetreiverResponseWithoutJudge(retriever,query)
     logging.info(f':::::: RETRIEVER LAYER > :RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
+    LANGFUSE_TRACER.trace(name="retriever-response", model=LLM_MODEL, input={"query": query, "search_type": search_type}, output={"response": str(response)})
 
     return response
 
