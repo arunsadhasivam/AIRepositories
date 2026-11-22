@@ -2,6 +2,7 @@ import os
 import logging
 from cache.RedisRagCache import RedisRagCache
 import logging
+logging.basicConfig(level=logging.INFO)
 from service.SearchService import SearchService
 
 class SearchController:    

@@ -145,7 +145,7 @@ def check_celery():
 # ── check Langfuse is running ──
 def langufse_check():
     try:
-        isSuccess =LANGFUSE_TRACER.isAuth()
+        isSuccess =LANGFUSE_TRACER.langufse_check()
         if isSuccess:
             # Log how many workers responded
             logging.info(f"::::: HEALTH CHECK — LANGFUSE      : UP ✅")

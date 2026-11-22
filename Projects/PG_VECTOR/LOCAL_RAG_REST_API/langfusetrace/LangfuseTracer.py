@@ -22,8 +22,9 @@ class LangfuseTracer:
             secret_key=LANGFUSE_SECRET_KEY,  # secret key from the config above
             base_url=LANGFUSE_BASE_URL,  # Langfuse server URL
         )
-    
-    def isAuth(self):   
+
+    #check if langfuse is connected and keys are valid
+    def langufse_check(self):
         try:
             # Calls the server once to check URL and keys
             self.langfuse.auth_check()
@@ -33,8 +34,8 @@ class LangfuseTracer:
         except Exception as e:
             # Shows the exception type and message, which tells the cause
             logging.error(f"Langfuse failed: {type(e).__name__}: {e}")
-            return False
-            
+            return False    
+              
     # Call this method after each LLM call to log it
     def trace(self, name, model, input, output, input_tokens=0, output_tokens=0, user_id=None, session_id=None):
         # Why: propagate_attributes (v4+) applies user and session ids to everything created inside it
