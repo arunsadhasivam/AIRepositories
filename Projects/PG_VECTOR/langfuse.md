@@ -67,6 +67,6 @@ LANGFUSE SETUP WORKING:
 =======================
 
 - works after changing the below
-- https://github.com/arunsadhasivam/AIRepositories/new/master/Projects/PG_VECTOR/langfuse/Readme.md
+- follow this docker-compose.yml https://github.com/arunsadhasivam/AIRepositories/new/master/Projects/PG_VECTOR/langfuse/Readme.md
 
 <img width="3792" height="2037" alt="image" src="https://github.com/user-attachments/assets/83f532fa-15b7-430a-b958-367e41a1fdee" />
