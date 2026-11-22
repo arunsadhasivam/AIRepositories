@@ -73,7 +73,7 @@ def getPgVectorStore(user_role,pwd):
 
 # Main function to handle the query process
 def query(query,search_type,user_role,pwd):
-    logging.info("-----------------------VECTOR DB LAYER > :QUERY BEGIN--------------------------------------")
+    logging.info("-----------------------VECTOR DB LAYER > : QUERY BEGIN--------------------------------------")
     """
     handle query and process input prompt using retriever (based on configured hybrid or cosine or other).
     Args:
@@ -172,7 +172,7 @@ def configureAndProcessRetriever(query,search_type,vectorRetriever):
     #     return 'OUTPUT :'+GUADRAIL_WARNING_MESSAGE
     # response =  getJudgeResponse(retriever,hybridRetriever,query,response,llm,retrieved_docs)
     response = getRetreiverResponseWithoutJudge(retriever,query)
-    logging.info(f':::::: RETRIEVER LAYER > :RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
+    logging.info(f':::::: RETRIEVER LAYER > : RESPONSE AFTER VECTOR SEARCH :::::{len(response)}')
     LANGFUSE_TRACER.trace(name="retriever-response", model=LLM_MODEL, input={"query": query, "search_type": search_type}, output={"response": str(response)})
 
     return response

@@ -176,8 +176,8 @@ class RAGUI:
                   safe_response = json.loads(json.dumps(response, default=str))
                   # Log only the first 200 characters of the result
                   logging.info("::::: UI LAYER >:QUERY SUCCESS: %s", json.dumps(safe_response)[:200])
-                  LANGFUSE_TRACER.trace_event("UI_RESPONSE_TIME", {"query": query, "search_type": search_type, "user_role": user_role,"RESPONSE_TOKENS_SIZE": len(str(safe_response))})
-
+                  LANGFUSE_TRACER.trace_event(name="UI_RESPONSE_TIME", input={"query": query, "search_type": search_type, "user_role": user_role}, output={"RESPONSE_TOKENS_SIZE": len(str(safe_response))})
+                    
                   # If it is a list or dict, show it as JSON
                   if isinstance(safe_response, (list, dict)):
                     # Render the structure as an expandable JSON view
