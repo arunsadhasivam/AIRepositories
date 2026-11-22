@@ -78,19 +78,13 @@ LANGFUSE SETUP WORKING:
 Langfuse:
 =========
 
-dashboard
-<img width="3830" height="1272" alt="image" src="https://github.com/user-attachments/assets/f9a1c9d5-5104-4223-8015-88d89261196e" />
+ <img width="3820" height="1807" alt="image" src="https://github.com/user-attachments/assets/dea2b93e-f79b-4839-900a-bbbeb70b379c" />
 
+ <img width="3830" height="1547" alt="image" src="https://github.com/user-attachments/assets/80b60217-1918-4bb5-9c59-b68e8d35b9e6" />
 
-<img width="3777" height="1520" alt="image" src="https://github.com/user-attachments/assets/052e8ed5-8c4f-4538-9d6b-44db7a05cab7" />
+ <img width="3830" height="1557" alt="image" src="https://github.com/user-attachments/assets/2ec496fe-6a05-4147-826b-b36eabee7d68" />
 
-inference time:
+ <img width="3830" height="1732" alt="image" src="https://github.com/user-attachments/assets/b6b29012-9104-4c99-943b-6ec06d9ea015" />
 
-<img width="3837" height="1537" alt="image" src="https://github.com/user-attachments/assets/c23b7408-bed3-4c5a-bb62-14ada1eee786" />
+<img width="3785" height="2010" alt="image" src="https://github.com/user-attachments/assets/e0d049e0-d9bf-46f4-b0db-78c1d19e4069" />
 
-ui screen frontend
-
-<img width="3825" height="1377" alt="image" src="https://github.com/user-attachments/assets/36b777df-da35-4426-aff4-fb63cf3b2fd1" />
-
-retrieve phase
-<img width="3817" height="1840" alt="image" src="https://github.com/user-attachments/assets/3248a7d8-bd04-4855-a61d-d847219202f9" />
