@@ -79,5 +79,6 @@ LANGFUSE SETUP WORKING:
 Langfuse:
 =========
 
+<img width="2310" height="1480" alt="image" src="https://github.com/user-attachments/assets/5bdd39f7-2246-4d90-9ce4-d3cccb4e0917" />
 
-<img width="3830" height="1692" alt="image" src="https://github.com/user-attachments/assets/8c3fb6f1-f06f-4443-a241-d43be06e2593" />
+<img width="3830" height="1590" alt="image" src="https://github.com/user-attachments/assets/8f248ba0-a044-491b-89a7-334861377fb1" />
