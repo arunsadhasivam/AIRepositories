@@ -158,3 +158,62 @@ CREATE DATABASE langfuse;
 <img width="3750" height="1800" alt="image" src="https://github.com/user-attachments/assets/842d6b42-7cff-4d90-869a-5e611a33422a" />
 
 <img width="3835" height="2132" alt="image" src="https://github.com/user-attachments/assets/e385886a-9aa5-48c3-8dc0-4c02772daa12" />
+
+
+CODE:
+=====
+
+code to log events in langfuse.
+
+```
+
+
+
+# Why: one class keeps all Langfuse code in one place, so the rest of your app only calls tracer.trace(...)
+class LangfuseTracer:
+
+    # Create the client once when the class is created
+    def __init__(self):
+        # Why: get_client() reads the keys and URL from the environment variables
+        self.langfuse = get_client()
+
+    # Call this method after each LLM call to log it
+    def trace(self, name, model, input, output, input_tokens=0, output_tokens=0, user_id=None, session_id=None):
+        # Why: this creates one generation (LLM call) record in Langfuse
+        with self.langfuse.start_as_current_generation(
+            name=name,  # name shown in Langfuse
+            model=model,  # model name shown in the trace
+            input=input,  # prompt
+        ) as gen:
+            # Why: output and token usage are known only after the LLM responds
+            gen.update(
+                output=output,  # answer text
+                usage_details={"input": input_tokens, "output": output_tokens},  # token counts
+            )
+            # Why: user and session ids let you filter traces in the Langfuse UI
+            gen.update_trace(user_id=user_id, session_id=session_id)
+
+    # Call this when the app shuts down
+    def flush(self):
+        # Why: traces are sent in the background, so flush sends the remaining ones before exit
+        self.langfuse.flush()
+```
+
+ERROR:
+======
+
+```
+ImportError: cannot import name 'get_client' from 'langfusetrace' (unknown location)
+
+```
+
+
+Solution:
+=========
+
+Step 1:
+=======
+
+```
+pip install -U langfuse --index-url https://pypi.org/simple
+```
