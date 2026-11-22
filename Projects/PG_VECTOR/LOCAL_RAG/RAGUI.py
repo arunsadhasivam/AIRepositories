@@ -3,6 +3,13 @@ import streamlit as st
 import os
 import requests
 from enum import Enum
+
+#streamlit does not load env variable from .env file automatically, so we need to load it manually using python-dotenv
+#load  before service and controller are loaded, so that env variable can be used in service and controller.
+from pathlib import Path                    # to build an absolute path to .env
+from dotenv import load_dotenv 
+load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=True)  # .env next to RAGUI.py
+
 from controller.SearchController import SearchController
 from service.SearchService import SearchService
 from cache.RedisRagCache import RedisRagCache
@@ -15,8 +22,10 @@ import time
 import json 
 from datetime import datetime
 
-logging.basicConfig(level=logging.INFO)
 
+from langfusetrace.LangfuseTracer import LangfuseTracer 
+LANGFUSE_TRACER = LangfuseTracer()
+logging.basicConfig(level=logging.INFO)
 
 
 class RAGUI:
@@ -167,6 +176,8 @@ class RAGUI:
                   safe_response = json.loads(json.dumps(response, default=str))
                   # Log only the first 200 characters of the result
                   logging.info("::::: UI LAYER >:QUERY SUCCESS: %s", json.dumps(safe_response)[:200])
+                  LANGFUSE_TRACER.trace_event("UI_RESPONSE_TIME", {"query": query, "search_type": search_type, "user_role": user_role,"RESPONSE_TOKENS_SIZE": len(str(safe_response))})
+
                   # If it is a list or dict, show it as JSON
                   if isinstance(safe_response, (list, dict)):
                     # Render the structure as an expandable JSON view

@@ -3,6 +3,8 @@ import requests
 import time
 import logging
 from cache.RedisRagCache import RedisRagCache
+from langfusetrace.LangfuseTracer import LangfuseTracer 
+LANGFUSE_TRACER = LangfuseTracer()
 class SearchService:
     """Service layer to handle business logic."""
     #C:\Windows\System32\drivers\etc\hosts has localhost if used sometimes localhost not working.
@@ -47,6 +49,7 @@ class SearchService:
             end_time = time.perf_counter()
             time_taken = end_time - start_time
             logging.info(f":::::::::::::::::::: DB LAYER CALL > VECTOR DB SEARCH END > INFERENCE TIME TAKEN: {time_taken}::::::::::::::::::::")
+            LANGFUSE_TRACER.trace_event("INFERENCE_TIME", {"query": query, "search_type": search_type, "user_role": user_role, "inference_time": time_taken,"RESPONSE_TOKENS_SIZE": len(str(response))})
             if response:
                 logging.info(f"::::: SERVICE LAYER >:searchQuery::: FINAL response length={len(str(response))}")  # log the size instead of the whole response
                 self.cache.set(querykey, None, response)  # or store embedding+result later

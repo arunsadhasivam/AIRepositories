@@ -3,6 +3,9 @@ import sys
 import logging
 import requests
 import redis
+from langfusetrace.LangfuseTracer import LangfuseTracer 
+LANGFUSE_TRACER = LangfuseTracer()
+
 LLM_MODEL = os.getenv('LLM_MODEL', 'mistral:7b-instruct-q2_K')
 GUADRAIL_WARNING_MESSAGE=os.getenv('GUADRAIL_WARNING_MESSAGE')
 GUADRAIL_TOPIC_CONTENT=os.getenv('GUADRAIL_TOPIC_CONTENT')
@@ -100,7 +103,8 @@ def getAvailabilityStatus():
         "Solr"      : check_solr(),
         "Redis"     : check_redis(),
         "PostgreSQL": check_postgres(),
-        "Celery"    : check_celery()
+        "Celery"    : check_celery(),
+        "Langfuse"  : langufse_check()
     }
 
     # find any failed checks
@@ -135,4 +139,18 @@ def check_celery():
     except Exception:
         pass
     logging.error("::::: HEALTH CHECK — Celery        : DOWN ❌")
+    return False
+
+
+# ── check Langfuse is running ──
+def langufse_check():
+    try:
+        isSuccess =LANGFUSE_TRACER.isAuth()
+        if isSuccess:
+            # Log how many workers responded
+            logging.info(f"::::: HEALTH CHECK — LANGFUSE      : UP ✅")
+            return True
+    except Exception:
+        pass
+    logging.error("::::: HEALTH CHECK — LANGFUSE      : DOWN ❌")
     return False
