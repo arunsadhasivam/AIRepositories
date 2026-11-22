@@ -162,6 +162,7 @@ ORDER:
 4) celery
 5) RAGUI
 6) in VSS run the LOCAL_RAG_REST_API (rest.bat)
+7) Langfuse
 
 **so that you can track the result in vss ( vector search call) else mistake multiple instance created vss LOCAL_RAG_REST_API wont get the 
 trigger**
@@ -257,3 +258,11 @@ Retrieve result from cache:
 
 
 <img width="3840" height="2400" alt="image" src="https://github.com/user-attachments/assets/18a981f0-391b-474f-821d-fb3c5049abb8" />
+
+Langfuse
+=========
+
+https://github.com/arunsadhasivam/AIRepositories/blob/master/Projects/PG_VECTOR/langfuse.md
+
+<img width="2535" height="900" alt="image" src="https://github.com/user-attachments/assets/ae82faf2-5867-4371-966e-7f943b39696d" />
+
